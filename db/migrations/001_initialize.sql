@@ -9,20 +9,29 @@ CREATE TABLE albums(
   id            INTEGER PRIMARY KEY NOT NULL,
   title         TEXT NOT NULL,
   artist        INTEGER NOT NULL,
+  year          INTEGER DEFAULT 0 NOT NULL,
   FOREIGN KEY(artist) REFERENCES artists(id)
+);
+
+CREATE TABLE genres(
+  id    INTEGER PRIMARY KEY NOT NULL,
+  name  TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE songs(
   id            INTEGER PRIMARY KEY NOT NULL,
   title         TEXT NOT NULL,
   artist        INTEGER NOT NULL,
-  FOREIGN KEY(artist) REFERENCES artists(id)
+  genre         INTEGER NOT NULL,
+  FOREIGN KEY(artist) REFERENCES artists(id),
+  FOREIGN KEY(genre) REFERENCES genres(id)
 );
 
 CREATE TABLE plays(
-  date  INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  song  INTEGER NOT NULL,
-  album INTEGER NOT NULL,
+  date          INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  song          INTEGER NOT NULL,
+  album         INTEGER NOT NULL,
+  duration      INTEGER DEFAULT 0 NOT NULL,
   FOREIGN KEY (song) REFERENCES songs(id),
   FOREIGN KEY (album) REFERENCES albums(id)
 );

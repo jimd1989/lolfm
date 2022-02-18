@@ -1,33 +1,52 @@
 #!/usr/local/bin/csi -s
 
-(import (chicken io) (chicken process-context) srfi-1)
-
-; need to log albumartist
-; genre?
-; need placeholders for bad data
+(import (chicken io) (chicken process) (chicken string) srfi-1)
 
 (define-syntax λ (syntax-rules () ((_ . α) (lambda . α))))
+(define-syntax ∃ (syntax-rules () ((_ . α) (let* . α))))
 
 (define-constant FIFO "/tmp/fifo")
 
-(define (pairs xs)
-  (cond ((null? xs) '())
-        ((= (length xs) 1) '())
-        (else (append `((,(car xs) ,(cadr xs))) (pairs (cddr xs))))))
+(define-constant FIELDS
+  '(status duration title album artist albumartist genre date))
+
+(define-constant NUMERICAL '(duration date))
+
+(define-constant FALLBACK
+ '((status unknown)
+   (duration 0)
+   (title "Unknown Title")
+   (album "Unknown Album")
+   (artist "Unknown Artist")
+   (genre "None")
+   (date 0)))
+
+(define (parse-field x)
+  (∃ ((split (string-split x))
+      (words (if (string=? "tag" (car split)) (cdr split) split))
+      (key (string->symbol (car words)))
+      (val (cond ((eq? key 'status) (string->symbol (cadr words)))
+                 ((member key NUMERICAL) (string->number (cadr words)))
+                 ((member key FIELDS) (string-intersperse (cdr words) " "))
+                 (else 'invalid))))
+     (if (equal? val 'invalid) #f `(,key ,val))))
+
+(define (check-albumartist xs)
+  (if (assoc 'albumartist xs)
+      xs 
+      (append `((albumartist ,(cadr (assoc 'artist xs)))) xs)))
 
 (define (parse-fields xs)
-  (let* ((fields '(status artist album title))
-         (f (λ (x) (if (string=? "status" (car x))
-                            `(status ,(string->symbol (cadr x)))
-                            `(,(string->symbol (car x)) ,(cadr x)))))
-         (fs (map f (pairs xs))))
-    (filter (λ (x) (member (car x) fields)) fs)))
+  (∃ ((f (λ (α ω) (∃ ((ok (parse-field α))) (if ok (append `(,ok) ω) ω))))
+      (parsed (foldr f '() xs))
+      (compare (λ (α ω) (equal? (car α) (car ω)))))
+    (check-albumartist (lset-union compare parsed FALLBACK))))
 
-(define main
-  (let* ((fn (open-output-file FIFO))
-         (args (pairs (command-line-arguments)))
-         (fields (parse-fields (command-line-arguments)))
-         (event `(log ,fields)))
+(define (main)
+  (∃ ((fn (open-output-file FIFO))
+      (report (with-input-from-pipe "cmus-remote -Q" read-lines))
+      (fields (parse-fields report))
+      (event `(log ,fields)))
     (write event fn)
     (newline fn)
     (close-output-port fn)))
