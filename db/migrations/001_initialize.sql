@@ -10,7 +10,8 @@ CREATE TABLE albums(
   title         TEXT NOT NULL,
   artist        INTEGER NOT NULL,
   year          INTEGER DEFAULT 0 NOT NULL,
-  FOREIGN KEY(artist) REFERENCES artists(id)
+  FOREIGN KEY(artist) REFERENCES artists(id),
+  UNIQUE(title,artist)
 );
 
 CREATE TABLE genres(
@@ -24,7 +25,8 @@ CREATE TABLE songs(
   artist        INTEGER NOT NULL,
   genre         INTEGER NOT NULL,
   FOREIGN KEY(artist) REFERENCES artists(id),
-  FOREIGN KEY(genre) REFERENCES genres(id)
+  FOREIGN KEY(genre) REFERENCES genres(id),
+  UNIQUE(title,artist)
 );
 
 CREATE TABLE plays(
