@@ -1,7 +1,12 @@
 BEGIN TRANSACTION;
-  INSERT OR IGNORE INTO artists(name) VALUES('大友良英');        -- artist
-  INSERT OR IGNORE INTO artists(name) VALUES('Various Artists'); -- albumartist
-  INSERT OR IGNORE INTO genres(name) VALUES('Experimental');
+  INSERT INTO artists(name) VALUES('大友良英');        -- artist 
+  ON CONFLICT(name) DO UPDATE SET name=excluded.name;
+
+  INSERT INTO artists(name) VALUES('Various Artists'); -- albumartist
+  ON CONFLICT(name) DO UPDATE SET name=excluded.name;
+
+  INSERT INTO genres(name) VALUES('Experimental');
+  ON CONFLICT(name) DO UPDATE SET name=excluded.name;
 
   WITH album_artist AS (SELECT id FROM artists WHERE name='Various Artists')
   INSERT INTO albums(title, artist, year)

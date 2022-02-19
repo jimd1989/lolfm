@@ -2,7 +2,8 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE artists(
   id    INTEGER PRIMARY KEY NOT NULL,
-  name  TEXT NOT NULL UNIQUE
+  name  TEXT NOT NULL,
+  UNIQUE(name COLLATE NOCASE)
 );
 
 CREATE TABLE albums(
@@ -16,7 +17,8 @@ CREATE TABLE albums(
 
 CREATE TABLE genres(
   id    INTEGER PRIMARY KEY NOT NULL,
-  name  TEXT NOT NULL UNIQUE
+  name  TEXT NOT NULL,
+  UNIQUE(name COLLATE NOCASE)
 );
 
 CREATE TABLE songs(
@@ -40,14 +42,12 @@ CREATE TABLE plays(
 
 CREATE TABLE loved(
   date          INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  is_loved      BOOL NOT NULL,
   song          INTEGER NOT NULL,
   FOREIGN KEY(song) REFERENCES songs(id)
 );
 
 CREATE TABLE suppressed(
   date          INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  is_suppressed BOOL NOT NULL,
   artist        INTEGER NOT NULL,
   FOREIGN KEY(artist) REFERENCES artists(id)
 );
