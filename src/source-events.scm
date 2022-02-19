@@ -60,3 +60,40 @@
   (listen '()))
 
 (main)
+
+; this is running locally, so don't complain about injection.
+(define (log-play artist aartist album title genre year duration)
+  (apply ◇
+    `("BEGIN TRANSACTION;"
+      "INSERT INTO artists(name) VALUES('",artist"')"
+      "ON CONFLICT(name) DO UPDATE SET name=excluded.name;"
+
+      "INSERT INTO artists(name) VALUES('",aartist"')"
+      "ON CONFLICT(name) DO UPDATE SET name=excluded.name;"
+
+      "INSERT INTO genres(name) VALUES('",genre"')"
+      "ON CONFLICT(name) DO UPDATE SET name=excluded.name;"
+
+      "WITH album_artist AS (SELECT id FROM artists WHERE name='",aartist"')"
+      "INSERT INTO albums(title, artist, year)"
+      "VALUES('",album"', (SELECT id FROM album_artist), ",year")"
+      "ON CONFLICT(title, artist) DO UPDATE SET year=excluded.year;"
+
+      "WITH artist AS (SELECT id FROM artists WHERE name='",artist"'),"
+      "genre AS (SELECT id FROM genres WHERE name='",genre"')"
+      "INSERT INTO songs(title, artist, genre)"
+      "VALUES('",title"',(SELECT id FROM artist),(SELECT id FROM genre))"
+      "ON CONFLICT(title, artist) DO UPDATE SET genre=excluded.genre;"
+
+      "WITH song AS ("
+      "SELECT id FROM songs "
+      "WHERE artist=(SELECT id FROM artists WHERE name='",artist"')"
+      "AND title=('",title"')),"
+      "album AS ("
+      "SELECT id FROM albums "
+      "WHERE artist=(SELECT id FROM artists WHERE name='",aartist"')"
+      "AND title=('",album"'))"
+      "INSERT INTO plays(song, album, duration)"
+      "VALUES((SELECT id FROM song), (SELECT id FROM album), ",duration");"
+      "COMMIT;"
+      )))
