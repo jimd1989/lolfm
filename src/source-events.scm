@@ -6,63 +6,22 @@
   srfi-1)
 
 (define-syntax λ (syntax-rules () ((_ . α) (lambda . α))))
-(define ∘ compose) 
+(define-syntax ∃ (syntax-rules () ((_ . α) (let* . α))))
 (define ◇ conc)
 
 (define-constant DB "/tmp/db.db")
 (define-constant FIFO "/tmp/fifo")
 (define-constant MIGRATIONS "~/prog/misc/lolfm/db/migrations")
+(define-constant QUERY "/tmp/lolfm-query")
 
-(define (log args events)
-  (let ((event (car args)))
-    (append `(,event) events)))
-
-(define (dump events)
-  (write events)
-  (newline)
-  events)
-
-(define (clear) '())
-
-(define (dispatch cmd events)
-  (let ((type (car cmd))
-        (args (cdr cmd)))
-    (cond ((eq? type 'log) (log args events))
-          ((eq? type 'dump) (dump events))
-          ((eq? type 'clear) (clear))
-          ((eq? type 'love) '())
-          ((eq? type 'unlove) '())
-          ((eq? type 'suppress) '())
-          ((eq? type 'unsuppress) '()))))
-
-(define (drain events)
-  (let* ((fn (open-input-file FIFO))
-         (cmds (read-list fn)))
-    (close-input-port fn)
-    (foldr dispatch events cmds)))
-
-(define (listen events) (listen (drain events)))
-
-(define (migrate)
-  (let* ((cmd (◇ "ls " MIGRATIONS "/*.sql"))
-         (scripts (call-with-input-pipe cmd read-list))
-         (run-migration (λ (x) (system (◇ "sqlite3 " DB " < " x)))))
-    (for-each run-migration scripts)))
-
-(define (main)
-  (display (◇ "Creating/checking for " FIFO)) (newline)
-  (system (◇ "mkfifo " FIFO)) 
-  (display (◇ "Creating/checking for " DB)) (newline)
-  (system (◇ "touch " DB))
-  (display (◇ "Applying migration scripts from " MIGRATIONS)) (newline)
-  (migrate)
-  (display "Listening for events") (newline)
-  (listen '()))
-
-(main)
+(define (run-query x)
+  (∃ ((fn (open-output-file QUERY)))
+    (display x fn)
+    (close-output-port fn)
+    (system (◇ "sqlite3 " DB " < " QUERY))))
 
 ; this is running locally, so don't complain about injection.
-(define (log-play artist aartist album title genre year duration)
+(define (log-query artist aartist album title genre year duration)
   (apply ◇
     `("BEGIN TRANSACTION;"
       "INSERT INTO artists(name) VALUES('",artist"')"
@@ -97,3 +56,84 @@
       "VALUES((SELECT id FROM song), (SELECT id FROM album), ",duration");"
       "COMMIT;"
       )))
+
+(define (prepare-log-query x)
+  (∃ ((get (λ (α) (cadr (assoc α x))))
+      (ordered-fields '(artist albumartist album title genre date duration))
+      (args (map get ordered-fields)))
+    (run-query (apply log-query args))))
+
+(define (new-song? now prev)
+  (not (equal?
+         `(,(assoc 'artist now) ,(assoc 'album now) ,(assoc 'title now))
+         `(,(assoc 'artist prev) ,(assoc 'album prev) ,(assoc 'title prev)))))
+
+(define (log-event args events)
+  (∃ ((now (car args))
+      (now-status (cadr (assoc 'status now)))
+      (prev (if (null? events) '((status empty)) (car events)))
+      (prev-status (cadr (assoc 'status prev))))
+     (cond
+       ((and (eq? now-status 'playing) (eq? prev-status 'empty))
+        `(,now))
+       ((and (eq? now-status 'playing) (eq? prev-status 'playing))
+        (prepare-log-query prev)
+        `(,now))
+       ((and (eq? now-status 'paused) (eq? prev-status 'playing))
+        `(,now))
+       ((and (new-song? now prev)
+             (eq? now-status 'playing) (eq? prev-status 'paused))
+        (prepare-log-query prev)
+        `(,now))
+       ((and (eq? now-status 'playing) (eq? prev-status 'paused))
+        `(,now))
+       ((and (not (eq? now-status 'playing)) (eq? prev-status 'playing))
+        (prepare-log-query prev)
+        '())
+       (else events))))
+
+(define (dump events)
+  (write events)
+  (newline)
+  events)
+
+(define (clear) '())
+
+(define (dispatch input events)
+  (∃ ((cmd (if (and (list? input) (not (null? input))) input '(invalid)))
+      (type (car cmd))
+      (args (cdr cmd)))
+    (cond ((eq? type 'log) (log-event args events))
+          ((eq? type 'dump) (dump events))
+          ((eq? type 'clear) (clear))
+          ((eq? type 'love) events)
+          ((eq? type 'unlove) events)
+          ((eq? type 'suppress) events)
+          ((eq? type 'unsuppress) events)
+          (else events))))
+
+(define (drain events)
+  (∃ ((fn (open-input-file FIFO))
+      (cmds (read-list fn)))
+    (close-input-port fn)
+    (foldr dispatch events cmds)))
+
+(define (listen events) (listen (drain events)))
+
+(define (migrate)
+  (∃ ((cmd (◇ "ls " MIGRATIONS "/*.sql"))
+      (scripts (call-with-input-pipe cmd read-list))
+      (run-migration (λ (x) (system (◇ "sqlite3 " DB " < " x)))))
+    (for-each run-migration scripts)))
+
+(define (main)
+  (display (◇ "Creating/checking for " FIFO)) (newline)
+  (system (◇ "mkfifo " FIFO)) 
+  (display (◇ "Creating/checking for " DB)) (newline)
+  (system (◇ "touch " DB))
+  (display (◇ "Applying migration scripts from " MIGRATIONS)) (newline)
+  (migrate)
+  (display "Listening for events") (newline)
+  (listen '()))
+
+(main)
