@@ -38,4 +38,10 @@ wc -l < ~/.config/cmus/lib.pl | xargs seq | xargs -I {} ./dump-tags.sh > /tmp/du
 
 Each track is delimited with a silly `+===+` line, while the individual tags are newline buffered.
 
-The next step is to parse this text file into a sqlite database of every possible song. Then reference the entries in the last.fm dump against this.
+The next step is to parse this text file into a sqlite database of every possible song. Running
+
+```
+./conversion/to-tsv.scm dumped-tags > tracks.tsv
+```
+
+filters out all the irrelevant tags and returns a tsv of your entire library, ready to be loaded into the database.
