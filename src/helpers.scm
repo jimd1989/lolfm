@@ -11,7 +11,7 @@
   ((_ ▽ (α β ...) (ω ...)) (Λ ▽ (β ...) (ω ... α)))
   ((_ α ...) (Λ ▽ (α ...) ()))))
 
-(← ((◇ conc) (⊖ flip) (∘ compose) (∀ map) (↑ car) (⊣ cons)
+(← ((◇ conc) (⊖ flip) (∘ compose) (∀ map) (↑ car) (⊣ cons) (⊢ (⊖ ⊣))
     (↓ cdr) (I identity) ($ apply) (∈ (⊖ member)) (∅ '())))
 (← ((s→x string->symbol) (s→n string->number)
     (s→xs string-split) (xs→s string-intersperse)))

@@ -45,3 +45,19 @@ The next step is to parse this text file into a sqlite database of every possibl
 ```
 
 filters out all the irrelevant tags and returns a tsv of your entire library, ready to be loaded into the database.
+
+The TSV is loaded into the `library_dump` table (run all migration scripts first) through the sqlite shell with the following commands
+
+```
+.mode ascii
+.separator "\t" "\n"
+.import tracks.tsv library_dump
+```
+
+Importing with the advised `.mode tabs` setting causes all sorts of issues with escaping quotes. This appears to import without issue, assuming all tags are present in every row of the TSV. Adjust your script if they aren't.
+
+Do the same thing for the dumped last.fm tracks.
+
+```
+.import lastfm.tsv lastfm_dump
+```
