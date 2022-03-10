@@ -14,11 +14,16 @@ I used the `to-unix-epoch.sh` script to convert the date strings into unix times
 cat tsv | cut -d "    " -f 1 | xargs -I {} ~/prog/misc/lolfm/conversion/to-unix-epoch.sh "{}" > /tmp/timestamps
 ```
 
-I pasted this column to the front of the TSV.
+Might want to run it through `uniq` in the case of mistaken double logs. I found a few.
+
+The resolution on the dates in the XML also isn't good enough for very short songs to be converted to their proper Unix timestamp. Looking at you The Gerogerigegege. You might have to manually edit stamps like these because the SQL manipulation of some of this data will rely on unique timestamps. In Vim, you can highlight entire blocks of duplicate timestamp rows and `:! fix-timestamp.scm` them using the included Scheme script. This manual approach is good for the (hopefully few and contiguous) rows in the log with lots of matching stamps. For simple pairs of matching stamps, it's probably saner to import just the timestamp column into K, cast it to a row of integers `xs`, and run the following before exporting and pasting it back into the log.
 
 ```
+{$[x=y;x+1;x]}':xs
+
 paste -d "    " /tmp/timestamps tsv > ~/.config/cmus/new-tsv
 ```
+
 
 ## Comparing dump against local tags
 

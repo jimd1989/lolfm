@@ -150,7 +150,7 @@ perfect_matches AS (
   SELECT 
     library_dump.duration, library_dump.title, library_dump.album,
     library_dump.artist, library_dump.album_artist, library_dump.genre,
-    lastfm_dump.date  
+    lastfm_dump.date, 1 AS optimality
   FROM lastfm_dump
   JOIN library_dump ON (
     (library_dump.artist = lastfm_dump.artist COLLATE NOCASE) AND 
@@ -162,7 +162,7 @@ track_matches AS (
   SELECT
     library_tracks.duration, library_tracks.title, library_tracks.album,
     library_tracks.artist, library_tracks.album_artist, library_tracks.genre,
-    lastfm_tracks.date
+    lastfm_tracks.date, 2 AS optimality
   FROM lastfm_tracks
   JOIN library_tracks ON (
     (library_tracks.track = lastfm_tracks.track) AND
@@ -174,7 +174,7 @@ best_matches AS (
   SELECT
     ranked_albums.duration, ranked_albums.title, ranked_albums.album,
     ranked_albums.artist, ranked_albums.album_artist, ranked_albums.genre,
-    lastfm_dump.date  
+    lastfm_dump.date, 3 AS optimality
   FROM lastfm_dump
   JOIN ranked_albums
   ON (
@@ -187,19 +187,37 @@ misspelled_titles AS (
   SELECT
     library_tracks.duration, library_tracks.title, library_tracks.album,
     library_tracks.artist, library_tracks.album_artist, library_tracks.genre,
-    lastfm_tracks.date
+    lastfm_tracks.date, 4 AS optimality
   FROM lastfm_tracks
   JOIN library_tracks ON (
     (library_tracks.track = lastfm_tracks.track) AND
     (library_tracks.artist = lastfm_tracks.artist COLLATE NOCASE)
   )
 ),
--- orphans
--- need to enforce uniqueness over union
+fallback AS (
+  SELECT
+    0 AS duration, lastfm_dump.title, 'Unknown Album' AS album,
+    lastfm_dump.artist, lastfm_dump.artist AS album_artist,
+    'Unknown Genre' AS genre, lastfm_dump.date, 5 AS optimality
+  FROM lastfm_dump
+),
 all_matches AS (
   SELECT * FROM perfect_matches UNION 
   SELECT * FROM track_matches UNION
   SELECT * FROM best_matches UNION
-  SELECT * FROM misspelled_titles
+  SELECT * FROM misspelled_titles UNION
+  SELECT * FROM fallback
+),
+unique_matches AS (
+  SELECT duration, duration, title, album, artist, album_artist, genre, date
+  FROM (
+    SELECT ROW_NUMBER() OVER (PARTITION BY date ORDER BY optimality) AS rank, *
+    FROM all_matches
+  )
+  WHERE rank = 1
+),
+orphans AS (
+  SELECT * FROM lastfm_dump 
+  WHERE lastfm_dump.date NOT IN (SELECT date FROM unique_matches)
 )
-SELECT COUNT(duration) FROM all_matches;
+SELECT * FROM unique_matches;
