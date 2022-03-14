@@ -37,7 +37,8 @@ CREATE TABLE plays(
   album         INTEGER NOT NULL,
   duration      INTEGER DEFAULT 0 NOT NULL,
   FOREIGN KEY (song) REFERENCES songs(id),
-  FOREIGN KEY (album) REFERENCES albums(id)
+  FOREIGN KEY (album) REFERENCES albums(id),
+  UNIQUE(date)
 );
 
 CREATE TABLE loved(

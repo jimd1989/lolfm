@@ -66,3 +66,11 @@ Do the same thing for the dumped last.fm tracks.
 ```
 .import lastfm.tsv lastfm_dump
 ```
+
+There is also a table available for libre.fm tracks, whose dump comes in a slightly different CSV format. Import that and then add its rows to the `lastfm_dump` table.
+
+Once again, it is very important that every `date` timestamp be unique.
+
+Run the first query in `insert-from-library-dump.sql` to perform best guess matching of `lastfm_dump` against `library_dump`. If artists, song titles, and album titles all match, this is simple enough, but it will also attempt to join `lastfm_dump` rows missing an "album" field by considering song titles, inferred track position, etc. This can become tricky for artists with many live albums and accuracy is not guaranteed. If no match can be made whatsoever, the missing fields will be filled with durations of zero and placeholder text like "Unknown Album". The dump rows with extra library-provided info will be written to another table: `master_dump`.
+
+Run the second query in `insert-from-library-dump.sql` to write the contents of `master_dump` to the respective `plays`, `songs`, `albums`, `genres`, and `artists` tables. You can delete `library_dump`, `lastfm_dump`, and `librefm_dump` after this. Though you might want to record all the contents of `library_dump` to the `songs`/`artists`/etc tables for completeness' sake. This is an exercise left to the reader.
