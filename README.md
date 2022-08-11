@@ -6,6 +6,8 @@ Listens to cmus status and populates a sqlite database with playback data, like 
 
 Intended for people who know how to script/pipe/etc and query SQL. No support offered.
 
+[Demo here](http://dalrym.pl/lolfm.html)
+
 ## Setup 
 
 Requires Chicken Scheme version 5 and the srfi-1 egg.
@@ -53,4 +55,4 @@ See the `conversion` folder for notes on how I imported my last.fm data. This wa
 
 ## Analysis
 
-Write whatever SQL scripts you'd like and make cron jobs for them. I might add some of my own here later.
+Write whatever SQL scripts you'd like and make cron jobs for them. See the `queries` folder for examples. 

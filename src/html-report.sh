@@ -17,6 +17,10 @@ echo "<h2>Top Artists</h2>" >> /tmp/lolfm.html
 echo "<table>" >> /tmp/lolfm.html
 sqlite3 ~/.config/cmus/lolfm.db < ~/prog/misc/lolfm/db/queries/top-artists.sql >> /tmp/lolfm.html
 echo "</table>" >> /tmp/lolfm.html
+echo "<h2>Top Songs</h2>" >> /tmp/lolfm.html
+echo "<table>" >> /tmp/lolfm.html
+sqlite3 ~/.config/cmus/lolfm.db < ~/prog/misc/lolfm/db/queries/top-songs.sql >> /tmp/lolfm.html
+echo "</table>" >> /tmp/lolfm.html
 echo "<h2>Top Genres</h2>" >> /tmp/lolfm.html
 echo "<table>" >> /tmp/lolfm.html
 sqlite3 ~/.config/cmus/lolfm.db < ~/prog/misc/lolfm/db/queries/top-genres.sql >> /tmp/lolfm.html
