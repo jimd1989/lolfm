@@ -12,7 +12,7 @@ CREATE TABLE albums(
   artist        INTEGER NOT NULL,
   year          INTEGER DEFAULT 0 NOT NULL,
   FOREIGN KEY(artist) REFERENCES artists(id),
-  UNIQUE(title,artist)
+  UNIQUE(title COLLATE NOCASE,artist)
 );
 
 CREATE TABLE genres(
@@ -28,7 +28,7 @@ CREATE TABLE songs(
   genre         INTEGER NOT NULL,
   FOREIGN KEY(artist) REFERENCES artists(id),
   FOREIGN KEY(genre) REFERENCES genres(id),
-  UNIQUE(title,artist)
+  UNIQUE(title COLLATE NOCASE,artist)
 );
 
 CREATE TABLE plays(

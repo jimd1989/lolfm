@@ -5,7 +5,7 @@
 (define-syntax λ (syntax-rules () ((_ . α) (lambda . α))))
 (define-syntax ∃ (syntax-rules () ((_ . α) (let* . α))))
 
-(define-constant FIFO "/tmp/fifo")
+(define-constant FIFO "/tmp/lolfm-fifo")
 
 (define-constant FIELDS
   '(status duration title album artist albumartist genre date))
@@ -21,13 +21,22 @@
    (genre "None")
    (date 0)))
 
+(define (apostrophe-quote x)
+  (list->string
+    (foldr 
+      (λ (x acc) (if (char=? #\' x) (cons #\' (cons #\' acc)) (cons x acc)))
+      '()
+      (string->list x))))
+
+
 (define (parse-field x)
   (∃ ((split (string-split x))
       (words (if (string=? "tag" (car split)) (cdr split) split))
       (key (string->symbol (car words)))
       (val (cond ((eq? key 'status) (string->symbol (cadr words)))
                  ((member key NUMERICAL) (string->number (cadr words)))
-                 ((member key FIELDS) (string-intersperse (cdr words) " "))
+                 ((member key FIELDS) 
+                  (string-intersperse (map apostrophe-quote (cdr words)) " "))
                  (else 'invalid))))
      (if (equal? val 'invalid) #f `(,key ,val))))
 
@@ -42,13 +51,18 @@
       (compare (λ (α ω) (equal? (car α) (car ω)))))
     (check-albumartist (lset-union compare parsed FALLBACK))))
 
+(define (no-nonsense xs)
+  (foldl (λ (acc x) (or acc (string=? "tag" (car (string-split x))))) #f xs))
+
 (define (main)
   (∃ ((fn (open-output-file FIFO))
       (report (with-input-from-pipe "cmus-remote -Q" read-lines))
       (fields (parse-fields report))
       (event `(log ,fields)))
-    (write event fn)
-    (newline fn)
-    (close-output-port fn)))
+     (if (no-nonsense report)
+         (begin
+           (write event fn)
+           (newline fn)
+           (close-output-port fn)))))
 
 (main)

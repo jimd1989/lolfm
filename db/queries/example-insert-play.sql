@@ -15,13 +15,12 @@ BEGIN TRANSACTION;
 
   WITH artist AS (SELECT id FROM artists WHERE name='大友良英'),
        genre AS (SELECT id FROM genres WHERE name='Experimental')
-  INSERT INTO songs(title, artist, genre, duration)
+  INSERT INTO songs(title, artist, genre)
   VALUES('Cathode #4: Sound Check Version',
          (SELECT id FROM artist),
-         (SELECT id FROM genre),
-         325)
+         (SELECT id FROM genre))
   ON CONFLICT(title, artist)
-  DO UPDATE SET genre=excluded.genre, duration=excluded.duration;
+  DO UPDATE SET genre=excluded.genre;
 
   WITH song AS (
          SELECT id FROM songs 
@@ -31,6 +30,6 @@ BEGIN TRANSACTION;
           SELECT id FROM albums
           WHERE artist=(SELECT id FROM artists WHERE name='Various Artists')
           AND   title=('Improvised Music from Japan'))
-   INSERT INTO plays(song, album)
-   VALUES((SELECT id FROM song), (SELECT id FROM album));
+   INSERT INTO plays(song, album, duration)
+   VALUES((SELECT id FROM song), (SELECT id FROM album), 325);
 COMMIT;
