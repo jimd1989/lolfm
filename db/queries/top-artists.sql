@@ -1,5 +1,5 @@
 .headers on
-.mode table
+.mode html
 WITH top_time AS (
   SELECT artists.name, (SUM(plays.duration) / 60) / 60 AS 'Hours' 
   FROM plays

@@ -1,5 +1,5 @@
 .headers on
-.mode table
+.mode html
 WITH ranked AS (
   SELECT artists.name AS 'Artist', (SUM(plays.duration) / 60) / 60 AS 'Hours' 
   FROM plays

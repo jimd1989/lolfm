@@ -1,5 +1,5 @@
 .headers on
-.mode table
+.mode html
 WITH top_plays AS (
   SELECT genres.name, COUNT(genres.id) AS 'Plays' FROM plays
   JOIN songs ON (plays.song = songs.id) 

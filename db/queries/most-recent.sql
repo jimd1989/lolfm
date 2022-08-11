@@ -1,5 +1,5 @@
 .headers on
-.mode table
+.mode html
 SELECT ROW_NUMBER() OVER (ORDER BY date) AS '#',
 datetime(plays.date, 'unixepoch', 'localtime') AS 'Date', 
 artists.name AS 'Artist', 

@@ -1,5 +1,5 @@
 .headers on
-.mode table
+.mode html
 WITH ranked AS (
   SELECT artists.name AS 'Artist', COUNT(artists.id) AS 'Plays' FROM plays
   JOIN songs ON (plays.song = songs.id) 
