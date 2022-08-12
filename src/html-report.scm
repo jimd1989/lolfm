@@ -5,9 +5,12 @@
 (define ◇ conc)
 
 (define-syntax ▽
-  (syntax-rules (@)
-    ((_ α (@ (β γ) ...) ω ...)
-     (◇ "<" (quote α) (property (quote β) γ) ... ">" ω ... "</" (quote α) ">"))
+  (syntax-rules (@ meta)
+    ((_ meta (@ (β γ ...) ...))
+     (◇ "<meta " (property (quote β) γ ...) ... ">"))
+    ((_ α (@ (β γ ...) ...) ω ...)
+     (◇ "<" (quote α) (property (quote β) γ ...) ... ">" ω ... "</" (quote α) ">"))
+    ((_ α) (◇ "<" (quote α) ">"))
     ((_ α ω ...)
      (◇ "<" (quote α) ">" ω ... "</" (quote α) ">"))))
 
@@ -37,15 +40,18 @@
        (td (padding "5px") (border-right "1pt solid #0493DD"))
        (table (border-collapse "collapse") (padding "1rem") 
               (background-color "#EAFFFF") (border "3px solid #0493DD")
-              (margin-bottom "1.5rem") (magin-top "1.5rem"))))
+              (margin-bottom "1.5rem") (magin-top "1.5rem")
+              (width "95%"))))
 
-(define (property key value)
-  (if (string? value)
-      (◇ " " key "=\"" value "\"")
-      (◇ " " key "=" value)))
+(define (property key . value)
+  (cond ((null? value) (◇ key))
+        ((string? (car value)) (◇ " " key "=\"" (car value) "\""))
+        (else (◇ " " key "=" (car value)))))
 
 (define (query sql)
   (with-input-from-pipe (◇ "sqlite3 " DB "< "  QUERIES-PATH sql) read-lines))
+
+(define (a url txt) (▽ a (@ (href url)) txt))
 
 (define (table title sql) (◇ (▽ h2 title) (▽ table (apply ◇ (query sql)))))
 
@@ -64,11 +70,13 @@
         "lolfm is an industry leading amazingly simple scrobbler (ASS). "
         "Just cmus and a local sqlite file on your hard drive. "
         "If you'd like to run it yourself, check it out on "
-        (▽ a (@ (href "https://github.com/jimd1989/lolfm")) "Github") ".")
+        (a "https://github.com/jimd1989/lolfm" "Github") ".")
       (table "Recent" "most-recent.sql")
       (table "Top Artists" "top-artists.sql")
       (table "Top Songs" "top-songs.sql")
-      (table "Top Genres" "top-genres.sql"))))
+      (table "Top Genres" "top-genres.sql")
+      (table "Top Years" "top-years.sql")
+      (table "Neglected Favorites" "forgotten-favorites.sql"))))
 
 (display HTML OUT)
 (close-output-port OUT)
