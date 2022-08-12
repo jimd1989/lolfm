@@ -9,7 +9,7 @@ WITH ranked AS (
   JOIN artists ON (songs.artist = artists.id) 
   GROUP BY songs.id 
   ORDER BY Plays DESC 
-  LIMIT 20
+  LIMIT 25
 )
 SELECT
 ROW_NUMBER() OVER (ORDER BY ranked.Plays DESC) AS '#', 

@@ -7,7 +7,7 @@ WITH top_plays AS (
   WHERE genres.name <> 'Unknown Genre'
   GROUP BY genres.id 
   ORDER BY Plays DESC 
-  LIMIT 20
+  LIMIT 25
 ),
 plays_ranked AS (
   SELECT
@@ -23,7 +23,7 @@ top_time AS (
   WHERE genres.name <> 'Unknown Genre'
   GROUP BY genres.id 
   ORDER BY Hours DESC 
-  LIMIT 20
+  LIMIT 25
 ),
 time_ranked AS (
   SELECT
