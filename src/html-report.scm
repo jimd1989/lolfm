@@ -1,8 +1,10 @@
 #!/usr/local/bin/csi -s
 
-(import (chicken file posix) (chicken io) (chicken process)(chicken string))
+(import (chicken file posix) (chicken io) (chicken process)(chicken string) srfi-1)
 
 (define ◇ conc)
+(define-syntax λ (syntax-rules () ((_ . α) (lambda . α))))
+(define-syntax ∃ (syntax-rules () ((_ . α) (let* . α))))
 
 (define-syntax ▼
   (syntax-rules (! @)
@@ -34,6 +36,17 @@
 (define-constant DB "~/.config/cmus/lolfm.db")
 (define-constant QUERIES-PATH "~/prog/misc/lolfm/db/queries/")
 
+(define-constant TAB-CSS
+ (◇ ".tabset > input[type=\"radio\"] {position: absolute; left: -200vw;}"
+    ".tabset .tab-panel {display: none;}"
+    ".tabset > input:first-child:checked ~ .tab-panels > .tab-panel:first-child, "
+    ".tabset > input:nth-child(3):checked ~ .tab-panels > .tab-panel:nth-child(2), "
+    ".tabset > input:nth-child(5):checked ~ .tab-panels > .tab-panel:nth-child(3), "
+    ".tabset > input:nth-child(7):checked ~ .tab-panels > .tab-panel:nth-child(4), "
+    ".tabset > input:nth-child(9):checked ~ .tab-panels > .tab-panel:nth-child(5), "
+    ".tabset > input:nth-child(11):checked ~ .tab-panels > .tab-panel:nth-child(6) { "
+    "display: block;}"))
+
 (define-constant STYLE
   (css (html (-webkit-text-size-adjust "100%"))
        (body (font-family "sans-serif") (background-color "#FFFFEA")
@@ -47,7 +60,11 @@
        (table (border-collapse "collapse") (padding "1rem") 
               (background-color "#EAFFFF") (border "3px solid #0493DD")
               (margin-bottom "1.5rem") (magin-top "1.5rem")
-              (width "95%"))))
+              (width "95%"))
+       (".tabset > input[type=\"radio\"]"
+        (position "absolute") (left "-200vw"))
+       (".tabset .tab-panel" (display "none"))
+       ))
 
 (define (property key value)
   (if (string? value)
@@ -59,7 +76,28 @@
 
 (define (a url txt) (▽ a (@ (href url)) txt))
 
-(define (table title sql) (◇ (▽ h2 title) (▽ table (apply ◇ (query sql)))))
+(define (table sql) (▽ table (apply ◇ (query sql))))
+
+(define (titled-table title sql) (◇ (▽ h2 title) (table sql)))
+
+(define (tab tabset-name n title checked?)
+  (∃ ((tab-name (◇ tabset-name "-" n))
+      (button (if checked?
+                (▼ input (@ (type "radio") (name tabset-name) (id tab-name) checked))
+                (▼ input (@ (type "radio") (name tabset-name) (id tab-name))))))
+     (◇ button (▽ label (@ (for tab-name)) title))))
+
+(define (tabs tabset-name . body)
+  (∃ ((titles (map car body))
+      (sections (map cadr body))
+      (ixs (iota (- (length body) 1) 1))
+      (first-tab (tab tabset-name 0 (car titles) #t))
+      (rest-tabs (apply ◇ (map (λ (α n) (tab tabset-name n α #f)) (cdr titles) ixs)))
+      (contents (apply ◇ (map (λ (α) (▽ section (@ (class "tab-panel")) α)) sections))))
+    (▽ div (@ (class "tabset"))
+      first-tab 
+      rest-tabs 
+      (▽ div (@ (class "tab-panels")) contents))))
 
 (define-constant HTML
 (▽ html
@@ -69,20 +107,23 @@
                  (initial-scale 1.0) (maximum-scale 12.0) (user-scalable 'yes)))
       (▼ meta (@ (http-equiv "Content-Type") 
                  (content "text/html; charset=UTF-8")))
-      (▽ style STYLE))
+      (▽ style (◇ TAB-CSS STYLE)))
     (▽ body
+       (tabs "top-artists"
+         `(Plays ,(table "top-artists-by-plays.sql"))
+         `(Time ,(table "top-artists-by-time.sql")))
       (▽ h1 "lol.fm")
       (▽ p 
         "lolfm is an industry leading amazingly simple scrobbler (ASS). "
         "Just cmus and a local sqlite file on your hard drive. "
         "If you'd like to run it yourself, check it out on "
         (a "https://github.com/jimd1989/lolfm" "Github") ".")
-      (table "Recent" "most-recent.sql")
-      (table "Top Artists" "top-artists.sql")
-      (table "Top Songs" "top-songs.sql")
-      (table "Top Genres" "top-genres.sql")
-      (table "Top Years" "top-years.sql")
-      (table "Neglected Favorites" "forgotten-favorites.sql"))))
+      (titled-table "Recent" "most-recent.sql")
+      (titled-table "Top Artists" "top-artists.sql")
+      (titled-table "Top Songs" "top-songs.sql")
+      (titled-table "Top Genres" "top-genres.sql")
+      (titled-table "Top Years" "top-years.sql")
+      (titled-table "Neglected Favorites" "forgotten-favorites.sql"))))
 
 (display HTML OUT)
 (close-output-port OUT)
