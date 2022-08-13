@@ -54,17 +54,16 @@
        (a (color "#0493DD"))
        (p (line-height "1.5rem"))
        ("tr:nth-child(even)" (background-color "white"))
-       (th (color "white") (text-align "center") (padding "5px")
+       (th (color "white") (text-align "left") (padding "10px 5px")
            (background-color "#0493DD"))
-       (td (padding "5px") (border-right "1pt solid #0493DD"))
+       (td (padding "5px"))
        (table (border-collapse "collapse") (padding "1rem") 
               (background-color "#EAFFFF") (border "3px solid #0493DD")
               (margin-bottom "1.5rem") (magin-top "1.5rem")
               (width "95%"))
-       (".tabset > input[type=\"radio\"]"
-        (position "absolute") (left "-200vw"))
-       (".tabset .tab-panel" (display "none"))
-       ))
+       (".tabset > label" (display "inline-block") (text-align "center") (padding "10px")
+        (border "3px solid #0493DD") (background-color "#EAFFFF"))
+       (".tabset > input:checked + label" (color "white") (background-color "#0493DD"))))
 
 (define (property key value)
   (if (string? value)
@@ -109,9 +108,6 @@
                  (content "text/html; charset=UTF-8")))
       (▽ style (◇ TAB-CSS STYLE)))
     (▽ body
-       (tabs "top-artists"
-         `(Plays ,(table "top-artists-by-plays.sql"))
-         `(Time ,(table "top-artists-by-time.sql")))
       (▽ h1 "lol.fm")
       (▽ p 
         "lolfm is an industry leading amazingly simple scrobbler (ASS). "
@@ -119,9 +115,15 @@
         "If you'd like to run it yourself, check it out on "
         (a "https://github.com/jimd1989/lolfm" "Github") ".")
       (titled-table "Recent" "most-recent.sql")
-      (titled-table "Top Artists" "top-artists.sql")
+      (▽ h2 "Top Artists")
+      (tabs "top-artists"
+        `("By Playcount" ,(table "top-artists-by-plays.sql"))
+        `("By Total Time" ,(table "top-artists-by-time.sql")))
       (titled-table "Top Songs" "top-songs.sql")
-      (titled-table "Top Genres" "top-genres.sql")
+      (▽ h2 "Top Genres")
+      (tabs "top-genres"
+        `("By Playcount" ,(table "top-genres-by-plays.sql"))
+        `("By Total Time" ,(table "top-genres-by-time.sql")))
       (titled-table "Top Years" "top-years.sql")
       (titled-table "Neglected Favorites" "forgotten-favorites.sql"))))
 
