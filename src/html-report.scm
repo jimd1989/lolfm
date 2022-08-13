@@ -4,15 +4,21 @@
 
 (define ◇ conc)
 
+(define-syntax ▼
+  (syntax-rules (! @)
+    ((_ ! (@ )) ">")
+    ((_ ! (@ (β γ) ω ...)) (◇ (property (quote β) γ) (▼ ! (@ ω ...))))
+    ((_ ! (@ β ω ...)) (◇ (quote β) (▼ ! (@ ω ...))))
+    ((_ α (@ β ...)) (◇ "<" (quote α) (▼ ! (@ β ...))))
+    ((_ α) (◇ "<" (quote α) ">"))))
+
 (define-syntax ▽
-  (syntax-rules (@ meta)
-    ((_ meta (@ (β γ ...) ...))
-     (◇ "<meta " (property (quote β) γ ...) ... ">"))
-    ((_ α (@ (β γ ...) ...) ω ...)
-     (◇ "<" (quote α) (property (quote β) γ ...) ... ">" ω ... "</" (quote α) ">"))
-    ((_ α) (◇ "<" (quote α) ">"))
-    ((_ α ω ...)
-     (◇ "<" (quote α) ">" ω ... "</" (quote α) ">"))))
+  (syntax-rules (! @)
+    ((_ ! α (@ ) ω ...) (◇ ">" ω ... "</" (quote α) ">"))
+    ((_ ! α (@ (β γ) δ ...) ω ...) (◇ (property (quote β) γ) (▽ ! α (@ δ ...) ω ...)))
+    ((_ ! α (@ β δ ...) ω ...) (◇ (quote β) (▽ ! α (@ δ ...) ω ...)))
+    ((_ α (@ β ...) ω ...) (◇ "<" (quote α) (▽ ! α (@ β ...) ω ...)))
+    ((_ α ω ...) (◇ "<" (quote α) ">" ω ... "</" (quote α) ">")))) 
 
 (define-syntax css-property
   (syntax-rules () ((_ α ω) (◇ (quote α) ":" ω ";"))))
@@ -43,10 +49,10 @@
               (margin-bottom "1.5rem") (magin-top "1.5rem")
               (width "95%"))))
 
-(define (property key . value)
-  (cond ((null? value) (◇ key))
-        ((string? (car value)) (◇ " " key "=\"" (car value) "\""))
-        (else (◇ " " key "=" (car value)))))
+(define (property key value)
+  (if (string? value)
+    (◇ " " key "=\"" value "\"")
+    (◇ " " key "=" value)))
 
 (define (query sql)
   (with-input-from-pipe (◇ "sqlite3 " DB "< "  QUERIES-PATH sql) read-lines))
@@ -59,9 +65,9 @@
 (▽ html
   (▽ head
     (▽ title "lol.fm")
-      (▽ meta (@ (name "viewport") (content "width=device-width")
+      (▼ meta (@ (name "viewport") (content "width=device-width")
                  (initial-scale 1.0) (maximum-scale 12.0) (user-scalable 'yes)))
-      (▽ meta (@ (http-equiv "Content-Type") 
+      (▼ meta (@ (http-equiv "Content-Type") 
                  (content "text/html; charset=UTF-8")))
       (▽ style STYLE))
     (▽ body

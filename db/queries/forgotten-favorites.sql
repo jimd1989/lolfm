@@ -25,7 +25,7 @@ scored AS (
   SELECT
     name,
     ago * count AS 'score',
-    datetime(date, 'unixepoch', 'localtime') AS 'last'
+    date(date, 'unixepoch', 'localtime') AS 'last'
   FROM last_played_counts ORDER BY score DESC LIMIT 20
 )
 SELECT
