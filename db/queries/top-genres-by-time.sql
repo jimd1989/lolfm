@@ -7,7 +7,7 @@ WITH top_time AS (
   WHERE genres.name <> 'Unknown Genre'
   GROUP BY genres.id 
   ORDER BY Hours DESC 
-  LIMIT 25
+  LIMIT 15
 ),
 time_ranked AS (
   SELECT

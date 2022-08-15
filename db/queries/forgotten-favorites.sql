@@ -19,6 +19,8 @@ last_played_counts AS (
     last_played.id
   FROM last_played 
   JOIN played ON (last_played.id = played.id) 
+  WHERE date(last_played.date, 'unixepoch', 'localtime') 
+    < date('now', '-36 months', 'localtime')
   GROUP BY last_played.id
 ),
 scored AS (
@@ -26,10 +28,11 @@ scored AS (
     name,
     ago * count AS 'score',
     date(date, 'unixepoch', 'localtime') AS 'last'
-  FROM last_played_counts ORDER BY score DESC LIMIT 20
+  FROM last_played_counts ORDER BY score DESC LIMIT 50
 )
 SELECT
-  ROW_NUMBER() OVER (ORDER BY score DESC) AS '#', 
   name AS 'Artist', 
   last AS 'Last Played' 
-FROM scored;
+FROM scored
+ORDER BY RANDOM()
+LIMIT 15;

@@ -62,7 +62,7 @@
               (margin-bottom "1.5rem") (magin-top "1.5rem")
               (width "95%"))
        (".tabset > label" (display "inline-block") (text-align "center") (padding "10px")
-        (border "3px solid #0493DD") (background-color "#EAFFFF"))
+       (background-color "#EAFFFF"))
        (".tabset > input:checked + label" (color "white") (background-color "#0493DD"))))
 
 (define (property key value)
@@ -114,18 +114,36 @@
         "Just cmus and a local sqlite file on your hard drive. "
         "If you'd like to run it yourself, check it out on "
         (a "https://github.com/jimd1989/lolfm" "Github") ".")
-      (titled-table "Recent" "most-recent.sql")
+      (▽ h2 "Recent Activity")
+      (tabs "recent"
+        `("Plays" ,(table "most-recent.sql"))
+        `("Discoveries" ,(table "recent-discoveries.sql")))
       (▽ h2 "Top Artists")
       (tabs "top-artists"
-        `("By Playcount" ,(table "top-artists-by-plays.sql"))
-        `("By Total Time" ,(table "top-artists-by-time.sql")))
-      (titled-table "Top Songs" "top-songs.sql")
+        `("Plays" ,(table "top-artists-by-plays.sql"))
+        `("Hours" ,(table "top-artists-by-time.sql"))
+        `("Year" ,(table "top-artists-12-months.sql"))
+        `("Month" ,(table "top-artists-1-month.sql"))
+        `("Week" ,(table "top-artists-1-week.sql")))
+      (▽ h2 "Top Albums")
+      (tabs "top-albums"
+        `("Plays" ,(table "top-albums-by-plays.sql"))
+        `("Hours" ,(table "top-albums-by-time.sql"))
+        `("Year" ,(table "top-albums-12-months.sql")))
+      (▽ h2 "Top Songs")
+      (tabs "top-songs"
+        `("Plays" ,(table "top-songs.sql"))
+        `("Hours" ,(table "top-songs-by-time.sql"))
+        `("Year" ,(table "top-songs-12-months.sql")))
       (▽ h2 "Top Genres")
       (tabs "top-genres"
-        `("By Playcount" ,(table "top-genres-by-plays.sql"))
-        `("By Total Time" ,(table "top-genres-by-time.sql")))
+        `("Plays" ,(table "top-genres-by-plays.sql"))
+        `("Hours" ,(table "top-genres-by-time.sql")))
       (titled-table "Top Years" "top-years.sql")
-      (titled-table "Neglected Favorites" "forgotten-favorites.sql"))))
+      (▽ h2 "Rediscover")
+      (tabs "rediscover"
+        `("Unfamiliar" ,(table "listen-again.sql"))
+        `("Neglected" ,(table "forgotten-favorites.sql"))))))
 
 (display HTML OUT)
 (close-output-port OUT)

@@ -7,7 +7,7 @@ WITH top_plays AS (
   WHERE genres.name <> 'Unknown Genre'
   GROUP BY genres.id 
   ORDER BY Plays DESC 
-  LIMIT 25
+  LIMIT 15
 ),
 plays_ranked AS (
   SELECT

@@ -8,4 +8,4 @@ FROM plays
 JOIN songs ON (plays.song = songs.id) 
 JOIN artists ON (songs.artist = artists.id) 
 ORDER BY date DESC 
-LIMIT 25;
+LIMIT 15;

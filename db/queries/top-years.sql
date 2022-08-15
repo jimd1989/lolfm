@@ -7,7 +7,7 @@ WITH ranked AS (
   WHERE Year <> 0 
   GROUP BY albums.year
   ORDER BY Plays DESC 
-  LIMIT 15
+  LIMIT 10
 )
 SELECT
   ROW_NUMBER() OVER (ORDER BY Plays DESC) AS '#',
