@@ -68,6 +68,23 @@
       (args (map get ordered-fields)))
     (run-query (apply log-query args))))
 
+(define (apostrophe-quote x)
+  (list->string
+    (foldr 
+      (λ (x acc) (if (char=? #\' x) (cons #\' (cons #\' acc)) (cons x acc)))
+      '()
+      (string->list x))))
+
+(define (love-track artist title)
+  (∃ ((a (apostrophe-quote artist))
+      (t (apostrophe-quote title))
+      (query 
+        (◇ "INSERT INTO loved(song) SELECT songs.id "
+           "FROM songs JOIN artists ON (artists.id = songs.artist) "
+           "WHERE (songs.title = '" t "' COLLATE NOCASE) AND "
+           "      (artists.name = '" a "' COLLATE NOCASE);")))
+     (run-query query)))
+
 (define (new-song? now prev)
   (not (equal?
          `(,(assoc 'artist now) ,(assoc 'album now) ,(assoc 'title now))
@@ -111,7 +128,7 @@
     (cond ((eq? type 'log) (log-event args events))
           ((eq? type 'dump) (dump events))
           ((eq? type 'clear) (clear))
-          ((eq? type 'love) events)
+          ((eq? type 'love) (apply love-track args) events)
           ((eq? type 'unlove) events)
           ((eq? type 'suppress) events)
           ((eq? type 'unsuppress) events)

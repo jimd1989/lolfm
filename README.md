@@ -41,9 +41,27 @@ Run it with `&` to put it in the background, but you might want to see if it's s
 
 It will set up a `lolfm.db` in your default cmus config directory. Change the code itself if you want something else. You will get errors about existing tables on subsequent runs; this is fine. It should write the tracks you play in cmus to this db. Manually verify with the `sqlite3` command line tool.
 
-## Caveats
+You can use `ps` to manipulate the process by PID, but if you ever lose this, `killall csi` will destroy the Chicken interpreter running lolfm.
 
-This is very, very fragile. You can fuck it up if you are doing deliberately malicious things like hammering pause/unpause. There are probably other ways to break it. You can always echo commands to `/tmp/lolfm-fifo` like `(clear)` to reset the event queue and `(dump)` to print its contents. Look at the source code for other commands. You can also see the most recent query to the db in `/tmp/lolfm-query`.
+## Interaction
+
+cmus will pipe its status to the `record-event.scm` script whenever the player's state changes (next song, pause, etc). These state changes are piped into `/tmp/lolfm-fifo`, which is listened to by `source-events.scm`. The latter script interprets these state changes and writes play events to `lolfm.db` when it is sure that a song has finished. It is possible to fuck this process up through deliberately malicious behavior, like hammering play/pause and flooding the queue with events, so treat it gently.
+
+One can interact with the logger by echoing some commands to `/tmp/lolfm-fifo`. Improper input crashes for now.
+
+- `(dump)`: Will print the current contents of the events queue to stdout. If starting lolfm in the background, pipe its stdout to somewhere readable from outside the current terminal session, or you may not see anything.
+- `(clear)`: Clears the contents of the events queue. Useful if events are unsynced or you don't want to record a play that's on deck.
+- `(love "Artist" "Title")`: Searches for a song by "Artist" with a title "Title" and adds it to the user's loved tracks if it exists. Case insensitive.
+
+Example:
+
+```
+echo '(love "Throwing Muses" "Honeychain")' > /tmp/lolfm-fifo 
+```
+
+Note the quotes.
+
+## Caveats
 
 This logs plays under 30 seconds, unlike last.fm. Good news for grindcore fans, bad news if you're skipping through your queue and don't want those plays registered. The user is expected to handle this on the analysis side of things, writing custom queries to ignore deltas on less than n seconds.
 
@@ -55,4 +73,4 @@ See the `conversion` folder for notes on how I imported my last.fm data. This wa
 
 ## Analysis
 
-Write whatever SQL scripts you'd like and make cron jobs for them. See the `queries` folder for examples. 
+Write whatever SQL scripts you'd like and make cron jobs for them. See the `queries` folder for examples. The `html-report.scm` script also demonstrates how they might be incorporated into a static html template.

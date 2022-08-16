@@ -3,6 +3,7 @@
 WITH ranked AS (
   SELECT 
   artists.name AS 'Artist', 
+  IIF(EXISTS (SELECT 1 FROM loved WHERE loved.song = songs.id), '♥', '') AS '♥',
   songs.title AS 'Song',
   (SUM(plays.duration) / 60) / 60 AS 'Hours' 
   FROM plays
@@ -15,6 +16,7 @@ WITH ranked AS (
 SELECT
 ROW_NUMBER() OVER (ORDER BY ranked.Hours DESC) AS '#', 
 ranked.Artist, 
+ranked.♥,
 ranked.Song,
 ranked.Hours
 FROM ranked;

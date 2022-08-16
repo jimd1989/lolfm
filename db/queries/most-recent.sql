@@ -3,7 +3,8 @@
 SELECT ROW_NUMBER() OVER (ORDER BY date) AS '#',
 datetime(plays.date, 'unixepoch', 'localtime') AS 'Date', 
 artists.name AS 'Artist', 
-songs.title AS 'Song' 
+IIF(EXISTS (SELECT 1 FROM loved WHERE loved.song = songs.id), '♥', '') AS '♥',
+songs.title AS 'Song'
 FROM plays 
 JOIN songs ON (plays.song = songs.id) 
 JOIN artists ON (songs.artist = artists.id) 

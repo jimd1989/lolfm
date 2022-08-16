@@ -117,7 +117,8 @@
       (▽ h2 "Recent Activity")
       (tabs "recent"
         `("Plays" ,(table "most-recent.sql"))
-        `("Discoveries" ,(table "recent-discoveries.sql")))
+        `("Discoveries" ,(table "recent-discoveries.sql"))
+        `("Loves" ,(table "recently-loved.sql")))
       (▽ h2 "Top Artists")
       (tabs "top-artists"
         `("Plays" ,(table "top-artists-by-plays.sql"))
