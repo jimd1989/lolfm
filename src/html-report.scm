@@ -77,8 +77,6 @@
 
 (define (table sql) (▽ table (apply ◇ (query sql))))
 
-(define (titled-table title sql) (◇ (▽ h2 title) (table sql)))
-
 (define (tab tabset-name n title checked?)
   (∃ ((tab-name (◇ tabset-name "-" n))
       (button (if checked?
@@ -140,7 +138,10 @@
       (tabs "top-genres"
         `("Plays" ,(table "top-genres-by-plays.sql"))
         `("Hours" ,(table "top-genres-by-time.sql")))
-      (titled-table "Top Years" "top-years.sql")
+      (▽ h2 "Top Years")
+      (tabs "top-years"
+        `("Plays" ,(table "top-years.sql"))
+        `("Hours" ,(table "top-years-by-time.sql")))
       (▽ h2 "Rediscover")
       (tabs "rediscover"
         `("Unfamiliar" ,(table "listen-again.sql"))
