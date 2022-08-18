@@ -151,8 +151,9 @@ BEGIN TRANSACTION;
     JOIN albums ON ((artists.id = albums.artist) AND
                     (master_dump.album = albums.title COLLATE NOCASE))
   )
-  --INSERT INTO plays(date, song, album, duration)
-  SELECT COUNT(matched_songs.date)
+  INSERT INTO plays(date, song, album, duration)
+  SELECT matched_songs.date, matched_songs.id,
+         matched_albums.id, matched_songs.duration
   FROM matched_songs
---  JOIN matched_albums ON (matched_songs.date = matched_albums.date);
+  JOIN matched_albums ON (matched_songs.date = matched_albums.date);
 COMMIT;

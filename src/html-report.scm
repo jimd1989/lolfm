@@ -142,8 +142,8 @@
       (tabs "top-years"
         `("Plays" ,(table "top-years.sql"))
         `("Hours" ,(table "top-years-by-time.sql")))
-      (▽ h2 "Rediscover")
-      (tabs "rediscover"
+      (▽ h2 "Discover")
+      (tabs "discover"
         `("Unfamiliar" ,(table "listen-again.sql"))
         `("Neglected" ,(table "forgotten-favorites.sql"))))))
 
