@@ -67,6 +67,8 @@ This logs plays under 30 seconds, unlike last.fm. Good news for grindcore fans, 
 
 Escaping quotes and special characters remains a pain in the ass.
 
+On a fresh boot with an empty `/tmp` directory, running `cmus` before `source-events &` might write to `/tmp/lolfm-fifo` as a regular file before `source-events` has a chance to `mkfifo /tmp/lolfm-fifo`. This could lead to a deluge of non-draining events and hammer the DB with superfluous writes. Make sure to run `source-events` before opening `cmus` for the first time. You can always fix the DB by running a query like `DELETE FROM plays WHERE date > (unix timestamp of when problem occurred)`. 
+
 ## Importing
 
 See the `conversion` folder for notes on how I imported my last.fm data. This was an excruciating process and your experience will be different. No support is offered for this.
