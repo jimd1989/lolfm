@@ -4,8 +4,8 @@ use std::process::{ChildStdout, Command, Stdio};
 
 #[derive(Debug)]
 pub struct RawCmusEvent {
-  artist: Option<Cow<'static, str>>,
   status: Option<Cow<'static, str>>,
+  artist: Option<Cow<'static, str>>,
   title: Option<Cow<'static, str>>,
   album: Option<Cow<'static, str>>,
   album_artist: Option<Cow<'static, str>>,
@@ -16,8 +16,8 @@ pub struct RawCmusEvent {
 
 pub fn get_raw_cmus_event() -> Result<RawCmusEvent, String> {
   let mut event = RawCmusEvent {
-    artist: None,
     status: None,
+    artist: None,
     title: None,
     album: None,
     album_artist: None,
@@ -35,21 +35,21 @@ pub fn get_raw_cmus_event() -> Result<RawCmusEvent, String> {
 }
 
 fn read_tag(e: &mut RawCmusEvent, l: &String) -> Result<(), String> {
-  let mut s1 = l.splitn(2, ' ');
+  let mut s1  = l.splitn(2, ' ');
   let s1_head = s1.next();
   let s1_tail = s1.next();
-  let mut s2 = s1_tail.map(|s| s.splitn(2, ' '));
+  let mut s2  = s1_tail.map(|s| s.splitn(2, ' '));
   let s2_head = s2.as_mut().and_then(|s| s.next());
   let s2_tail = s2.as_mut().and_then(|s| s.next());
   match (s1_head, s2_head, s2_tail) {
     (Some("status"), Some(a), _) => {
       e.status = Some(Cow::Owned(a.to_string())); Ok(())
     },
-    (Some("tag"), Some("album"), Some(a)) => { 
-      e.artist = Some(Cow::Owned(a.to_string())); Ok(())
-    },
     (Some("tag"), Some("artist"), Some(a)) => { 
       e.artist = Some(Cow::Owned(a.to_string())); Ok(())
+    },
+    (Some("tag"), Some("album"), Some(a)) => { 
+      e.album = Some(Cow::Owned(a.to_string())); Ok(())
     },
     (Some("tag"), Some("albumartist"), Some(a)) => { 
       e.album_artist = Some(Cow::Owned(a.to_string())); Ok(())

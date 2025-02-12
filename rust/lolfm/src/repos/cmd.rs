@@ -2,7 +2,7 @@ use std::env::args;
 
 #[derive(Debug)]
 pub enum Cmd {
-  Event,
+  Event(String),
   Init(String),
 }
 
@@ -14,8 +14,8 @@ pub fn get_cmd() -> Result<Cmd, String> {
 
 fn parse_cmd(a: &Vec<&str>) -> Result<Cmd, String> {
   match a.as_slice() {
-    [_, "event"]         => Ok(Cmd::Event),
-    [_, "init", db_path] => Ok(Cmd::Init(db_path.to_string())),
-    _                    => Err(format!("Bad cmd {:?}", a)),
+    [_, "event", db_path] => Ok(Cmd::Event(db_path.to_string())),
+    [_, "init", db_path]  => Ok(Cmd::Init(db_path.to_string())),
+    _                     => Err(format!("Bad cmd {:?}", a)),
   }
 }
