@@ -1,12 +1,8 @@
 use std::env::args;
 
-#[derive(Debug)]
-pub enum Cmd {
-  Event(String),
-  Init(String),
-}
+use crate::models::cmd::Cmd;
 
-pub fn get_cmd() -> Result<Cmd, String> {
+pub fn get_cmd_from_shell() -> Result<Cmd, String> {
   let a: Vec<String> = args().collect();
   let ass: Vec<&str> = a.iter().map(|s| s.as_str()).collect();
   parse_cmd(&ass)

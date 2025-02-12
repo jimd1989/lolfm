@@ -2,19 +2,9 @@ use std::borrow::Cow;
 use std::io::{BufRead, BufReader, Error, ErrorKind, Lines};
 use std::process::{ChildStdout, Command, Stdio};
 
-#[derive(Debug)]
-pub struct RawCmusEvent {
-  status: Option<Cow<'static, str>>,
-  artist: Option<Cow<'static, str>>,
-  title: Option<Cow<'static, str>>,
-  album: Option<Cow<'static, str>>,
-  album_artist: Option<Cow<'static, str>>,
-  genre: Option<Cow<'static, str>>,
-  duration: usize,
-  date: usize
-}
+use crate::models::raw_cmus_event::RawCmusEvent;
 
-pub fn get_raw_cmus_event() -> Result<RawCmusEvent, String> {
+pub fn get_raw_cmus_event_from_shell() -> Result<RawCmusEvent, String> {
   let mut event = RawCmusEvent {
     status: None,
     artist: None,
