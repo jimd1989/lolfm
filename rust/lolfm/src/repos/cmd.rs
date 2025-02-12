@@ -9,7 +9,7 @@ pub enum Cmd {
 pub fn get_cmd() -> Result<Cmd, String> {
   let a: Vec<String> = args().collect();
   let ass: Vec<&str> = a.iter().map(|s| s.as_str()).collect();
-  return parse_cmd(&ass);
+  parse_cmd(&ass)
 }
 
 fn parse_cmd(a: &Vec<&str>) -> Result<Cmd, String> {
