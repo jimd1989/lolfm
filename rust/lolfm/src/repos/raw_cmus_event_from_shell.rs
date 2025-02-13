@@ -7,12 +7,18 @@ use crate::models::raw_cmus_event::{RawCmusEvent, empty_raw_cmus_event};
 pub fn get_raw_cmus_event_from_shell() -> Result<RawCmusEvent, String> {
   let mut event = empty_raw_cmus_event();
   let mut lines = get_lines()?;
+  let mut n = 0;
   let res = lines.try_for_each(|line| {
     let l = line.map_err(|ω| ω.to_string())?;
     read_tag(&mut event, &l)?;
+    n += 1;
     Ok(())
   });
-  res.map(|_| event)
+  match (n, res) {
+    (0,      _) => Err("is cmus running?".to_string()),
+    (_,  Ok(_)) => Ok(event),
+    (_, Err(ω)) => Err(ω),
+  }
 }
 
 fn read_tag(e: &mut RawCmusEvent, l: &String) -> Result<(), String> {
