@@ -31,7 +31,7 @@ fn main() {
         let event  = get_raw_cmus_event_from_shell().unwrap();
         let _z     = write_raw_cmus_event_to_db(&db, event).unwrap();
         let events = get_raw_cmus_events_from_db(&db).unwrap();
-        let time   = events.last().unwrap().time.unwrap();
+        let time   = events.last().unwrap().time_milliseconds.unwrap();
         //let _y     = delete_raw_cmus_events_from_db(&db, time).unwrap();
         println!("{:?}", events);
       },

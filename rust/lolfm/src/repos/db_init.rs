@@ -5,15 +5,17 @@ pub fn init_db(db: &Connection) -> Result<(), String> {
     PRAGMA foreign_keys = ON;
 
     CREATE TABLE IF NOT EXISTS raw_cmus_events(
-      time          INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-      status        INTEGER NOT NULL,
-      artist        TEXT,
-      title         TEXT,
-      album         TEXT,
-      album_artist  TEXT,
-      genre         TEXT,
-      duration      INTEGER,
-      date          INTEGER
+      time_milliseconds BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+      status            INTEGER NOT NULL,
+      artist            TEXT,
+      title             TEXT,
+      album             TEXT,
+      album_artist      TEXT,
+      genre             TEXT,
+      disc_number       TEXT,
+      track_number      TEXT,
+      duration          INTEGER,
+      date              TEXT
     );
     
     CREATE TABLE IF NOT EXISTS artists(

@@ -2,27 +2,33 @@ use crate::models::cmus_status::CmusStatus;
 
 #[derive(Debug)]
 pub struct RawCmusEvent {
-  pub time: Option<i64>,
-  pub status: CmusStatus,
-  pub artist: Option<String>,
-  pub title: Option<String>,
-  pub album: Option<String>,
-  pub album_artist: Option<String>,
-  pub genre: Option<String>,
-  pub duration: i64,
-  pub date: i64,
+  pub time_milliseconds:  Option<i64>,
+  pub status:             CmusStatus,
+  pub artist:             Option<String>,
+  pub title:              Option<String>,
+  pub album:              Option<String>,
+  pub album_artist:       Option<String>,
+  pub genre:              Option<String>,
+  pub disc_number:        Option<String>,
+  pub track_number:       Option<String>,
+  pub duration:           i64,
+  pub date:               Option<String>,
 }
 
-pub fn empty_raw_cmus_event() -> RawCmusEvent {
-  RawCmusEvent {
-    time: None,
-    status: CmusStatus::Stopped,
-    artist: None,
-    title: None,
-    album: None,
-    album_artist: None,
-    genre: None,
-    duration: 0,
-    date: 0
+impl Default for RawCmusEvent {
+  fn default() -> Self {
+    Self {
+      time_milliseconds: None,
+      status: CmusStatus::Stopped,
+      artist: None,
+      title: None,
+      album: None,
+      album_artist: None,
+      genre: None,
+      disc_number: None,
+      track_number: None,
+      duration: 0,
+      date: None,
+    }
   }
 }
