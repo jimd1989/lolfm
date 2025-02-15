@@ -1,5 +1,7 @@
 use sqlite::Connection;
 
-pub fn connect_to_db(db_path: &String) -> Result<Connection, String> {
-  sqlite::open(db_path).map_err(|e| e.to_string())
+use crate::models::er::Er;
+
+pub fn connect_to_db(db_path: &String) -> Result<Connection, Er> {
+  Ok(sqlite::open(db_path)?)
 }

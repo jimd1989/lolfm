@@ -1,6 +1,8 @@
 use sqlite::Connection;
 
-pub fn init_db(db: &Connection) -> Result<(), String> {
+use crate::models::er::Er;
+
+pub fn init_db(db: &Connection) -> Result<(), Er> {
   let query = "
     PRAGMA foreign_keys = ON;
 
@@ -71,8 +73,7 @@ pub fn init_db(db: &Connection) -> Result<(), String> {
       FOREIGN KEY(artist) REFERENCES artists(id)
     );
     ";
-    db.execute("BEGIN TRANSACTION")
-      .and_then(|_| db.execute(query))
-      .and_then(|_| db.execute("COMMIT"))
-      .map_err(|e| e.to_string())
+    db.execute("BEGIN TRANSACTION")?;
+    db.execute(query)?;
+    Ok(db.execute("COMMIT")?)
 }
