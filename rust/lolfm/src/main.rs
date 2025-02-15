@@ -10,6 +10,7 @@ mod models {
   pub mod cmus_status;
   pub mod er;
   pub mod played_song;
+  pub mod played_songs;
   pub mod raw_cmus_event;
 }
 mod repos {

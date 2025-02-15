@@ -32,3 +32,18 @@ impl Default for RawCmusEvent {
     }
   }
 }
+
+impl PartialEq for RawCmusEvent {
+/* Ignores timestamp and status — useful in event sourcing */
+  fn eq(&self, ω: &Self) -> bool {
+    self.artist       == ω.artist       &&
+    self.title        == ω.title        &&
+    self.album        == ω.album        &&
+    self.album_artist == ω.album_artist &&
+    self.genre        == ω.genre        &&
+    self.disc_number  == ω.disc_number  &&
+    self.track_number == ω.track_number &&
+    self.duration     == ω.duration     &&
+    self.date         == ω.date
+  }
+}
