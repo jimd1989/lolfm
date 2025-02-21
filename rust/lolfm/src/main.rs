@@ -1,9 +1,14 @@
+use std::process::exit;
+
 mod actions {
   pub mod get_app_config;
+  pub mod process_cmus_event;
 }
+
 mod helpers {
   pub mod sql_helpers;
 }
+
 mod models {
   pub mod app_config;
   pub mod cmd;
@@ -13,6 +18,7 @@ mod models {
   pub mod played_songs;
   pub mod raw_cmus_event;
 }
+
 mod repos {
   pub mod cmd_from_shell;
   pub mod db_connection;
@@ -23,35 +29,40 @@ mod repos {
   pub mod raw_cmus_event_to_db;
   pub mod system_time;
 }
+
 mod transformers {
   pub mod raw_cmus_events_to_played_songs;
 }
+
 use actions::get_app_config::get_app_config;
+use actions::process_cmus_event::process_cmus_event;
 use models::cmd::Cmd;
+use models::er::Er;
 use repos::cmd_from_shell::get_cmd_from_shell;
-use repos::db_connection::connect_to_db;
 use repos::db_init::init_db;
-use repos::raw_cmus_events_delete_from_db::delete_raw_cmus_events_from_db;
-use repos::raw_cmus_event_from_shell::get_raw_cmus_event_from_shell;
-use repos::raw_cmus_event_to_db::write_raw_cmus_event_to_db;
-use repos::raw_cmus_events_from_db::get_raw_cmus_events_from_db;
 
 fn main() {
-    match get_cmd_from_shell() {
-      Ok(Cmd::Event(db_path)) => {
-        let α      = get_app_config(&db_path).unwrap();
-        let db     = connect_to_db(&db_path).unwrap();
-        let event  = get_raw_cmus_event_from_shell(α.time_milliseconds).unwrap();
-        let _z     = write_raw_cmus_event_to_db(&db, event).unwrap();
-        let events = get_raw_cmus_events_from_db(&db).unwrap();
-        let time   = events.last().unwrap().time_milliseconds.unwrap();
-        //let _y     = delete_raw_cmus_events_from_db(&db, time).unwrap();
-        println!("{:?}", events);
-      },
-      Ok(Cmd::Init(db_path))  => {
-        let db = connect_to_db(&db_path).unwrap();
-        println!("{:?}", init_db(&db))
-      }
-      Err(e)           => println!("{:?}", e),
+  match exec() {
+    Err(ω) => {
+      println!("{:?}", ω);
+      exit(1);
     }
+    Ok(_) => {
+      exit(0);
+    }
+  }
+}
+
+fn exec() -> Result<(), Er> {
+  match get_cmd_from_shell() {
+    Ok(Cmd::Event(db_path)) => {
+      let config = get_app_config(&db_path)?;
+      Ok(process_cmus_event(&config)?)
+    }
+    Ok(Cmd::Init(db_path)) => {
+      let config = get_app_config(&db_path)?;
+      init_db(&config.db)
+    }
+    Err(ω) => Err(ω),
+  }
 }

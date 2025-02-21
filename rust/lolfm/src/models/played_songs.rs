@@ -1,7 +1,7 @@
 use crate::models::played_song::PlayedSong;
 use crate::models::raw_cmus_event::RawCmusEvent;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct PlayedSongs {
   pub cutoff_time:  Option<i64>,
   pub last_event:   Option<RawCmusEvent>,

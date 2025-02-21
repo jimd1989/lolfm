@@ -1,7 +1,6 @@
 use crate::models::er::Er;
 
-#[derive(Debug)]
-#[derive(PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum CmusStatus {
   Stopped,
   Paused,

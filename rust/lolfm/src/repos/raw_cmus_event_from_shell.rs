@@ -7,9 +7,9 @@ use crate::models::raw_cmus_event::RawCmusEvent;
 
 pub fn get_raw_cmus_event_from_shell(time_milliseconds: i64) 
 -> Result<RawCmusEvent, Er> {
-  let mut e = RawCmusEvent::default();
-  let mut lines = get_lines()?;
+  let mut e = RawCmusEvent::default().with_time(time_milliseconds);
   let mut lines_read = 0;
+  let lines = get_lines()?;
   for line in lines {
     let l = line?;
     read_tag(&mut e, &l)?;
@@ -18,7 +18,6 @@ pub fn get_raw_cmus_event_from_shell(time_milliseconds: i64)
   if lines_read == 0 {
     return Err(Er("is cmus running".to_string()));
   }
-  set_time(&mut e, time_milliseconds);
   Ok(e)
 }
 
@@ -30,9 +29,9 @@ fn read_tag(e: &mut RawCmusEvent, l: &String) -> Result<(), Er> {
   let s2_head = s2.as_mut().and_then(|ω| ω.next());
   let s2_tail = s2.as_mut().and_then(|ω| ω.next());
   match (s1_head, s2_head, s2_tail) {
-    (Some("time_milliseconds"), Some(n), _) => { 
+    (Some("timemilliseconds"), Some(n), _) => { 
       let ω = parse_int(n)?;
-      Ok({ e.time_milliseconds = Some(ω); })
+      Ok({ e.time_milliseconds = ω; })
     },
     (Some("status"), Some(α), _) => {
       let ω = CmusStatus::from_str(α)?;
@@ -78,11 +77,4 @@ fn get_lines() -> Result<Lines<BufReader<ChildStdout>>, Er> {
   let α = Command::new("cmus-remote").arg("-Q").stdout(Stdio::piped()).spawn()?;
   let ω = α.stdout.ok_or("is cmus running")?;
   Ok(BufReader::new(ω).lines())
-}
-
-fn set_time(event: &mut RawCmusEvent, t: i64) {
-  match event.time_milliseconds {
-    Some(_) => {},
-    None    => { event.time_milliseconds = Some(t); }
-  }
 }

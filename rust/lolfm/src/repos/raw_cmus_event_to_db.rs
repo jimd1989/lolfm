@@ -1,8 +1,6 @@
-use sqlite::{Connection, Error, State};
+use sqlite::{Connection, State};
 
-use crate::helpers::sql_helpers::{
-  sql_int, sql_nullable_int, sql_nullable_string
-};
+use crate::helpers::sql_helpers::{sql_int, sql_nullable_string};
 use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
 use crate::models::raw_cmus_event::RawCmusEvent;
@@ -34,7 +32,7 @@ pub fn write_event(db: &Connection, α: RawCmusEvent) -> Result<State, Er> {
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   println!("{:?}", α);
   let mut statement = db.prepare(query)?;
-  sql_nullable_int(   &mut statement, 1,  α.time_milliseconds)?;
+  sql_int(            &mut statement, 1,  α.time_milliseconds)?;
   sql_int(            &mut statement, 2,  CmusStatus::to_sql_enum(α.status))?;
   sql_nullable_string(&mut statement, 3,  α.artist)?;
   sql_nullable_string(&mut statement, 4,  α.title)?;
