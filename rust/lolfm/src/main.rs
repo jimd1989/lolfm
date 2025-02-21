@@ -23,6 +23,7 @@ mod repos {
   pub mod cmd_from_shell;
   pub mod db_connection;
   pub mod db_init;
+  pub mod played_songs_to_db;
   pub mod raw_cmus_events_delete_from_db;
   pub mod raw_cmus_event_from_shell;
   pub mod raw_cmus_events_from_db;

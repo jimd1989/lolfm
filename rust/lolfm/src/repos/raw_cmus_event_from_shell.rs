@@ -16,7 +16,7 @@ pub fn get_raw_cmus_event_from_shell(time_milliseconds: i64)
     lines_read += 1;
   }
   if lines_read == 0 {
-    return Err(Er("is cmus running".to_string()));
+    return Err(Er("is cmus running?".to_string()));
   }
   Ok(e)
 }

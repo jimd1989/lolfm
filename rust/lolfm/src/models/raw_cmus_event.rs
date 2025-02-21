@@ -70,9 +70,9 @@ mod tests {
     use super::*;
     #[test]
     fn equal_events() {
-      let mut ω = RawCmusEvent::default().with_time(123);
-      let mut α = RawCmusEvent::default().with_time(124)
-                                         .with_status(CmusStatus::Paused);
+      let ω = RawCmusEvent::default().with_time(123);
+      let α = RawCmusEvent::default().with_time(124)
+                                      .with_status(CmusStatus::Paused);
       assert_eq!(ω, α);
     }
 }
