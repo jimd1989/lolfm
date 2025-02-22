@@ -1,12 +1,11 @@
 use crate::models::app_config::AppConfig;
 use crate::models::er::Er;
-use crate::repos::played_songs_to_db::write_played_songs_to_db;
-use
-crate::repos::raw_cmus_events_delete_from_db::delete_raw_cmus_events_from_db;
-use crate::repos::raw_cmus_events_from_db::get_raw_cmus_events_from_db;
-use crate::repos::raw_cmus_event_from_shell::get_raw_cmus_event_from_shell;
-use crate::repos::raw_cmus_event_to_db::write_raw_cmus_event_to_db;
-use crate::transformers::raw_cmus_events_to_played_songs::source_events;
+use crate::repos::played_songs_to_db;
+use crate::repos::raw_cmus_events_delete_from_db;
+use crate::repos::raw_cmus_events_from_db;
+use crate::repos::raw_cmus_event_from_shell;
+use crate::repos::raw_cmus_event_to_db;
+use crate::transformers::raw_cmus_events_to_played_songs;
 
 pub fn process_cmus_event(ω: &AppConfig) -> Result<(), Er> {
   match process(ω) {
@@ -22,13 +21,13 @@ pub fn process_cmus_event(ω: &AppConfig) -> Result<(), Er> {
 
 pub fn process(ω: &AppConfig) -> Result<(), Er> {
   ω.db.execute("BEGIN TRANSACTION")?;
-  let e = get_raw_cmus_event_from_shell(ω.time_milliseconds)?;
-  write_raw_cmus_event_to_db(&ω.db, e)?;
-  let es = get_raw_cmus_events_from_db(&ω.db)?;
-  let ps = source_events(es, ω.time_milliseconds);
-  write_played_songs_to_db(&ω.db, ps.plays)?;
+  let e     =  raw_cmus_event_from_shell::get(ω.time_milliseconds)?;
+               raw_cmus_event_to_db::write(&ω.db, e)?;
+  let es    =  raw_cmus_events_from_db::get(&ω.db)?;
+  let ps    =  raw_cmus_events_to_played_songs::run(es, ω.time_milliseconds);
+               played_songs_to_db::write(&ω.db, ps.plays)?;
   match ps.cutoff_time {
-    Some(t) => delete_raw_cmus_events_from_db(&ω.db, t),
+    Some(t) => raw_cmus_events_delete_from_db::run(&ω.db, t),
     _       => Ok(()),
   }
 }

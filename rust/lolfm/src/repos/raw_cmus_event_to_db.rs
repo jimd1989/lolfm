@@ -7,8 +7,7 @@ use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
 use crate::models::raw_cmus_event::RawCmusEvent;
 
-pub fn write_raw_cmus_event_to_db(db: &Connection, α: RawCmusEvent) 
--> Result<(), Er> {
+pub fn write(db: &Connection, α: RawCmusEvent) -> Result<(), Er> {
   let query = "
     INSERT INTO raw_cmus_events (
                   time_milliseconds,

@@ -3,8 +3,7 @@ use sqlite::Connection;
 use crate::helpers::sql_helpers::{sql_execute_void, sql_int};
 use crate::models::er::Er;
 
-pub fn delete_raw_cmus_events_from_db(db: &Connection, timestamp: i64)
--> Result<(), Er> {
+pub fn run(db: &Connection, timestamp: i64) -> Result<(), Er> {
   let query = "
     DELETE FROM raw_cmus_events
      WHERE time_milliseconds < ?

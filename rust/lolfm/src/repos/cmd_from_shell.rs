@@ -3,7 +3,7 @@ use std::env::args;
 use crate::models::cmd::Cmd;
 use crate::models::er::Er;
 
-pub fn get_cmd_from_shell() -> Result<Cmd, Er> {
+pub fn get() -> Result<Cmd, Er> {
   let α: Vec<String> = args().collect();
   let αα: Vec<&str> = α.iter().map(|ω| ω.as_str()).collect();
   parse_cmd(&αα)

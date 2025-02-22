@@ -3,8 +3,7 @@ use crate::models::played_song::PlayedSong;
 use crate::models::played_songs::PlayedSongs;
 use crate::models::raw_cmus_event::RawCmusEvent;
 
-pub fn source_events(es: Vec<RawCmusEvent>, time_milliseconds: i64)
--> PlayedSongs {
+pub fn run(es: Vec<RawCmusEvent>, time_milliseconds: i64) -> PlayedSongs {
   let mut ps = PlayedSongs::default();
   for e in es {
     /* Don't process future events */

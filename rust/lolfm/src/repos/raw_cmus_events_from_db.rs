@@ -4,12 +4,7 @@ use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
 use crate::models::raw_cmus_event::RawCmusEvent;
 
-pub fn get_raw_cmus_events_from_db(db: &Connection)
--> Result<Vec<RawCmusEvent>, String> {
-  get_events(db).map_err(|ω| ω.to_string())
-}
-
-fn get_events(db: &Connection) -> Result<Vec<RawCmusEvent>, Er> {
+pub fn get(db: &Connection) -> Result<Vec<RawCmusEvent>, Er> {
   let query = "
     SELECT time_milliseconds,
            status,

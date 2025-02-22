@@ -2,7 +2,7 @@ use sqlite::Connection;
 
 use crate::models::er::Er;
 
-pub fn init_db(db: &Connection) -> Result<(), Er> {
+pub fn run(db: &Connection) -> Result<(), Er> {
   let query = "
     PRAGMA foreign_keys = ON;
 

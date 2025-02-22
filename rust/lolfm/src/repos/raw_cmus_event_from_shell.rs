@@ -5,8 +5,7 @@ use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
 use crate::models::raw_cmus_event::RawCmusEvent;
 
-pub fn get_raw_cmus_event_from_shell(time_milliseconds: i64) 
--> Result<RawCmusEvent, Er> {
+pub fn get(time_milliseconds: i64) -> Result<RawCmusEvent, Er> {
   let mut e = RawCmusEvent::default().with_time(time_milliseconds);
   let mut lines_read = 0;
   let lines = get_lines()?;

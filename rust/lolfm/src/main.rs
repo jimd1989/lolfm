@@ -39,8 +39,8 @@ use actions::get_app_config::get_app_config;
 use actions::process_cmus_event::process_cmus_event;
 use models::cmd::Cmd;
 use models::er::Er;
-use repos::cmd_from_shell::get_cmd_from_shell;
-use repos::db_init::init_db;
+use repos::cmd_from_shell;
+use repos::db_init;
 
 fn main() {
   match exec() {
@@ -55,14 +55,14 @@ fn main() {
 }
 
 fn exec() -> Result<(), Er> {
-  match get_cmd_from_shell() {
+  match cmd_from_shell::get() {
     Ok(Cmd::Event(db_path)) => {
       let config = get_app_config(&db_path)?;
       Ok(process_cmus_event(&config)?)
     }
     Ok(Cmd::Init(db_path)) => {
       let config = get_app_config(&db_path)?;
-      init_db(&config.db)
+      db_init::run(&config.db)
     }
     Err(ω) => Err(ω),
   }

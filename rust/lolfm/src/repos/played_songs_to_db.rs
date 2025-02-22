@@ -4,8 +4,7 @@ use crate::helpers::sql_helpers::{sql_execute_void, sql_int, sql_string};
 use crate::models::er::Er;
 use crate::models::played_song::PlayedSong;
 
-pub fn write_played_songs_to_db(db: &Connection, ω: Vec<PlayedSong>) 
--> Result<(), Er> {
+pub fn write(db: &Connection, ω: Vec<PlayedSong>) -> Result<(), Er> {
   let artists_query = "
     INSERT INTO artists(name)
     VALUES (?)
@@ -39,7 +38,7 @@ pub fn write_played_songs_to_db(db: &Connection, ω: Vec<PlayedSong>)
            album AS (SELECT id FROM albums WHERE artist=(
                       SELECT id FROM artists WHERE name=? AND title=?))
     INSERT INTO plays(song, album, duration)
-    VALUES ((SELECT id FROM song), (SELECT id FROM album), ?)
+    VALUES (?, (SELECT id FROM song), (SELECT id FROM album), ?)
   ";
 
   let mut artists_statement = db.prepare(artists_query)?;
@@ -77,7 +76,8 @@ pub fn write_played_songs_to_db(db: &Connection, ω: Vec<PlayedSong>)
     sql_string(&mut plays_statement, 2, α.title)?;
     sql_string(&mut plays_statement, 3, α.album_artist)?;
     sql_string(&mut plays_statement, 4, α.album)?;
-    sql_int   (&mut plays_statement, 5, α.duration)?;
+    sql_int   (&mut plays_statement, 5, α.time_milliseconds)?;
+    sql_int   (&mut plays_statement, 6, α.duration)?;
     sql_execute_void(&mut plays_statement)?;
     plays_statement.reset()?;
   }
