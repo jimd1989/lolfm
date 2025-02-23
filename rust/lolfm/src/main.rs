@@ -14,9 +14,11 @@ mod models {
   pub mod cmd;
   pub mod cmus_status;
   pub mod er;
+  pub mod lolfm_event;
   pub mod played_song;
   pub mod played_songs;
   pub mod raw_cmus_event;
+  pub mod song;
 }
 
 mod repos {
@@ -24,6 +26,7 @@ mod repos {
   pub mod cmus_tags_from_shell;
   pub mod db_connection;
   pub mod db_init;
+  pub mod lolfm_events_to_db;
   pub mod played_songs_to_db;
   pub mod raw_cmus_events_delete_from_db;
   pub mod raw_cmus_events_from_db;
@@ -33,6 +36,7 @@ mod repos {
 
 mod transformers {
   pub mod cmus_tags_to_raw_cmus_events;
+  pub mod raw_cmus_events_to_lolfm_events;
   pub mod raw_cmus_events_to_played_songs;
 }
 
