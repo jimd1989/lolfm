@@ -21,22 +21,23 @@ mod models {
 
 mod repos {
   pub mod cmd_from_shell;
+  pub mod cmus_tags_from_shell;
   pub mod db_connection;
   pub mod db_init;
   pub mod played_songs_to_db;
   pub mod raw_cmus_events_delete_from_db;
-  pub mod raw_cmus_event_from_shell;
   pub mod raw_cmus_events_from_db;
-  pub mod raw_cmus_event_to_db;
+  pub mod raw_cmus_events_to_db;
   pub mod system_time;
 }
 
 mod transformers {
+  pub mod cmus_tags_to_raw_cmus_events;
   pub mod raw_cmus_events_to_played_songs;
 }
 
 use actions::get_app_config::get_app_config;
-use actions::process_cmus_event::process_cmus_event;
+use actions::process_cmus_event;
 use models::cmd::Cmd;
 use models::er::Er;
 use repos::cmd_from_shell;
@@ -58,7 +59,7 @@ fn exec() -> Result<(), Er> {
   match cmd_from_shell::get() {
     Ok(Cmd::Event(db_path)) => {
       let config = get_app_config(&db_path)?;
-      Ok(process_cmus_event(&config)?)
+      Ok(process_cmus_event::run(&config)?)
     }
     Ok(Cmd::Init(db_path)) => {
       let config = get_app_config(&db_path)?;

@@ -37,7 +37,7 @@ pub fn write(db: &Connection, ω: Vec<PlayedSong>) -> Result<(), Er> {
                       SELECT id FROM artists WHERE name=? AND title=?)),
            album AS (SELECT id FROM albums WHERE artist=(
                       SELECT id FROM artists WHERE name=? AND title=?))
-    INSERT INTO plays(song, album, duration)
+    INSERT INTO plays(date, song, album, duration)
     VALUES (?, (SELECT id FROM song), (SELECT id FROM album), ?)
   ";
 

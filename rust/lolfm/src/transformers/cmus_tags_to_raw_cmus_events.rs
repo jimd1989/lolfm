@@ -1,22 +1,16 @@
-use std::io::{BufRead, BufReader, Lines};
-use std::process::{ChildStdout, Command, Stdio};
-
 use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
 use crate::models::raw_cmus_event::RawCmusEvent;
 
-pub fn get(time_milliseconds: i64) -> Result<RawCmusEvent, Er> {
+pub fn run(tags: impl Iterator<Item = Vec<String>>, time_milliseconds: i64) 
+-> impl Iterator<Item = Result<RawCmusEvent, Er>> {
+  tags.map(move |ω| read_tags(&ω, time_milliseconds))
+}
+
+fn read_tags(lines: &Vec<String>, time_milliseconds: i64)
+-> Result<RawCmusEvent, Er> {
   let mut e = RawCmusEvent::default().with_time(time_milliseconds);
-  let mut lines_read = 0;
-  let lines = get_lines()?;
-  for line in lines {
-    let l = line?;
-    read_tag(&mut e, &l)?;
-    lines_read += 1;
-  }
-  if lines_read == 0 {
-    return Err(Er("is cmus running?".to_string()));
-  }
+  for l in lines { read_tag(&mut e, &l)?; }
   Ok(e)
 }
 
@@ -70,10 +64,4 @@ fn read_tag(e: &mut RawCmusEvent, l: &String) -> Result<(), Er> {
 
 fn parse_int(s: &str) -> Result<i64, Er> {
   Ok(s.parse::<i64>()?)
-}
-
-fn get_lines() -> Result<Lines<BufReader<ChildStdout>>, Er> { 
-  let α = Command::new("cmus-remote").arg("-Q").stdout(Stdio::piped()).spawn()?;
-  let ω = α.stdout.ok_or("is cmus running")?;
-  Ok(BufReader::new(ω).lines())
 }
