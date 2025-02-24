@@ -1,20 +1,20 @@
 use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
-use crate::models::raw_cmus_event::RawCmusEvent;
+use crate::models::cmus_event::CmusEvent;
 
 pub fn run(tags: impl Iterator<Item = Vec<String>>, time_milliseconds: i64) 
--> impl Iterator<Item = Result<RawCmusEvent, Er>> {
+-> impl Iterator<Item = Result<CmusEvent, Er>> {
   tags.map(move |ω| read_tags(&ω, time_milliseconds))
 }
 
 fn read_tags(lines: &Vec<String>, time_milliseconds: i64)
--> Result<RawCmusEvent, Er> {
-  let mut e = RawCmusEvent::default().with_time(time_milliseconds);
+-> Result<CmusEvent, Er> {
+  let mut e = CmusEvent::default().with_time(time_milliseconds);
   for l in lines { read_tag(&mut e, &l)?; }
   Ok(e)
 }
 
-fn read_tag(e: &mut RawCmusEvent, l: &String) -> Result<(), Er> {
+fn read_tag(e: &mut CmusEvent, l: &String) -> Result<(), Er> {
   let mut s1  = l.splitn(2, ' ');
   let s1_head = s1.next();
   let s1_tail = s1.next();

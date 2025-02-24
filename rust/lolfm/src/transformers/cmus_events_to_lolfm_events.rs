@@ -3,18 +3,18 @@ use std::iter;
 use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
 use crate::models::lolfm_event::LolfmEvent;
-use crate::models::raw_cmus_event::RawCmusEvent;
+use crate::models::cmus_event::CmusEvent;
 use crate::models::song::Song;
 
-pub fn run(mut es: impl Iterator<Item = Result<RawCmusEvent, Er>>, limit: i64)
+pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, limit: i64)
 -> impl Iterator<Item = Result<LolfmEvent, Er>> {
   /* Cutoff timestamp to DELETE outdated events when stream is finished */
   let mut cutoff = limit;
   /* Previous event in stream */
-  let mut prev: Option<RawCmusEvent> = None;
+  let mut prev: Option<CmusEvent> = None;
   let mut stream_end = false;
   iter::from_fn(move || {
-  /* There is a n:1 relationship between RawCmusEvents and LolfmEvents. The 
+  /* There is a n:1 relationship between CmusEvents and LolfmEvents. The 
    * iterator must loop over multiple raw events and return completed songs at 
    * irregular intervals, hence this ugly stateful loop. */
     if stream_end {
@@ -67,7 +67,7 @@ pub fn run(mut es: impl Iterator<Item = Result<RawCmusEvent, Er>>, limit: i64)
   })
 }
 
-fn to_song(e: &RawCmusEvent) -> Song {
+fn to_song(e: &CmusEvent) -> Song {
   let mut s = Song::default();
   assign_artists(e, &mut s);
   assign_year(&e.date, &mut s);
@@ -78,7 +78,7 @@ fn to_song(e: &RawCmusEvent) -> Song {
   s
 }
 
-fn assign_artists(e: &RawCmusEvent, s: &mut Song) {
+fn assign_artists(e: &CmusEvent, s: &mut Song) {
   match (&e.artist, &e.album_artist) {
     (Some(α), Some(ω)) => {
       s.artist = α.to_string();

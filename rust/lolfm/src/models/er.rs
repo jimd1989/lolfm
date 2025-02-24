@@ -2,7 +2,7 @@ use std::fmt::{Display, Formatter, Result};
 use std::num::ParseIntError;
 use std::time::SystemTimeError;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Er(pub String);
 
 impl Display for Er {

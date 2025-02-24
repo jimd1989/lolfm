@@ -5,9 +5,9 @@ use crate::helpers::sql_helpers::{
 };
 use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
-use crate::models::raw_cmus_event::RawCmusEvent;
+use crate::models::cmus_event::CmusEvent;
 
-pub fn write(db: &Connection, ω: impl Iterator<Item = Result<RawCmusEvent, Er>>)
+pub fn write(db: &Connection, ω: impl Iterator<Item = Result<CmusEvent, Er>>)
 -> Result<(), Er> {
   let query = "
     INSERT INTO raw_cmus_events (
