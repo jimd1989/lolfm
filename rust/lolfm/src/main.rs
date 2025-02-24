@@ -17,6 +17,7 @@ mod models {
   pub mod er;
   pub mod lolfm_event;
   pub mod song;
+  pub mod timestamp;
 }
 
 mod repos {

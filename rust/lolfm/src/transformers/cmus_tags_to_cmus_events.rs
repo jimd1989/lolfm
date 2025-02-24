@@ -1,15 +1,16 @@
+use crate::models::cmus_event::CmusEvent;
 use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
-use crate::models::cmus_event::CmusEvent;
+use crate::models::timestamp::Timestamp;
 
-pub fn run(tags: impl Iterator<Item = Vec<String>>, time_milliseconds: i64) 
+pub fn run(tags: impl Iterator<Item = Vec<String>>, time: Timestamp) 
 -> impl Iterator<Item = Result<CmusEvent, Er>> {
-  tags.map(move |ω| read_tags(&ω, time_milliseconds))
+  tags.map(move |ω| read_tags(&ω, time))
 }
 
-fn read_tags(lines: &Vec<String>, time_milliseconds: i64)
+fn read_tags(lines: &Vec<String>, time: Timestamp)
 -> Result<CmusEvent, Er> {
-  let mut e = CmusEvent::default().with_time(time_milliseconds);
+  let mut e = CmusEvent::default().with_time(time);
   for l in lines { read_tag(&mut e, &l)?; }
   Ok(e)
 }
@@ -24,7 +25,7 @@ fn read_tag(e: &mut CmusEvent, l: &String) -> Result<(), Er> {
   match (s1_head, s2_head, s2_tail) {
     (Some("timemilliseconds"), Some(n), _) => { 
       let ω = parse_int(n)?;
-      Ok({ e.time_milliseconds = ω; })
+      Ok({ e.time = Timestamp::from_milliseconds(ω); })
     },
     (Some("status"), Some(α), _) => {
       let ω = CmusStatus::from_str(α)?;

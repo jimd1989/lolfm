@@ -16,10 +16,10 @@ pub fn run(ω: &AppConfig) -> Result<(), Er> {
 
 pub fn process(ω: &AppConfig) -> Result<(), Er> {
   ω.db.execute("BEGIN TRANSACTION")?;
-  let ts  = cmus_tags_from_shell::get("-Q", "status")?;
-  let tes = cmus_tags_to_cmus_events::run(ts, ω.time_milliseconds);
-            cmus_events_to_db::write(&ω.db, tes)?;
-  let ees = cmus_events_from_db::get(&ω.db)?;
-  let ss  = cmus_events_to_lolfm_events::run(ees, ω.time_milliseconds);
-            lolfm_events_to_db::write(&ω.db, ss)
+  let ts = cmus_tags_from_shell::get("-Q", "status")?;
+  let cs = cmus_tags_to_cmus_events::run(ts, ω.time);
+           cmus_events_to_db::write(&ω.db, cs)?;
+  let es = cmus_events_from_db::get(&ω.db)?;
+  let ss = cmus_events_to_lolfm_events::run(es, ω.time);
+           lolfm_events_to_db::write(&ω.db, ss)
 }

@@ -5,11 +5,12 @@ use crate::models::er::Er;
 use crate::models::lolfm_event::LolfmEvent;
 use crate::models::cmus_event::CmusEvent;
 use crate::models::song::Song;
+use crate::models::timestamp::Timestamp;
 
-pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, limit: i64)
+pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, lim: Timestamp)
 -> impl Iterator<Item = Result<LolfmEvent, Er>> {
   /* Cutoff timestamp to DELETE outdated events when stream is finished */
-  let mut cutoff = limit;
+  let mut cutoff = lim;
   /* Previous event in stream */
   let mut prev: Option<CmusEvent> = None;
   let mut stream_end = false;
@@ -28,8 +29,8 @@ pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, limit: i64)
            * would be written immediately out to T+50min. These do not get
            * logged as plays until T+50min has arrived, however. The stream
            * simply ends without deleting them. */
-          if e.time_milliseconds > limit { return None; }
-          cutoff = e.time_milliseconds;
+          if e.time > lim { return None; }
+          cutoff = e.time;
           let (song, new_prev) = match (&prev, &e.status) {
             /* Begin tracking new play */
             (None, CmusStatus::Paused | CmusStatus::Playing) =>
@@ -52,8 +53,7 @@ pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, limit: i64)
           prev = new_prev;
           match song {
             Some(ω) => { 
-              /* Final plays are logged as seconds (÷ 1000) */
-              return Some(Ok(LolfmEvent::RecordPlay(cutoff / 1000, ω))); 
+              return Some(Ok(LolfmEvent::RecordPlay(cutoff, ω))); 
             }
             _       => {}
           }

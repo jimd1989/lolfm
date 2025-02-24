@@ -1,7 +1,8 @@
 use crate::models::song::Song;
+use crate::models::timestamp::Timestamp;
 
 #[derive(Debug, PartialEq)]
 pub enum LolfmEvent {
-  DeleteBefore(i64),
-  RecordPlay(i64, Song),
+  DeleteBefore(Timestamp),
+  RecordPlay(Timestamp, Song),
 }
