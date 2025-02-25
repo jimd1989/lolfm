@@ -7,7 +7,7 @@ pub fn run(db: &Connection) -> Result<(), Er> {
     PRAGMA foreign_keys = ON;
 
     CREATE TABLE IF NOT EXISTS raw_cmus_events(
-      time_milliseconds BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+      time_milliseconds BIGINT NOT NULL,
       status            INTEGER NOT NULL,
       artist            TEXT,
       title             TEXT,
@@ -22,13 +22,13 @@ pub fn run(db: &Connection) -> Result<(), Er> {
     
     CREATE TABLE IF NOT EXISTS artists(
       id    INTEGER PRIMARY KEY NOT NULL,
-      name  TEXT NOT NULL,
+      name  TEXT NOT NULL COLLATE NOCASE,
       UNIQUE(name COLLATE NOCASE)
     );
     
     CREATE TABLE IF NOT EXISTS albums(
       id            INTEGER PRIMARY KEY NOT NULL,
-      title         TEXT NOT NULL,
+      title         TEXT NOT NULL COLLATE NOCASE,
       artist        INTEGER NOT NULL,
       year          INTEGER DEFAULT 0 NOT NULL,
       FOREIGN KEY(artist) REFERENCES artists(id),
@@ -37,13 +37,13 @@ pub fn run(db: &Connection) -> Result<(), Er> {
     
     CREATE TABLE IF NOT EXISTS genres(
       id    INTEGER PRIMARY KEY NOT NULL,
-      name  TEXT NOT NULL,
+      name  TEXT NOT NULL COLLATE NOCASE,
       UNIQUE(name COLLATE NOCASE)
     );
     
     CREATE TABLE IF NOT EXISTS songs(
       id            INTEGER PRIMARY KEY NOT NULL,
-      title         TEXT NOT NULL,
+      title         TEXT NOT NULL COLLATE NOCASE,
       artist        INTEGER NOT NULL,
       genre         INTEGER NOT NULL,
       FOREIGN KEY(artist) REFERENCES artists(id),
@@ -73,7 +73,5 @@ pub fn run(db: &Connection) -> Result<(), Er> {
       FOREIGN KEY(artist) REFERENCES artists(id)
     );
     ";
-    db.execute("BEGIN TRANSACTION")?;
-    db.execute(query)?;
-    Ok(db.execute("COMMIT")?)
+    Ok(db.execute(query)?)
 }

@@ -14,9 +14,9 @@ pub fn run(ω: &AppConfig) -> Result<(), Er> {
   }
 }
 
-pub fn process(ω: &AppConfig) -> Result<(), Er> {
-  ω.db.execute("BEGIN TRANSACTION")?;
-  let ts = cmus_tags_from_shell::get("-Q", "status")?;
+fn process(ω: &AppConfig) -> Result<(), Er> {
+           ω.db.execute("BEGIN TRANSACTION")?;
+  let ts = cmus_tags_from_shell::get(&["-Q"], "status")?;
   let cs = cmus_tags_to_cmus_events::run(ts, ω.time);
            cmus_events_to_db::write(&ω.db, cs)?;
   let es = cmus_events_from_db::get(&ω.db)?;
