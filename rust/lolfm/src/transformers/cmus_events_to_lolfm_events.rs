@@ -22,6 +22,7 @@ pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, lim: Timestamp)
       return None;
     }
     for res in es.by_ref() {
+      println!("{:?}", res);
       match res {
         Ok(e)  => { 
           /* It is possible to write future events. If one manually queued up 
@@ -47,7 +48,7 @@ pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, lim: Timestamp)
             /* Return finished play */
             (Some(ω), CmusStatus::Stopped) => (Some(to_song(&ω)), None),
             /* Write past absurd conditions */
-            _ => (None, Some(e)),
+            _ => (None, None),
           };
           /* Match on song, new_prev */
           prev = new_prev;
