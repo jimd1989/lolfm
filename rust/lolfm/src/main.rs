@@ -14,12 +14,12 @@ mod helpers {
 mod models {
   pub mod app_config;
   pub mod cmd;
-  pub mod cmus_decoder;
   pub mod cmus_event;
   pub mod cmus_status;
   pub mod cmus_tag;
   pub mod er;
   pub mod lolfm_event;
+  pub mod played_song;
   pub mod song;
   pub mod table_name;
   pub mod timestamp;
@@ -33,8 +33,16 @@ mod repos {
   pub mod db_connection;
   pub mod db_create_schema;
   pub mod lolfm_events_to_db;
+  pub mod loved_songs_from_db;
+  pub mod played_songs_from_db;
+  pub mod songs_from_db;
   pub mod songs_to_db;
   pub mod system_time;
+}
+
+mod traits {
+  pub mod cmus_decoder;
+  pub mod cmus_encoder;
 }
 
 mod transformers {

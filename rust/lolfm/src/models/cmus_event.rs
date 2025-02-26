@@ -1,12 +1,12 @@
-use crate::models::cmus_decoder::CmusDecoder;
 use crate::models::cmus_status::CmusStatus;
 use crate::models::cmus_tag::CmusTag;
 use crate::models::er::Er;
-use crate::models::timestamp::Timestamp;
+use crate::models::timestamp::Milliseconds;
+use crate::traits::cmus_decoder::CmusDecoder;
 
 #[derive(Clone, Debug)]
 pub struct CmusEvent {
-  pub time:         Timestamp,
+  pub time:         Milliseconds,
   pub status:       CmusStatus,
   pub artist:       Option<String>,
   pub title:        Option<String>,
@@ -22,7 +22,7 @@ pub struct CmusEvent {
 impl Default for CmusEvent {
   fn default() -> Self {
     Self {
-      time: Timestamp::from_milliseconds(0),
+      time: Milliseconds::from_i64(0),
       status: CmusStatus::Stopped,
       artist: None,
       title: None,
@@ -38,7 +38,7 @@ impl Default for CmusEvent {
 }
 
 impl CmusEvent {
-  pub fn with_time(mut self, ω: Timestamp) -> Self {
+  pub fn with_time(mut self, ω: Milliseconds) -> Self {
     self.time = ω;
     self
   }
@@ -51,7 +51,7 @@ impl CmusDecoder for CmusEvent {
            ω.2.as_ref().map(|α| α.as_str())) {
       (Some("timemilliseconds"), Some(n), _) => { 
         let ω = n.parse::<i64>()?;
-        Ok({ self.time = Timestamp::from_milliseconds(ω); })
+        Ok({ self.time = Milliseconds::from_i64(ω); })
       },
       (Some("status"), Some(α), _) => {
         let ω = CmusStatus::from_str(α)?;

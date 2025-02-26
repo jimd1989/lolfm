@@ -27,7 +27,7 @@ pub fn write(db: &Connection, ω: impl Iterator<Item = Result<CmusEvent, Er>>)
   let mut statement = db.prepare(query)?;
   for e in ω {
     let α = e?;
-    sql_int(            &mut statement, 1,  α.time.to_milliseconds())?;
+    sql_int(            &mut statement, 1,  α.time.to_i64())?;
     sql_int(            &mut statement, 2,  CmusStatus::to_sql_enum(α.status))?;
     sql_nullable_string(&mut statement, 3,  α.artist)?;
     sql_nullable_string(&mut statement, 4,  α.title)?;

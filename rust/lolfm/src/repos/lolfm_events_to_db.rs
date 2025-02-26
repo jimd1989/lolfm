@@ -84,13 +84,13 @@ pub fn write(db: &Connection, ω: impl Iterator<Item = Result<LolfmEvent, Er>>)
         sql_string(&mut plays_statement, 2, α.title)?;
         sql_string(&mut plays_statement, 3, α.album_artist)?;
         sql_string(&mut plays_statement, 4, α.album)?;
-        sql_int   (&mut plays_statement, 5, time.to_seconds())?;
+        sql_int   (&mut plays_statement, 5, time.to_i64())?;
         sql_int   (&mut plays_statement, 6, α.duration)?;
         sql_execute_void(&mut plays_statement)?;
         plays_statement.reset()?;
       }
       Ok(LolfmEvent::DeleteBefore(time)) => {
-        sql_int   (&mut delete_statement, 1, time.to_milliseconds())?;
+        sql_int   (&mut delete_statement, 1, time.to_i64())?;
         sql_execute_void(&mut delete_statement)?;
         delete_statement.reset()?;
       }

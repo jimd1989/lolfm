@@ -5,9 +5,9 @@ use crate::models::er::Er;
 use crate::models::lolfm_event::LolfmEvent;
 use crate::models::cmus_event::CmusEvent;
 use crate::models::song::Song;
-use crate::models::timestamp::Timestamp;
+use crate::models::timestamp::Milliseconds;
 
-pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, lim: Timestamp)
+pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, lim: Milliseconds)
 -> impl Iterator<Item = Result<LolfmEvent, Er>> {
   /* Cutoff timestamp to DELETE outdated events when stream is finished */
   let mut cutoff = lim;
@@ -22,7 +22,6 @@ pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, lim: Timestamp)
       return None;
     }
     for res in es.by_ref() {
-      println!("{:?}", res);
       match res {
         Ok(e)  => { 
           /* It is possible to write future events. If one manually queued up 
@@ -54,7 +53,7 @@ pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, lim: Timestamp)
           prev = new_prev;
           match song {
             Some(ω) => { 
-              return Some(Ok(LolfmEvent::RecordPlay(cutoff, ω))); 
+              return Some(Ok(LolfmEvent::RecordPlay(cutoff.to_seconds(), ω))); 
             }
             _       => {}
           }

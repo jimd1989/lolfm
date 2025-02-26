@@ -4,7 +4,7 @@ use std::iter;
 use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
 use crate::models::cmus_event::CmusEvent;
-use crate::models::timestamp::Timestamp;
+use crate::models::timestamp::Milliseconds;
 
 pub fn get<'a>(db: &'a Connection)
 -> Result<impl Iterator<Item = Result<CmusEvent, Er>> + 'a, Er> {
@@ -38,7 +38,7 @@ fn to_event(statement: &mut Statement) -> Result<CmusEvent, Er> {
   let status = CmusStatus::from_sql_enum(raw_status)?;
   let raw_time: i64 = statement.read(0)?;
   let event = CmusEvent {
-    time:         Timestamp::from_milliseconds(raw_time),
+    time:         Milliseconds::from_i64(raw_time),
     status:       status,
     artist:       statement.read(2)?,
     title:        statement.read(3)?,

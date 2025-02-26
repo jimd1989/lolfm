@@ -1,9 +1,13 @@
-use crate::models::cmus_decoder::CmusDecoder;
+use std::io::Write;
+
 use crate::models::cmus_tag::CmusTag;
 use crate::models::er::Er;
+use crate::traits::cmus_decoder::CmusDecoder;
+use crate::traits::cmus_encoder::CmusEncoder;
 
 #[derive(Debug, PartialEq)]
 pub struct Song {
+  pub id:           i64,    /* Only used when dumping from DB */
   pub artist:       String,
   pub album_artist: String,
   pub title:        String,
@@ -16,6 +20,7 @@ pub struct Song {
 impl Default for Song {
   fn default() -> Self {
     Self {
+      id: 0,
       artist: "Unknown Artist".to_string(),
       album_artist: "Unknown Artist".to_string(),
       title: "Unknown Title".to_string(),
@@ -57,5 +62,15 @@ impl CmusDecoder for Song {
       },
       _ => Ok(()),
     }
+  }
+}
+
+impl CmusEncoder for Song {
+  fn as_event(&self, ω: &mut dyn Write) -> Result<(), Er> {
+    Ok(writeln!(ω, "song\ntag id {}\ntag artist {}\ntag title {}",
+       self.id, self.artist, self.title)?)
+  }
+  fn as_row(&self, ω: &mut dyn Write) -> Result<(), Er> {
+    Ok(writeln!(ω, "{}\t{}\t{}", self.id, self.artist, self.title)?)
   }
 }

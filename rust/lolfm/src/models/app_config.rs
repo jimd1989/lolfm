@@ -1,8 +1,8 @@
 use sqlite::Connection;
 
-use crate::models::timestamp::Timestamp;
+use crate::models::timestamp::Milliseconds;
 
 pub struct AppConfig {
-  pub time: Timestamp,
+  pub time: Milliseconds,
   pub db:   Connection,
 }
