@@ -26,7 +26,11 @@ fn parse_cmd(α: &Vec<&str>) -> Result<Cmd, Er> {
       let ω = id.parse::<i64>()?;
       Ok(Cmd::Love(ω, db_path.to_string()))
     }
+    [_, "unlove", id, db_path] => {
+      let ω = id.parse::<i64>()?;
+      Ok(Cmd::Unlove(ω, db_path.to_string()))
+    }
     [_, "init", db_path]  => Ok(Cmd::Init(db_path.to_string())),
-    _                                 => Err(format!("Bad cmd {:?}", α).into()),
+    _ => Err(format!("Bad cmd {:?}", α).into()),
   }
 }
