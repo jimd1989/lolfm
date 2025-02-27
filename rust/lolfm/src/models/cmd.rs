@@ -2,7 +2,8 @@ use crate::models::table_name::TableName;
 
 #[derive(Debug)]
 pub enum Cmd {
-  Dump(bool, TableName, String),
   Event(String),
+  Dump(bool, TableName, String),
+  Love(i64, String),
   Init(String),
 }

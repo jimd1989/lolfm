@@ -4,6 +4,7 @@ mod actions {
   pub mod dump_table;
   pub mod get_app_config;
   pub mod init_db;
+  pub mod love_song;
   pub mod process_cmus_event;
 }
 
@@ -19,6 +20,7 @@ mod models {
   pub mod cmus_tag;
   pub mod er;
   pub mod lolfm_event;
+  pub mod loved_song;
   pub mod played_song;
   pub mod song;
   pub mod table_name;
@@ -33,6 +35,7 @@ mod repos {
   pub mod db_connection;
   pub mod db_create_schema;
   pub mod lolfm_events_to_db;
+  pub mod love_song_in_db;
   pub mod loved_songs_from_db;
   pub mod played_songs_from_db;
   pub mod songs_from_db;
@@ -54,6 +57,7 @@ mod transformers {
 use actions::dump_table;
 use actions::get_app_config::get_app_config;
 use actions::init_db;
+use actions::love_song;
 use actions::process_cmus_event;
 use models::cmd::Cmd;
 use models::er::Er;
@@ -73,13 +77,17 @@ fn main() {
 
 fn exec() -> Result<(), Er> {
   match cmd_from_shell::get() {
+    Ok(Cmd::Event(db_path)) => {
+      let config = get_app_config(&db_path)?;
+      Ok(process_cmus_event::run(&config)?)
+    }
     Ok(Cmd::Dump(as_events, table, db_path)) => {
       let config = get_app_config(&db_path)?;
       Ok(dump_table::run(&config, table, as_events)?)
     }
-    Ok(Cmd::Event(db_path)) => {
+    Ok(Cmd::Love(id, db_path)) => {
       let config = get_app_config(&db_path)?;
-      Ok(process_cmus_event::run(&config)?)
+      Ok(love_song::run(&config, id)?)
     }
     Ok(Cmd::Init(db_path)) => {
       let config = get_app_config(&db_path)?;

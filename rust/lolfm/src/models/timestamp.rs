@@ -23,4 +23,7 @@ impl Seconds {
   pub fn to_i64(&self) -> i64 {
     self.0
   }
+  pub fn to_milliseconds(&self) -> Milliseconds {
+    Milliseconds(self.0 * 1000)
+  }
 }

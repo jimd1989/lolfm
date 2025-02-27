@@ -17,7 +17,7 @@ pub struct PlayedSong {
 
 impl CmusEncoder for PlayedSong {
   fn as_event(&self, ω: &mut dyn Write) -> Result<(), Er> {
-    let n = self.date.to_i64() - 1;
+    let n = self.date.to_milliseconds().to_i64() - 1;
     Ok(writeln!(ω, 
 "status playing
 duration {}
@@ -31,7 +31,7 @@ timemilliseconds {}
 status stopped
 timemilliseconds {}",
       self.duration, self.artist, self.album, self.title, self.year,
-      self.genre, self.album_artist, n, self.date.to_i64())?)
+      self.genre, self.album_artist, n, self.date.to_milliseconds().to_i64())?)
   }
   fn as_row(&self, ω: &mut dyn Write) -> Result<(), Er> {
     Ok(writeln!(ω, "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", 

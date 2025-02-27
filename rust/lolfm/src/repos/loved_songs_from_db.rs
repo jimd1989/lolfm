@@ -2,12 +2,10 @@ use sqlite::{Connection, State, Statement};
 use std::iter;
 
 use crate::models::er::Er;
-use crate::models::song::Song;
-
-/* Partially reuses the Song model. Not sure if this is a mistake. */
+use crate::models::loved_song::LovedSong;
 
 pub fn get<'a>(db: &'a Connection)
--> Result<impl Iterator<Item = Result<Song, Er>> + 'a, Er> {
+-> Result<impl Iterator<Item = Result<LovedSong, Er>> + 'a, Er> {
   let query = "
     SELECT songs.id,
            songs.title,
@@ -27,10 +25,10 @@ pub fn get<'a>(db: &'a Connection)
   }))
 }
 
-fn to_song(statement: &mut Statement) -> Result<Song, Er> {
-  let mut s = Song::default();
-  s.id     = statement.read(0)?;
-  s.title  = statement.read(1)?;
-  s.artist = statement.read(2)?;
+fn to_song(statement: &mut Statement) -> Result<LovedSong, Er> {
+  let mut s = LovedSong::default();
+  s.song_id = statement.read(0)?;
+  s.title   = statement.read(1)?;
+  s.artist  = statement.read(2)?;
   Ok(s)
 }
