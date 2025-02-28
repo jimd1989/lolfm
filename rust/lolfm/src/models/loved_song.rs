@@ -1,8 +1,9 @@
 use std::io::Write;
 
-use crate::traits::cmus_encoder::CmusEncoder;
 use crate::models::er::Er;
 use crate::models::timestamp::Seconds;
+use crate::traits::cmus_event_encoder::CmusEventEncoder;
+use crate::traits::row_encoder::RowEncoder;
 
 pub struct LovedSong {
   pub date:     Seconds,
@@ -22,12 +23,16 @@ impl Default for LovedSong {
   }
 }
 
-impl CmusEncoder for LovedSong {
-  fn as_event(&self, ω: &mut dyn Write) -> Result<(), Er> {
-    Ok(writeln!(ω, "song\ntag id {}\ntag artist {}\ntag title {}",
-       self.song_id, self.artist, self.title)?)
+/* Need date */
+impl CmusEventEncoder for LovedSong {
+  fn print(&self, ω: &mut dyn Write) -> Result<(), Er> {
+    Ok(writeln!(ω, "song\ntag artist {}\ntag title {}",
+        self.artist, self.title)?)
   }
-  fn as_row(&self, ω: &mut dyn Write) -> Result<(), Er> {
+}
+
+impl RowEncoder for LovedSong {
+  fn print(&self, ω: &mut dyn Write) -> Result<(), Er> {
     Ok(writeln!(ω, "{}\t{}\t{}", self.song_id, self.artist, self.title)?)
   }
 }

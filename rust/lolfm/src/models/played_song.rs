@@ -2,7 +2,8 @@ use std::io::Write;
 
 use crate::models::er::Er;
 use crate::models::timestamp::Seconds;
-use crate::traits::cmus_encoder::CmusEncoder;
+use crate::traits::cmus_event_encoder::CmusEventEncoder;
+use crate::traits::row_encoder::RowEncoder;
 
 pub struct PlayedSong {
   pub date:         Seconds,
@@ -15,11 +16,11 @@ pub struct PlayedSong {
   pub duration:     i64,
 }
 
-impl CmusEncoder for PlayedSong {
-  fn as_event(&self, ω: &mut dyn Write) -> Result<(), Er> {
+impl CmusEventEncoder for PlayedSong {
+  fn print(&self, ω: &mut dyn Write) -> Result<(), Er> {
     let n = self.date.to_milliseconds().to_i64() - 1;
     Ok(writeln!(ω, 
-"status playing
+        "status playing
 duration {}
 tag artist {}
 tag album {}
@@ -30,10 +31,13 @@ tag albumartist {}
 timemilliseconds {}
 status stopped
 timemilliseconds {}",
-      self.duration, self.artist, self.album, self.title, self.year,
-      self.genre, self.album_artist, n, self.date.to_milliseconds().to_i64())?)
+self.duration, self.artist, self.album, self.title, self.year,
+self.genre, self.album_artist, n, self.date.to_milliseconds().to_i64())?)
   }
-  fn as_row(&self, ω: &mut dyn Write) -> Result<(), Er> {
+}
+
+impl RowEncoder for PlayedSong {
+  fn print(&self, ω: &mut dyn Write) -> Result<(), Er> {
     Ok(writeln!(ω, "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", 
         self.date.to_i64(), self.artist, self.title, self.album, 
         self.year, self.album_artist, self.genre, self.duration)?)

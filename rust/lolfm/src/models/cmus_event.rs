@@ -2,7 +2,7 @@ use crate::models::cmus_status::CmusStatus;
 use crate::models::cmus_tag::CmusTag;
 use crate::models::er::Er;
 use crate::models::timestamp::Milliseconds;
-use crate::traits::cmus_decoder::CmusDecoder;
+use crate::traits::cmus_event_decoder::CmusEventDecoder;
 
 #[derive(Clone, Debug)]
 pub struct CmusEvent {
@@ -44,7 +44,7 @@ impl CmusEvent {
   }
 }
 
-impl CmusDecoder for CmusEvent {
+impl CmusEventDecoder for CmusEvent {
   fn match_tag(&mut self, ω: CmusTag) -> Result<(), Er> {
     match (ω.0.as_ref().map(|α| α.as_str()), 
            ω.1.as_ref().map(|α| α.as_str()),

@@ -46,8 +46,9 @@ mod repos {
 }
 
 mod traits {
-  pub mod cmus_decoder;
-  pub mod cmus_encoder;
+  pub mod cmus_event_decoder;
+  pub mod cmus_event_encoder;
+  pub mod row_encoder;
 }
 
 mod transformers {

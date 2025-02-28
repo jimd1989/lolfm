@@ -2,7 +2,7 @@ use crate::models::cmus_event::CmusEvent;
 use crate::models::cmus_tag::CmusTag;
 use crate::models::er::Er;
 use crate::models::timestamp::Milliseconds;
-use crate::traits::cmus_decoder::CmusDecoder;
+use crate::traits::cmus_event_decoder::CmusEventDecoder;
 
 pub fn run(tags: impl Iterator<Item = Vec<CmusTag>>, time: Milliseconds) 
 -> impl Iterator<Item = Result<CmusEvent, Er>> {

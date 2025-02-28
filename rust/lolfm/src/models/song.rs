@@ -2,8 +2,8 @@ use std::io::Write;
 
 use crate::models::cmus_tag::CmusTag;
 use crate::models::er::Er;
-use crate::traits::cmus_decoder::CmusDecoder;
-use crate::traits::cmus_encoder::CmusEncoder;
+use crate::traits::cmus_event_decoder::CmusEventDecoder;
+use crate::traits::row_encoder::RowEncoder;
 
 #[derive(Debug, PartialEq)]
 pub struct Song {
@@ -32,7 +32,7 @@ impl Default for Song {
   }
 }
 
-impl CmusDecoder for Song {
+impl CmusEventDecoder for Song {
   fn match_tag(&mut self, ω: CmusTag) -> Result<(), Er> {
     match (ω.0.as_ref().map(|α| α.as_str()), 
            ω.1.as_ref().map(|α| α.as_str()),
@@ -65,12 +65,8 @@ impl CmusDecoder for Song {
   }
 }
 
-impl CmusEncoder for Song {
-  fn as_event(&self, ω: &mut dyn Write) -> Result<(), Er> {
-    Ok(writeln!(ω, "song\ntag id {}\ntag artist {}\ntag title {}",
-       self.id, self.artist, self.title)?)
-  }
-  fn as_row(&self, ω: &mut dyn Write) -> Result<(), Er> {
+impl RowEncoder for Song {
+  fn print(&self, ω: &mut dyn Write) -> Result<(), Er> {
     Ok(writeln!(ω, "{}\t{}\t{}", self.id, self.artist, self.title)?)
   }
 }

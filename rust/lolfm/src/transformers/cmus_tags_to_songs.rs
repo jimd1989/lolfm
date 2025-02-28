@@ -1,7 +1,7 @@
 use crate::models::cmus_tag::CmusTag;
 use crate::models::er::Er;
 use crate::models::song::Song;
-use crate::traits::cmus_decoder::CmusDecoder;
+use crate::traits::cmus_event_decoder::CmusEventDecoder;
 
 pub fn run(tags: impl Iterator<Item = Vec<CmusTag>>) 
   -> impl Iterator<Item = Result<Song, Er>> {
