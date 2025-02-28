@@ -32,9 +32,9 @@ mod repos {
   pub mod cmd_from_shell;
   pub mod cmus_events_from_db;
   pub mod cmus_events_to_db;
-  pub mod cmus_tags_from_shell;
   pub mod db_connection;
   pub mod db_create_schema;
+  pub mod lines_from_cmus_remote;
   pub mod lolfm_events_to_db;
   pub mod love_song_in_db;
   pub mod loved_song_delete_from_db;
@@ -55,6 +55,7 @@ mod transformers {
   pub mod cmus_events_to_lolfm_events;
   pub mod cmus_tags_to_cmus_events;
   pub mod cmus_tags_to_songs;
+  pub mod lines_to_cmus_tags;
 }
 
 use actions::dump_table;
