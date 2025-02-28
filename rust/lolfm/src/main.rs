@@ -29,12 +29,13 @@ mod models {
 }
 
 mod repos {
-  pub mod cmd_from_shell;
+  pub mod cmd_from_stdin;
   pub mod cmus_events_from_db;
   pub mod cmus_events_to_db;
   pub mod db_connection;
   pub mod db_create_schema;
   pub mod lines_from_cmus_remote;
+  pub mod lines_from_stdin;
   pub mod lolfm_events_to_db;
   pub mod love_song_in_db;
   pub mod loved_song_delete_from_db;
@@ -66,7 +67,7 @@ use actions::process_cmus_event;
 use actions::unlove_song;
 use models::cmd::Cmd;
 use models::er::Er;
-use repos::cmd_from_shell;
+use repos::cmd_from_stdin;
 
 fn main() {
   match exec() {
@@ -81,7 +82,7 @@ fn main() {
 }
 
 fn exec() -> Result<(), Er> {
-  match cmd_from_shell::get() {
+  match cmd_from_stdin::get() {
     Ok(Cmd::Event(db_path)) => {
       let config = get_app_config(&db_path)?;
       Ok(process_cmus_event::run(&config)?)
