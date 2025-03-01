@@ -34,7 +34,7 @@
 
 (define-constant OUT (open-output-file "/tmp/lolfm.html"))
 (define-constant DB "~/.config/cmus/lolfm.db")
-(define-constant QUERIES-PATH "~/prog/misc/lolfm/db/queries/")
+(define-constant QUERIES-PATH "~/prog/misc/lolfm/db/")
 
 (define-constant TAB-CSS
  (◇ ".tabset > input[type=\"radio\"] {position: absolute; left: -200vw;}"
