@@ -1,10 +1,13 @@
 use std::io::Write;
 
+use crate::models::cmus_tag::CmusTag;
 use crate::models::er::Er;
 use crate::models::timestamp::Seconds;
+use crate::traits::cmus_event_decoder::CmusEventDecoder;
 use crate::traits::cmus_event_encoder::CmusEventEncoder;
 use crate::traits::row_encoder::RowEncoder;
 
+#[derive(Debug)]
 pub struct LovedSong {
   pub date:     Seconds,
   pub song_id:  i64,
@@ -23,7 +26,26 @@ impl Default for LovedSong {
   }
 }
 
-/* Need date */
+impl CmusEventDecoder for LovedSong {
+  fn match_tag(&mut self, ω: CmusTag) -> Result<(), Er> {
+    match (ω.0.as_ref().map(|α| α.as_str()), 
+           ω.1.as_ref().map(|α| α.as_str()),
+           ω.2.as_ref().map(|α| α.as_str())) {
+      (Some("tag"), Some("artist"), Some(α)) => { 
+        Ok({ self.artist = α.to_string(); })
+      },
+      (Some("tag"), Some("title"), Some(α)) => { 
+        Ok({ self.title = α.to_string(); })
+      },
+      (Some("time"), Some(n), _) => { 
+        let α = n.parse::<i64>()?;
+        Ok({ self.date = Seconds::from_i64(α); })
+      },
+      _ => Ok(()),
+    }
+  }
+}
+
 impl CmusEventEncoder for LovedSong {
   fn print(&self, ω: &mut dyn Write) -> Result<(), Er> {
     Ok(writeln!(ω, "love\ntime {}\ntag artist {}\ntag title {}",

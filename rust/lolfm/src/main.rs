@@ -41,6 +41,7 @@ mod repos {
   pub mod love_song_in_db;
   pub mod loved_song_delete_from_db;
   pub mod loved_songs_from_db;
+  pub mod loved_songs_to_db;
   pub mod played_songs_from_db;
   pub mod songs_from_db;
   pub mod songs_to_db;
@@ -56,6 +57,7 @@ mod traits {
 mod transformers {
   pub mod cmus_events_to_lolfm_events;
   pub mod cmus_tags_to_cmus_events;
+  pub mod cmus_tags_to_loved_songs;
   pub mod cmus_tags_to_songs;
   pub mod lines_to_cmus_tags;
 }
