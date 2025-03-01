@@ -26,7 +26,7 @@ impl Default for LovedSong {
 /* Need date */
 impl CmusEventEncoder for LovedSong {
   fn print(&self, ω: &mut dyn Write) -> Result<(), Er> {
-    Ok(writeln!(ω, "song\ntime {}\ntag artist {}\ntag title {}",
+    Ok(writeln!(ω, "love\ntime {}\ntag artist {}\ntag title {}",
         self.date.to_i64(), self.artist, self.title)?)
   }
 }

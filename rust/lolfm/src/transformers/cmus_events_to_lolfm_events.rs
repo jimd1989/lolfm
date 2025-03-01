@@ -7,7 +7,8 @@ use crate::models::cmus_event::CmusEvent;
 use crate::models::song::Song;
 use crate::models::timestamp::Milliseconds;
 
-pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, lim: Milliseconds)
+pub fn run(mut es: impl Iterator<Item = Result<CmusEvent, Er>>, 
+           lim: Milliseconds)
 -> impl Iterator<Item = Result<LolfmEvent, Er>> {
   /* Cutoff timestamp to DELETE outdated events when stream is finished */
   let mut cutoff = lim;

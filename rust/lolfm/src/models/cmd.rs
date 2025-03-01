@@ -4,6 +4,7 @@ use crate::models::table_name::TableName;
 pub enum Cmd {
   Event(String),
   Dump(bool, TableName, String),
+  Read(TableName, String),
   Love(i64, String),
   Unlove(i64, String),
   Init(String),

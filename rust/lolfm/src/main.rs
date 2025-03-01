@@ -6,6 +6,7 @@ mod actions {
   pub mod init_db;
   pub mod love_song;
   pub mod process_cmus_event;
+  pub mod read_events;
   pub mod unlove_song;
 }
 
@@ -64,6 +65,7 @@ use actions::get_app_config::get_app_config;
 use actions::init_db;
 use actions::love_song;
 use actions::process_cmus_event;
+use actions::read_events;
 use actions::unlove_song;
 use models::cmd::Cmd;
 use models::er::Er;
@@ -90,6 +92,10 @@ fn exec() -> Result<(), Er> {
     Ok(Cmd::Dump(as_events, table, db_path)) => {
       let config = get_app_config(&db_path)?;
       Ok(dump_table::run(&config, table, as_events)?)
+    }
+    Ok(Cmd::Read(table, db_path)) => {
+      let config = get_app_config(&db_path)?;
+      Ok(read_events::run(&config, table)?)
     }
     Ok(Cmd::Love(id, db_path)) => {
       let config = get_app_config(&db_path)?;

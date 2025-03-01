@@ -10,7 +10,6 @@ pub fn get() -> Result<Cmd, Er> {
   parse_cmd(&αα)
 }
 
-/* Should probably be a transformer rather than in repo */
 fn parse_cmd(α: &Vec<&str>) -> Result<Cmd, Er> {
   match α.as_slice() {
     [_, "event", db_path] => Ok(Cmd::Event(db_path.to_string())),
@@ -21,6 +20,10 @@ fn parse_cmd(α: &Vec<&str>) -> Result<Cmd, Er> {
     [_, "dump", table, db_path] => {
       let name = TableName::from_string(table)?;
       Ok(Cmd::Dump(false, name, db_path.to_string()))
+    }
+    [_, "read", table, db_path] => {
+      let name = TableName::from_string(table)?;
+      Ok(Cmd::Read(name, db_path.to_string()))
     }
     [_, "love", id, db_path] => {
       let ω = id.parse::<i64>()?;
