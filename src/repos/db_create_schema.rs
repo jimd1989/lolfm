@@ -65,6 +65,7 @@ pub fn run(db: &Connection) -> Result<(), Er> {
       date          INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       song          INTEGER NOT NULL,
       FOREIGN KEY(song) REFERENCES songs(id)
+      UNIQUE(song)
     );
     
     CREATE TABLE IF NOT EXISTS suppressed(
