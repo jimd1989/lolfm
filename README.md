@@ -10,7 +10,7 @@ Intended for people who know how to script/pipe/etc and query SQL. No support of
 
 ## New in 2025
 
-lolfm has undergone the dreaded Rust rewrite. It has done away with a clunky client:server FIFO approach and now runs as a solitary command. If you prefer the older Scheme approach, please look further back in git history.
+lolfm has undergone the dreaded Rust rewrite. It has done away with a clunky client:server FIFO approach and now runs as a solitary command. If you prefer the older Scheme code, please look further back in git history.
 
 Note that older lolfm databases are not quite compatible with new ones, but Rust tool makes migration simple.
 
@@ -25,6 +25,8 @@ make uninstall
 ```
 
 ## Setup
+
+lolfm unfortunately requires a wrapper script around it to make cmus happy.
 
 1. Open `cmus` to make your library available
 2. Run `lolfm init your/db/path.sql` to populate it with all your cmus info
@@ -49,11 +51,11 @@ The user is generally expected to read/interact with the database directly throu
 
 | command | parameters | description |
 |---------|------------|-------------|
-| dump    | [-e] plays/loved/songs <db-name> | Dumps the `plays`, `loved`, and `songs` tables of `<db-name>` to stdout in tab separated format. If the `-e` option is provided, the dump is in cmus event format instead, which is ingestible by other instances of `lolfm`. |
-| read    | plays/loved <db-name> | reads stdin to the `plays` or `loved` table of `<db-name>`, provided it's in cmus event format. |
-| love    | <song-id> <db-name> | adds `<song-id>` (column `songs.id` in the database) to the `loved` table of `<db-name>`. |
-| unlove  | <song-id> <db-name> | removes `<song-id>` from the loved table of `<db-name>`. |
-| init    | <db-name>           | starts a new database `<db-name>` with all the tags found in a running instance of `cmus`. Can be re-run to update library info. |
+| dump    | [-e] plays/loved/songs db-name | Dumps the `plays`, `loved`, and `songs` tables of `db-name` to stdout in tab separated format. If the `-e` option is provided, the dump is in cmus event format instead, which is ingestible by other instances of `lolfm`. |
+| read    | plays/loved db-name | reads stdin to the `plays` or `loved` table of `db-name`, provided it's in cmus event format. |
+| love    | song-id db-name | adds `song-id` (column `songs.id` in the database) to the `loved` table of `db-name`. |
+| unlove  | song-id db-name | removes `song-id` from the loved table of `db-name`. |
+| init    | db-name           | starts a new database `db-name` with all the tags found in a running instance of `cmus`. Can be re-run to update library info. |
 
 Use `grep`, `cut`, etc to get these commands to do what you want. Anything more complicated calls for SQL itself.
 
