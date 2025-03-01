@@ -72,7 +72,7 @@ Love it based on the first column id. No quote escaping needed.
 
 ```
 $ lolfm love 21108 /tmp/db.sql
-$ lolfm dump loved | tail -n 5
+$ lolfm dump loved /tmp/db.sql | tail -n 5
 26389	ゼルダ	灰色少年
 13380	New Edition	That's the Way We're Livin'
 13384	New Edition	Crucial
@@ -84,7 +84,7 @@ You can unlove it with `lolfm unlove`.
 
 ### cmus event format
 
-`lolfm` uses `cmus-remote -Q` under the hood, which spits out events like
+lolfm uses `cmus-remote -Q` under the hood, which spits out events like
 
 ```
 status paused
