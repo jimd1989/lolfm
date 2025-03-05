@@ -11,6 +11,7 @@ mod actions {
 }
 
 mod helpers {
+  pub mod reset_sigpipe;
   pub mod sql_helpers;
 }
 
@@ -70,11 +71,13 @@ use actions::love_song;
 use actions::process_cmus_event;
 use actions::read_events;
 use actions::unlove_song;
+use helpers::reset_sigpipe::reset_sigpipe;
 use models::cmd::Cmd;
 use models::er::Er;
 use repos::cmd_from_stdin;
 
 fn main() {
+  reset_sigpipe();
   match exec() {
     Err(ω) => {
       println!("{:?}", ω);
