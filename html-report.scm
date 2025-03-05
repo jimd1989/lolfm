@@ -1,4 +1,5 @@
-#!/usr/local/bin/csi -s
+#!/opt/homebrew/bin/csi -s
+;#!/usr/local/bin/csi -s
 
 (import (chicken file posix) (chicken io) (chicken process)(chicken string) srfi-1)
 
