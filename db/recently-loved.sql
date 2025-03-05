@@ -1,7 +1,7 @@
 .headers on
 .mode html
 WITH q AS (
-  SELECT printf('%,d', ROW_NUMBER() OVER (ORDER BY loved.date)) AS 'd',
+  SELECT ROW_NUMBER() OVER (ORDER BY loved.date) AS 'd',
          date(loved.date, 'unixepoch', 'localtime') AS 'Loved', 
          artists.name AS 'Artist', 
          songs.title AS 'Song' 
@@ -11,4 +11,4 @@ WITH q AS (
    ORDER BY d DESC 
    LIMIT 15
 )
-SELECT d AS '#', Loved, Artist, Song FROM q;
+SELECT printf('%,d', d) AS '#', Loved, Artist, Song FROM q;

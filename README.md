@@ -186,6 +186,27 @@ $ lolfm dump plays ~/.config/cmus/lolfm.db | tail -n 40
 
 The vinyl play on March 3rd was successfully recorded into the past, even though other digital plays have taken place afterwards.
 
+### Example: getting tracklist of a new album
+
+If you think about it, only the tracklist and runtimes of an album are tedious to record. You can fetch both of these from Discogs
+
+```
+$ curl https://api.discogs.com/releases/3741251 --user-agent "jq test" | jq -r '.tracklist[]| "\(.title)\t\((.duration | split(":") | .[0] | tonumber) * 60 + (.duration | split(":") | .[1] | tonumber))"' | awk -F '\t' '{print "3rd Matinee\t" $1 "\tMeanwhile\t1994\t3rd Matinee\tRock\t" $2}'
+3rd Matinee     I Don't Care    Meanwhile       1994    3rd Matinee     Rock    270
+3rd Matinee     Freedom Road    Meanwhile       1994    3rd Matinee     Rock    294
+3rd Matinee     Holiday For Sweet Louise        Meanwhile       1994    3rd Matinee     Rock    289
+3rd Matinee     She Dreams      Meanwhile       1994    3rd Matinee     Rock    360
+3rd Matinee     Ordinary Day    Meanwhile       1994    3rd Matinee     Rock    257
+3rd Matinee     Family Tree     Meanwhile       1994    3rd Matinee     Rock    282
+3rd Matinee     Echo  Hill      Meanwhile       1994    3rd Matinee     Rock    255
+3rd Matinee     All The Way Home        Meanwhile       1994    3rd Matinee     Rock    312
+3rd Matinee     Silver Cage     Meanwhile       1994    3rd Matinee     Rock    157
+3rd Matinee     Trust Somebody  Meanwhile       1994    3rd Matinee     Rock    275
+3rd Matinee     Meanwhile       Meanwhile       1994    3rd Matinee     Rock    291
+```
+
+where `3741251` is the album release number at the top corner of a page. You can fill in the constants with `awk` or do more `jq` wrangling. I fucking hate it personally. This output can be fed back into the other `awk` script above.
+
 ### Future events
 
 You can feed `lolfm` timestamped events that haven't transpired yet. For example, if you've just put on a 50 minute vinyl record at time T, you can have a script that generates play events for each track T+n seconds out into the future. `lolfm` will ingest them immediately, but won't record the songs until T+n has actually arrived. The program can be invoked again at T+n to write these plays.
