@@ -7,44 +7,41 @@ use crate::models::lolfm_event::LolfmEvent;
 pub fn write(db: &Connection, ω: impl Iterator<Item = Result<LolfmEvent, Er>>) 
 -> Result<(), Er> {
   let artists_query = "
-    INSERT INTO artists(name)
-    VALUES (?)
-        ON CONFLICT(name)
-        DO UPDATE SET name=excluded.name
+       INSERT INTO artists(name)
+       VALUES (?)
+           ON CONFLICT(name)
+           DO UPDATE SET name=excluded.name
+    RETURNING artists.id
     ";
   let genres_query = "
-    INSERT INTO genres(name)
-    VALUES (?)
-        ON CONFLICT(name)
-        DO UPDATE SET name=excluded.name
+       INSERT INTO genres(name)
+       VALUES (?)
+           ON CONFLICT(name)
+           DO UPDATE SET name=excluded.name
+    RETURNING genres.id
     ";
   let albums_query = "
-      WITH album_artist AS (SELECT id FROM artists WHERE name=?)
-    INSERT INTO albums(title, artist, year)
-    VALUES (?, (SELECT id FROM album_artist), ?)
-        ON CONFLICT(title, artist)
-        DO UPDATE SET year=excluded.year
+     INSERT INTO albums(artist, title, year)
+     VALUES (?, ?, ?)
+         ON CONFLICT(title, artist)
+         DO UPDATE SET year=excluded.year
+  RETURNING albums.id
   ";
   let songs_query = "
-      WITH artist AS (SELECT id FROM artists WHERE name=?),
-           genre  AS (SELECT id FROM  genres WHERE name=?)
-    INSERT INTO songs(title, artist, genre)
-    VALUES (?, (SELECT id FROM artist), (SELECT id FROM genre))
+    INSERT INTO songs(artist, genre, title)
+    VALUES (?, ?, ?)
         ON CONFLICT(title, artist)
         DO UPDATE SET genre=excluded.genre
+  RETURNING songs.id
   ";
   let plays_query = "
-      WITH song  AS (SELECT id FROM songs WHERE artist=(
-                      SELECT id FROM artists WHERE name=? AND title=?)),
-           album AS (SELECT id FROM albums WHERE artist=(
-                      SELECT id FROM artists WHERE name=? AND title=?))
-    INSERT INTO plays(date, song, album, duration)
-    VALUES (?, (SELECT id FROM song), (SELECT id FROM album), ?)
+  INSERT INTO plays(song, album, date, duration)
+  VALUES (?, ?, ?, ?)
   ";
   let delete_query = "
-    DELETE FROM raw_cmus_events
-     WHERE time_milliseconds < ?
-     ";
+  DELETE FROM raw_cmus_events
+   WHERE time_milliseconds < ?
+  ";
 
   let mut artists_statement = db.prepare(artists_query)?;
   let mut genres_statement  = db.prepare(genres_query)?;
@@ -57,35 +54,38 @@ pub fn write(db: &Connection, ω: impl Iterator<Item = Result<LolfmEvent, Er>>)
     match res {
       Ok(LolfmEvent::RecordPlay(time, α)) => {
         sql_string(&mut artists_statement, 1, α.artist.clone())?;
-        sql_execute_void(&mut artists_statement)?;
+        artists_statement.next()?;
+        let artist_id: i64 = artists_statement.read(0)?;
         artists_statement.reset()?;
 
         sql_string(&mut artists_statement, 1, α.album_artist.clone())?;
-        sql_execute_void(&mut artists_statement)?;
+        artists_statement.next()?;
+        let album_artist_id: i64 = artists_statement.read(0)?;
         artists_statement.reset()?;
 
         sql_string(&mut genres_statement, 1, α.genre.clone())?;
-        sql_execute_void(&mut genres_statement)?;
+        genres_statement.next()?;
+        let genre_id: i64 = genres_statement.read(0)?;
         genres_statement.reset()?;
 
-        sql_string(&mut albums_statement, 1, α.album_artist.clone())?;
+        sql_int   (&mut albums_statement, 1, album_artist_id)?;
         sql_string(&mut albums_statement, 2, α.album.clone())?;
         sql_int   (&mut albums_statement, 3, α.year)?;
-        sql_execute_void(&mut albums_statement)?;
+        albums_statement.next()?;
+        let album_id: i64 = albums_statement.read(0)?;
         albums_statement.reset()?;
 
-        sql_string(&mut songs_statement, 1, α.artist.clone())?;
-        sql_string(&mut songs_statement, 2, α.genre.clone())?;
+        sql_int   (&mut songs_statement, 1, artist_id)?;
+        sql_int   (&mut songs_statement, 2, genre_id)?;
         sql_string(&mut songs_statement, 3, α.title.clone())?;
-        sql_execute_void(&mut songs_statement)?;
+        songs_statement.next()?;
+        let song_id: i64 = songs_statement.read(0)?;
         songs_statement.reset()?;
 
-        sql_string(&mut plays_statement, 1, α.artist)?;
-        sql_string(&mut plays_statement, 2, α.title)?;
-        sql_string(&mut plays_statement, 3, α.album_artist)?;
-        sql_string(&mut plays_statement, 4, α.album)?;
-        sql_int   (&mut plays_statement, 5, time.to_i64())?;
-        sql_int   (&mut plays_statement, 6, α.duration)?;
+        sql_int(&mut plays_statement, 1, song_id)?;
+        sql_int(&mut plays_statement, 2, album_id)?;
+        sql_int(&mut plays_statement, 3, time.to_i64())?;
+        sql_int(&mut plays_statement, 4, α.duration)?;
         sql_execute_void(&mut plays_statement)?;
         plays_statement.reset()?;
       }

@@ -96,8 +96,6 @@ This logs plays under 30 seconds, unlike last.fm. Good news for grindcore fans, 
 
 I don't know if hammering the db with events will break anything. I think it's supposed to be serial, but don't do anything stupid.
 
-Performance is quite nice in most cases, but migrating is slower than it should be. I don't know if this is because of rollbacks. I am more interested in data integrity than speeding this up, but do let me know if I've missed something obvious.
-
 ## Importing historical last.fm data
 
 I have some writeups and helper scripts in the `conversion-notes` folder. This was an excruciating process and your experience will be different. No support is offered for this.
