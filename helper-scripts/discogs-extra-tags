@@ -1,0 +1,2 @@
+#!/bin/sh
+awk -F '\t' -v artist="$1" -v album="$2" -v year="$3" -v genre="$4" '{print artist "\t" $1 "\t" album "\t" year "\t" artist "\t" genre "\t" $2}'

@@ -1,0 +1,2 @@
+#!/bin/sh
+lolfm dump plays "PATH TO YOUR DB" | grep "$1" | cut -d "	" -f 2- | awk '!seen[$0]++'

@@ -82,134 +82,13 @@ $ lolfm dump loved /tmp/db.sql | tail -n 5
 
 You can unlove it with `lolfm unlove`.
 
-### cmus event format
+## Advanced usage
 
-lolfm uses `cmus-remote -Q` under the hood, which spits out events like
+Please see the `helper-scripts` folder for tricks involving:
 
-```
-status paused
-file /music/Throwing Muses/The Real Ramona/10 Honeychain.mp3
-duration 264
-position 1
-tag artist Throwing Muses
-tag album The Real Ramona
-tag title Honeychain
-tag date 1991
-tag genre Alternative
-tag discnumber 01
-tag tracknumber 10
-tag albumartist Throwing Muses
-```
-
-It parses these events into db rows. Running `lolfm dump -e` will also output tweaked versions of this format for db migrations. You are generally advised to treat this as a black box, but feel free to hack on it. If you have another instance of `cmus` running on a different computer, its `status_display_program` could be a shell script that just logs `cmus-remote -Q` with one extra line of `timemilliseconds <time-in-milliseconds>`. You can `cat` this dumb log of events back into your main db at any time with `lolfm read plays`.
-
-### Example: manually recording plays for an existing album
-
-If you like CDs or vinyl, you can (ab)use `lolfm dump` to record another round of plays for an album that's already in your db. Just run a command like this every time you drop the needle. You can even record playing sessions from many days ago. I listened to _Steve McQueen_ on vinyl two days back, but I'll put it in my db.
-
-You can isolate the tracks of an album with `grep` and `awk`.
-
-(You can use a literal tab as a `cut` delimiter by doing ctrl-v + tab. Dunno how common that knowledge is.)
-
-```
-$ lolfm dump plays ~/.config/cmus/lolfm.db | grep "Steve McQueen" | cut -d "    " -f 2- | awk '!seen[$0]++'
-Prefab Sprout   Faron Young     Steve McQueen   1985    Prefab Sprout   Pop     230
-Prefab Sprout   Bonny   Steve McQueen   1985    Prefab Sprout   Pop     225
-Prefab Sprout   Appetite        Steve McQueen   1985    Prefab Sprout   Pop     236
-Prefab Sprout   When Love Breaks Down   Steve McQueen   1985    Prefab Sprout   Pop     248
-Prefab Sprout   Goodbye Lucille #1      Steve McQueen   1985    Prefab Sprout   Pop     271
-Prefab Sprout   Hallelujah      Steve McQueen   1985    Prefab Sprout   Pop     261
-Prefab Sprout   Moving the River        Steve McQueen   1985    Prefab Sprout   Pop     238
-Prefab Sprout   Horsin' Around  Steve McQueen   1985    Prefab Sprout   Pop     280
-Prefab Sprout   Desire As       Steve McQueen   1985    Prefab Sprout   Pop     320
-Prefab Sprout   Blueberry Pies  Steve McQueen   1985    Prefab Sprout   Pop     144
-Prefab Sprout   When the Angels Steve McQueen   1985    Prefab Sprout   Pop     269
-```
-
-Two big assumptions here:
-
-1. You've filtered accordingly. Here "Steve McQueen" is all I need, but this might have to be a fancier regex or something.
-2. Your plays are in the correct track order. Might want to write this to a text file and move around if not.
-
-This input can go into another `awk`, with an arbitrary date as the starting `sum` timestamp. You can record past/future events like this. It should generate timestamped events using the `duration` column.
-
-```
-awk -F '\t' -v sum="$(date -j -f "%Y-%m-%d %H:%M" "2025-03-03 19:00" +%s)" '{sum += $7; print "status playing\ntag artist " $1 "\ntag title " $2 "\ntag album " $3 "\ntag date " $4 "\ntag albumartist " $5 "\ntag genre " $6 "\nduration " $7 "\ntimemilliseconds " (sum - 1) * 1000 "\nstatus stopped\ntimemilliseconds " sum * 1000}'
-```
-
-This can be read back into the same db with `lolfm read`. The full command is as follows.
-
-```
-$ lolfm dump plays ~/.config/cmus/lolfm.db | grep "Steve McQueen" | cut -d "    " -f 2- | awk '!seen[$0]++' | awk -F '\t' -v sum="$(date -j -f "%Y-%m-%d %H:%M" "2025-03-03 19:00" +%s)" '{sum += $7; print "status playing\ntag artist " $1 "\ntag title " $2 "\ntag album " $3 "\ntag date " $4 "\ntag albumartist " $5 "\ntag genre " $6 "\nduration " $7 "\ntimemilliseconds " (sum - 1) * 1000 "\nstatus stopped\ntimemilliseconds " sum * 1000}' | lolfm read plays ~/.config/cmus/lolfm.db
-$ lolfm dump plays ~/.config/cmus/lolfm.db | tail -n 40
-1740816327      Throwing Muses  Honeychain      The Real Ramona 1991    Throwing Muses  Alternative     264
-1740816651      Wang Chung      Dance Hall Days Points on the Curve     1983    Wang Chung      Synth Pop       238
-1740817274      Varg    Snake City / Maserati Music     Nordic Flora Series Pt.3 (Gore-Tex City)        2017    Varg    Techno  328
-1740989043      Prefab Sprout   Faron Young     Steve McQueen   1985    Prefab Sprout   Pop     230
-1740989268      Prefab Sprout   Bonny   Steve McQueen   1985    Prefab Sprout   Pop     225
-1740989504      Prefab Sprout   Appetite        Steve McQueen   1985    Prefab Sprout   Pop     236
-1740989752      Prefab Sprout   When Love Breaks Down   Steve McQueen   1985    Prefab Sprout   Pop     248
-1740990023      Prefab Sprout   Goodbye Lucille #1      Steve McQueen   1985    Prefab Sprout   Pop     271
-1740990284      Prefab Sprout   Hallelujah      Steve McQueen   1985    Prefab Sprout   Pop     261
-1740990522      Prefab Sprout   Moving the River        Steve McQueen   1985    Prefab Sprout   Pop     238
-1740990802      Prefab Sprout   Horsin' Around  Steve McQueen   1985    Prefab Sprout   Pop     280
-1740991122      Prefab Sprout   Desire As       Steve McQueen   1985    Prefab Sprout   Pop     320
-1740991266      Prefab Sprout   Blueberry Pies  Steve McQueen   1985    Prefab Sprout   Pop     144
-1740991535      Prefab Sprout   When the Angels Steve McQueen   1985    Prefab Sprout   Pop     269
-1741040177      Big City Orchestra      Quiet Kids Noize Please A Child's Garden of Noise       1994    Big City Orchestra      Experimental    99
-1741040345      Big City Orchestra      Noize All Day   A Child's Garden of Noise       1994    Big City Orchestra      Experimental    160
-1741040475      Big City Orchestra      Popub's Party   A Child's Garden of Noise       1994    Big City Orchestra      Experimental    129
-1741040584      Big City Orchestra      Go      A Child's Garden of Noise       1994    Big City Orchestra      Experimental    108
-1741041040      Big City Orchestra      The Pirate Song A Child's Garden of Noise       1994    Big City Orchestra      Experimental    456
-1741046498      Yoran   Concert Maillol Montparnasse    1981    Yoran   Experimental    252
-1741046655      Yoran   Je Derve Avec Láir      Montparnasse    1981    Yoran   Experimental    158
-1741048049      Yoran   Montparnasse    Montparnasse    1981    Yoran   Experimental    260
-1741048082      Yoran   La Bou.....     Montparnasse    1981    Yoran   Experimental    35
-1741048329      Bourbonese Qualk        Shutdown        The Spike       1985    Bourbonese Qualk        Industrial      248
-1741048517      Bourbonese Qualk        Suburb City     The Spike       1985    Bourbonese Qualk        Industrial      190
-1741048614      Bourbonese Qualk        About This      The Spike       1985    Bourbonese Qualk        Industrial      97
-1741048807      Bourbonese Qualk        New England     The Spike       1985    Bourbonese Qualk        Industrial      195
-1741048951      Bourbonese Qualk        Preparing for Power     The Spike       1985    Bourbonese Qualk        Industrial      145
-1741049109      Bourbonese Qualk        Pogrom  The Spike       1985    Bourbonese Qualk        Industrial      159
-1741055771      Bourbonese Qualk        Call to Arms    The Spike       1985    Bourbonese Qualk        Industrial      283
-1741055889      Bourbonese Qualk        Frontline       The Spike       1985    Bourbonese Qualk        Industrial      119
-1741056088      Bourbonese Qualk        Spanner in the Works    The Spike       1985    Bourbonese Qualk        Industrial      200
-1741056317      Bourbonese Qualk        In-flux The Spike       1985    Bourbonese Qualk        Industrial      230
-1741056524      Bourbonese Qualk        Deadbeat        The Spike       1985    Bourbonese Qualk        Industrial      208
-1741056965      Robert Turman   Way Down        Way Down        1987    Robert Turman   Minimal Synth   441
-1741057296      Robert Turman   Lotek   Way Down        1987    Robert Turman   Minimal Synth   330
-1741057899      Robert Turman   Mind the Gap    Way Down        1987    Robert Turman   Minimal Synth   602
-1741058249      Robert Turman   Freedom from Fear       Way Down        1987    Robert Turman   Minimal Synth   349
-1741058745      Robert Turman   Deadkingspeak   Way Down        1987    Robert Turman   Minimal Synth   496
-1741148274      Robert Turman   Clean Living    Way Down        1987    Robert Turman   Minimal Synth   597
-```
-
-The vinyl play on March 3rd was successfully recorded into the past, even though other digital plays have taken place afterwards.
-
-### Example: getting tracklist of a new album
-
-If you think about it, only the tracklist and runtimes of an album are tedious to record. You can fetch both of these from Discogs
-
-```
-$ curl https://api.discogs.com/releases/3741251 --user-agent "jq test" | jq -r '.tracklist[]| "\(.title)\t\((.duration | split(":") | .[0] | tonumber) * 60 + (.duration | split(":") | .[1] | tonumber))"' | awk -F '\t' '{print "3rd Matinee\t" $1 "\tMeanwhile\t1994\t3rd Matinee\tRock\t" $2}'
-3rd Matinee     I Don't Care    Meanwhile       1994    3rd Matinee     Rock    270
-3rd Matinee     Freedom Road    Meanwhile       1994    3rd Matinee     Rock    294
-3rd Matinee     Holiday For Sweet Louise        Meanwhile       1994    3rd Matinee     Rock    289
-3rd Matinee     She Dreams      Meanwhile       1994    3rd Matinee     Rock    360
-3rd Matinee     Ordinary Day    Meanwhile       1994    3rd Matinee     Rock    257
-3rd Matinee     Family Tree     Meanwhile       1994    3rd Matinee     Rock    282
-3rd Matinee     Echo  Hill      Meanwhile       1994    3rd Matinee     Rock    255
-3rd Matinee     All The Way Home        Meanwhile       1994    3rd Matinee     Rock    312
-3rd Matinee     Silver Cage     Meanwhile       1994    3rd Matinee     Rock    157
-3rd Matinee     Trust Somebody  Meanwhile       1994    3rd Matinee     Rock    275
-3rd Matinee     Meanwhile       Meanwhile       1994    3rd Matinee     Rock    291
-```
-
-where `3741251` is the album release number at the top corner of a page. You can fill in the constants with `awk` or do more `jq` wrangling. I fucking hate it personally. This output can be fed back into the other `awk` script above.
-
-### Future events
-
-You can feed `lolfm` timestamped events that haven't transpired yet. For example, if you've just put on a 50 minute vinyl record at time T, you can have a script that generates play events for each track T+n seconds out into the future. `lolfm` will ingest them immediately, but won't record the songs until T+n has actually arrived. The program can be invoked again at T+n to write these plays.
+1. Ingesting events divorced from cmus
+2. Logging physical media plays
+3. Fetching useful info from Discogs
 
 ## Caveats
 

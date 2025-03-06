@@ -1,0 +1,2 @@
+#!/bin/sh
+awk -F '\t' -v sum="$(date -j -f "%Y-%m-%d %H:%M" "$1" +%s)" '{sum += $7; print "status playing\ntag artist " $1 "\ntag title " $2 "\ntag album " $3 "\ntag date " $4 "\ntag albumartist " $5 "\ntag genre " $6 "\nduration " $7 "\ntimemilliseconds " (sum - 1) * 1000 "\nstatus stopped\ntimemilliseconds " sum * 1000}'
