@@ -53,23 +53,23 @@ pub fn write(db: &Connection, ω: impl Iterator<Item = Result<LolfmEvent, Er>>)
   for res in ω {
     match res {
       Ok(LolfmEvent::RecordPlay(time, α)) => {
-        sql_string(&mut artists_statement, 1, α.artist.clone())?;
+        sql_string(&mut artists_statement, 1, α.artist)?;
         artists_statement.next()?;
         let artist_id: i64 = artists_statement.read(0)?;
         artists_statement.reset()?;
 
-        sql_string(&mut artists_statement, 1, α.album_artist.clone())?;
+        sql_string(&mut artists_statement, 1, α.album_artist)?;
         artists_statement.next()?;
         let album_artist_id: i64 = artists_statement.read(0)?;
         artists_statement.reset()?;
 
-        sql_string(&mut genres_statement, 1, α.genre.clone())?;
+        sql_string(&mut genres_statement, 1, α.genre)?;
         genres_statement.next()?;
         let genre_id: i64 = genres_statement.read(0)?;
         genres_statement.reset()?;
 
         sql_int   (&mut albums_statement, 1, album_artist_id)?;
-        sql_string(&mut albums_statement, 2, α.album.clone())?;
+        sql_string(&mut albums_statement, 2, α.album)?;
         sql_int   (&mut albums_statement, 3, α.year)?;
         albums_statement.next()?;
         let album_id: i64 = albums_statement.read(0)?;
@@ -77,7 +77,7 @@ pub fn write(db: &Connection, ω: impl Iterator<Item = Result<LolfmEvent, Er>>)
 
         sql_int   (&mut songs_statement, 1, artist_id)?;
         sql_int   (&mut songs_statement, 2, genre_id)?;
-        sql_string(&mut songs_statement, 3, α.title.clone())?;
+        sql_string(&mut songs_statement, 3, α.title)?;
         songs_statement.next()?;
         let song_id: i64 = songs_statement.read(0)?;
         songs_statement.reset()?;
