@@ -179,4 +179,4 @@ You can see this is the same format as `lolfm dump` now. Which means it can be p
 
 ## Future events
 
-You can feed lolfm events that have yet to transpire. It will save them all, but won't write played songs until the system time has moved beyond the event timestamp. This is (maybe) useful if you want to record a vinyl album right when you put it on, rather than later. I can also see it being a source of headaches—use it at your discretion. Because lolfm is event driven, you'll have to feed it another event to actually write the events later. It won't automatically record them when the time has arrived.
+`lolfm read plays` skips a db write of raw cmus events for performance reasons. This means it will silently drop events that have yet to transpire, whereas `cmus event` can hold on to these. Keep future plays in a plaintext log and `cat` them later.
