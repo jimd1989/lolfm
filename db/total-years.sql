@@ -13,6 +13,6 @@ first_play AS (
    ORDER BY date ASC
    LIMIT 1
 )
-SELECT CAST(ceil((last - first) / (365.25 * 24 * 60 * 60)) AS INT)
+SELECT printf('%,d', CAST(ceil((last - first) / (365.25 * 24 * 60 * 60)) AS INT))
   FROM (SELECT last FROM last_play),
        (SELECT first FROM first_play);

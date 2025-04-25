@@ -1,7 +1,6 @@
 .headers on
 .mode html
-SELECT printf('%,d', ROW_NUMBER() OVER (ORDER BY date)) AS '#',
-       strftime('%Y-%m-%d %H:%M', plays.date, 'unixepoch', 'localtime') AS 'Time',
+SELECT strftime('%Y-%m-%d %H:%M', plays.date, 'unixepoch', 'localtime') AS 'Time',
        artists.name AS 'Artist', 
        IIF(EXISTS (SELECT 1 FROM loved WHERE loved.song = songs.id), '♥', '') AS '♥',
        songs.title AS 'Song'

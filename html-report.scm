@@ -49,7 +49,7 @@
     "display: block;}"))
 
 (define-constant STYLE
-  (css (html (-webkit-text-size-adjust "100%"))
+  (css (html (-webkit-text-size-adjust "80%"))
        (body (font-family "sans-serif") (background-color "#FFFFEA")
              (margin "0 auto") (max-width "52rem") (padding "1rem"))
        (a (color "#0493DD"))
@@ -79,6 +79,8 @@
 
 (define (query sql)
   (with-input-from-pipe (◇ "sqlite3 " DB "< "  QUERIES-PATH sql) read-lines))
+
+(define (scalar-query sql) (car (query sql)))
 
 (define (a url txt) (▽ a (@ (href url)) txt))
 
@@ -119,29 +121,48 @@
         "Just cmus and a local sqlite file on your hard drive. "
         "If you'd like to run it yourself, check it out on "
         (a "https://github.com/jimd1989/lolfm" "Github") ".")
-      (▽ h2 (◇ "Activity (" (car (query "total-years.sql")) " years)"))
+      (▽ h2 "Activity")
+      (▽ p 
+         "Listened to " (scalar-query "total-plays.sql") " songs over "
+         (scalar-query "total-years.sql") " years, with an average of "
+         (scalar-query "average-plays.sql") " plays a day. That's "
+         (scalar-query "total-hours.sql") " total hours.")
+      (▽ p
+         "Listened to " (scalar-query "total-discoveries.sql") " different releases.")
+      (▽ p
+         (scalar-query "total-loves.sql") " songs are loved, which is "
+         (scalar-query "percentage-loved.sql") "% of the total.")
       (tabs "recent"
         `("Plays" ,(table "most-recent.sql"))
         `("Discoveries" ,(table "recent-discoveries.sql"))
         `("Loves" ,(table "recently-loved.sql")))
-      (▽ h2 (◇ "Top Artists (" (car (query "total-artists.sql")) " total)"))
+      (▽ h2 "Top Artists")
+      (▽ p
+         (scalar-query "total-artists.sql") " artists in library.")
       (tabs "top-artists"
         `("Plays" ,(table "top-artists-by-plays.sql"))
         `("Hours" ,(table "top-artists-by-time.sql"))
         `("Year" ,(table "top-artists-12-months.sql"))
         `("Month" ,(table "top-artists-1-month.sql"))
         `("Week" ,(table "top-artists-1-week.sql")))
-      (▽ h2 (◇ "Top Albums (" (car (query "total-albums.sql")) " total)"))
+      (▽ h2 "Top Albums")
+      (▽ p
+         (scalar-query "total-albums.sql") " albums in library.")
       (tabs "top-albums"
         `("Plays" ,(table "top-albums-by-plays.sql"))
         `("Hours" ,(table "top-albums-by-time.sql"))
-        `("Year" ,(table "top-albums-12-months.sql")))
-      (▽ h2 (◇ "Top Songs (" (car (query "total-songs.sql")) " total)"))
+        `("Year" ,(table "top-albums-12-months.sql"))
+        `("By Artist" ,(table "top-albums-by-artist.sql")))
+      (▽ h2 "Top Songs")
+      (▽ p
+         (scalar-query "total-songs.sql") " songs in library.")
       (tabs "top-songs"
         `("Plays" ,(table "top-songs.sql"))
         `("Hours" ,(table "top-songs-by-time.sql"))
         `("Year" ,(table "top-songs-12-months.sql")))
-      (▽ h2 (◇ "Top Genres (" (car (query "total-genres.sql")) " total)"))
+      (▽ h2 "Top Genres")
+      (▽ p
+         (scalar-query "total-genres.sql") " genres in library.")
       (tabs "top-genres"
         `("Plays" ,(table "top-genres-by-plays.sql"))
         `("Hours" ,(table "top-genres-by-time.sql")))
