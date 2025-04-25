@@ -1,12 +1,13 @@
 use sqlite::{Connection, State, Statement};
 use std::iter;
 
+use crate::helpers::sql_helpers::sql_int;
 use crate::models::cmus_status::CmusStatus;
 use crate::models::er::Er;
 use crate::models::cmus_event::CmusEvent;
 use crate::models::timestamp::Milliseconds;
 
-pub fn get<'a>(db: &'a Connection)
+pub fn get<'a>(db: &'a Connection, time: Milliseconds)
 -> Result<impl Iterator<Item = Result<CmusEvent, Er>> + 'a, Er> {
   let query = "
     SELECT time_milliseconds,
@@ -21,9 +22,11 @@ pub fn get<'a>(db: &'a Connection)
            duration,
            date
       FROM raw_cmus_events
+     WHERE time_milliseconds <= ?
      ORDER BY time_milliseconds ASC
     ";
   let mut statement = db.prepare(query)?;
+  sql_int(&mut statement, 1, time.to_i64())?;
   Ok(iter::from_fn(move || {
     match statement.next() {
       Ok(State::Row)  => Some(to_event(&mut statement)),
