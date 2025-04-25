@@ -1,5 +1,6 @@
 .headers on
 .mode html
+  WITH last_albums AS (
 SELECT printf('%,d', ROW_NUMBER() OVER (ORDER BY plays.date)) AS '#',
        date(plays.date, 'unixepoch', 'localtime') AS 'Date',
        artists.name AS 'Artist',
@@ -9,4 +10,7 @@ SELECT printf('%,d', ROW_NUMBER() OVER (ORDER BY plays.date)) AS '#',
   JOIN artists ON (albums.artist = artists.id)
  GROUP BY albums.id
  ORDER BY date DESC
- LIMIT 15;
+ LIMIT 15)
+SELECT "#", Date, Artist, Title
+  FROM last_albums
+ ORDER BY "#" DESC;

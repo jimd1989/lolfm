@@ -179,4 +179,6 @@ You can see this is the same format as `lolfm dump` now. Which means it can be p
 
 ## Future events
 
-`lolfm read plays` skips a db write of raw cmus events for performance reasons. This means it will silently drop events that have yet to transpire, whereas `cmus event` can hold on to these. Keep future plays in a plaintext log and `cat` them later.
+You should be able to manually write events that have yet to transpire. If it's time T, and you write an event timestamped to T+n, it will sit in stasis until your system time is T+n. This allows one to log an entire physical album's worth of plays ahead of time, rather than after the fact. Since lolfm is event-driven, you'll have to invoke it again after T+n to reify the event into a play. Manual invocation of `lolfm event` with cmus stopped should work.
+
+I have not thoroughly tested this.

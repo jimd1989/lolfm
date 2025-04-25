@@ -21,7 +21,7 @@ fn process(ω: &AppConfig) -> Result<(), Er> {
   let ts = lines_to_cmus_tags::run(ls, "status");
   let cs = cmus_tags_to_cmus_events::run(ts, ω.time);
            cmus_events_to_db::write(&ω.db, cs)?;
-  let es = cmus_events_from_db::get(&ω.db)?;
-  let ss = cmus_events_to_lolfm_events::run(es, ω.time);
+  let es = cmus_events_from_db::get(&ω.db, ω.time)?;
+  let ss = cmus_events_to_lolfm_events::run(es);
            lolfm_events_to_db::write(&ω.db, ss)
 }
