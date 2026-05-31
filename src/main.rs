@@ -18,6 +18,7 @@ mod helpers {
 mod models {
   pub mod app_config;
   pub mod cmd;
+  pub mod country;
   pub mod cmus_event;
   pub mod cmus_status;
   pub mod cmus_tag;
@@ -35,6 +36,7 @@ mod repos {
   pub mod cmd_from_stdin;
   pub mod cmus_events_from_db;
   pub mod cmus_events_to_db;
+  pub mod countries_from_db;
   pub mod db_connection;
   pub mod db_create_schema;
   pub mod lines_from_cmus_remote;

@@ -75,8 +75,6 @@ pub fn run(db: &Connection) -> Result<(), Er> {
     );
     
     -- Migration 01. Adding countries
-    BEGIN TRANSACTION;
-    
     CREATE TABLE IF NOT EXISTS countries(
       id              INTEGER PRIMARY KEY AUTOINCREMENT,
       abbreviation    TEXT NOT NULL DEFAULT 'XX',
@@ -354,8 +352,6 @@ pub fn run(db: &Connection) -> Result<(), Er> {
     SELECT id, name, 0 FROM artists_old;
     
     DROP TABLE artists_old;
-    
-    COMMIT;
     ";
     Ok(db.execute(query)?)
 }
