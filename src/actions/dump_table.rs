@@ -3,6 +3,8 @@ use std::io;
 use crate::models::app_config::AppConfig;
 use crate::models::er::Er;
 use crate::models::table_name_dump::DumpTableName;
+use crate::repos::artists_from_db;
+use crate::repos::countries_from_db;
 use crate::repos::loved_songs_from_db;
 use crate::repos::played_songs_from_db;
 use crate::repos::songs_from_db;
@@ -43,6 +45,20 @@ pub fn run(ω: &AppConfig, t: DumpTableName, as_events: bool) -> Result<(), Er> 
       let ss = songs_from_db::get(&ω.db)?;
       for s in ss {
         s?.print_row(&mut out)?;
+      }
+      Ok(())
+    }
+    DumpTableName::Countries => {
+      let cs = countries_from_db::get(&ω.db)?;
+      for c in cs {
+        c?.print_row(&mut out)?;
+      }
+      Ok(())
+    }
+    DumpTableName::Artists => {
+      let cs = artists_from_db::get(&ω.db)?;
+      for c in cs {
+        c?.print_row(&mut out)?;
       }
       Ok(())
     }

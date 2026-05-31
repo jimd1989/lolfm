@@ -34,6 +34,10 @@ fn parse_cmd(α: &Vec<&str>) -> Result<Cmd, Er> {
       let ω = id.parse::<i64>()?;
       Ok(Cmd::Unlove(ω, db_path.to_string()))
     }
+    [_, "country", id, abbreviation, db_path] => {
+      let ω = id.parse::<i64>()?;
+      Ok(Cmd::Country(ω, abbreviation.to_string(), db_path.to_string()))
+    }
     [_, "init", db_path]  => Ok(Cmd::Init(db_path.to_string())),
     _ => Err(format!("Bad cmd {:?}", α).into()),
   }

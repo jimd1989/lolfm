@@ -8,6 +8,7 @@ mod actions {
   pub mod process_cmus_event;
   pub mod read_events;
   pub mod unlove_song;
+  pub mod update_artist_country;
 }
 
 mod helpers {
@@ -17,7 +18,9 @@ mod helpers {
 
 mod models {
   pub mod app_config;
+  pub mod artist;
   pub mod cmd;
+  pub mod country;
   pub mod cmus_event;
   pub mod cmus_status;
   pub mod cmus_tag;
@@ -32,9 +35,11 @@ mod models {
 }
 
 mod repos {
+  pub mod artists_from_db;
   pub mod cmd_from_stdin;
   pub mod cmus_events_from_db;
   pub mod cmus_events_to_db;
+  pub mod countries_from_db;
   pub mod db_connection;
   pub mod db_create_schema;
   pub mod lines_from_cmus_remote;
@@ -48,6 +53,7 @@ mod repos {
   pub mod songs_from_db;
   pub mod songs_to_db;
   pub mod system_time;
+  pub mod update_artist_country_in_db;
 }
 
 mod traits {
@@ -71,6 +77,7 @@ use actions::love_song;
 use actions::process_cmus_event;
 use actions::read_events;
 use actions::unlove_song;
+use actions::update_artist_country;
 use helpers::reset_sigpipe::reset_sigpipe;
 use models::cmd::Cmd;
 use models::er::Er;
@@ -114,6 +121,10 @@ fn exec() -> Result<(), Er> {
     Ok(Cmd::Init(db_path)) => {
       let config = get_app_config(&db_path)?;
       Ok(init_db::run(&config)?)
+    }
+    Ok(Cmd::Country(artist_id, abbreviation, db_path)) => {
+      let config = get_app_config(&db_path)?;
+      Ok(update_artist_country::run(&config, artist_id, abbreviation)?)
     }
     Err(ω) => Err(ω),
   }
