@@ -56,6 +56,7 @@ The user is generally expected to read/interact with the database directly throu
 | love    | song-id db-name | adds `song-id` (column `songs.id` in the database) to the `loved` table of `db-name`. |
 | unlove  | song-id db-name | removes `song-id` from the loved table of `db-name`. |
 | init    | db-name           | starts a new database `db-name` with all the tags found in a running instance of `cmus`. Can be re-run to update library info. |
+| country | artist-id country-abbreviation | updates an artist's country of origin with country-abbreviation. Both these data points can be `dump`ed. |
 
 Use `grep`, `cut`, etc to get these commands to do what you want. Anything more complicated calls for SQL itself.
 

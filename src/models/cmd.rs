@@ -9,4 +9,5 @@ pub enum Cmd {
   Love(i64, String),
   Unlove(i64, String),
   Init(String),
+  Country(i64, String, String),
 }
