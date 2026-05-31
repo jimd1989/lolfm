@@ -51,7 +51,7 @@ The user is generally expected to read/interact with the database directly throu
 
 | command | parameters | description |
 |---------|------------|-------------|
-| dump    | [-e] plays/loved/songs/countries db-name | Dumps the `plays`, `loved`, `songs`, and `countries` tables of `db-name` to stdout in tab separated format. If the `-e` option is provided, the dump is in cmus event format instead, which is ingestible by other instances of `lolfm`. |
+| dump    | [-e] plays/loved/songs/countries/artists db-name | Dumps the `plays`, `loved`, `songs`, `countries`, and `artists` tables of `db-name` to stdout in tab separated format. If the `-e` option is provided, the dump is in cmus event format instead, which is ingestible by other instances of `lolfm`. |
 | read    | plays/loved db-name | reads stdin to the `plays` or `loved` table of `db-name`, provided it's in cmus event format. |
 | love    | song-id db-name | adds `song-id` (column `songs.id` in the database) to the `loved` table of `db-name`. |
 | unlove  | song-id db-name | removes `song-id` from the loved table of `db-name`. |

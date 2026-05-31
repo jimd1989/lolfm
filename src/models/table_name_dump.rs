@@ -6,6 +6,7 @@ pub enum DumpTableName {
   Plays,
   Songs,
   Countries,
+  Artists,
 }
 
 impl DumpTableName {
@@ -15,6 +16,7 @@ impl DumpTableName {
       α if α.eq_ignore_ascii_case("PLAYS") => Ok(DumpTableName::Plays),
       α if α.eq_ignore_ascii_case("SONGS") => Ok(DumpTableName::Songs),
       α if α.eq_ignore_ascii_case("COUNTRIES") => Ok(DumpTableName::Countries),
+      α if α.eq_ignore_ascii_case("ARTISTS") => Ok(DumpTableName::Artists),
       α => Err(format!("invalid table {}", α).into()),
     }
   }

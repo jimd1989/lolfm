@@ -17,6 +17,7 @@ mod helpers {
 
 mod models {
   pub mod app_config;
+  pub mod artist;
   pub mod cmd;
   pub mod country;
   pub mod cmus_event;
@@ -33,6 +34,7 @@ mod models {
 }
 
 mod repos {
+  pub mod artists_from_db;
   pub mod cmd_from_stdin;
   pub mod cmus_events_from_db;
   pub mod cmus_events_to_db;
