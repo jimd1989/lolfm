@@ -160,6 +160,12 @@
         `("Plays" ,(table "top-songs.sql"))
         `("Hours" ,(table "top-songs-by-time.sql"))
         `("Year" ,(table "top-songs-12-months.sql")))
+      (▽ h2 "Top Countries")
+      (▽ p
+         (scalar-query "total-countries.sql") " countries in library.")
+      (tabs "top-countries"
+        `("Plays" ,(table "top-countries-by-plays.sql"))
+        `("Hours" ,(table "top-countries-by-time.sql")))
       (▽ h2 "Top Genres")
       (▽ p
          (scalar-query "total-genres.sql") " genres in library.")
