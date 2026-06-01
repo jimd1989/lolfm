@@ -34,7 +34,10 @@ lolfm unfortunately requires a wrapper script around it to make cmus happy.
 4. `chmod +x lolfm-event.sh`
 5. `sudo cp lolfm-event.sh /usr/local/bin/lolfm-event` (or wherever)
 6. In `cmus`, do `:set status_display_program=/usr/local/bin/lolfm-event`
-7. If you have an existing lolfm database `old.db`, do:
+
+### Scheme → Rust migration
+
+If you have an existing Scheme lolfm database `old.db`, do:
 
 ```
 lolfm dump -e plays old.db | lolfm read plays your/db/path.sql
@@ -42,6 +45,10 @@ lolfm dump -e loved old.db | lolfm read loved your/db/path.sql
 ```
 
 This could take some time.
+
+### Rust → Rust migration
+
+If you ever need to update the lolfm database to support new features, it should be safe to run `lolfm init your/db/path.sql` to add the new tables, but maybe have a backup copy.
 
 ## Usage
 
