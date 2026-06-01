@@ -172,7 +172,8 @@
          (scalar-query "total-genres.sql") " genres in library.")
       (tabs "top-genres"
         `("Plays" ,(table "top-genres-by-plays.sql"))
-        `("Hours" ,(table "top-genres-by-time.sql")))
+        `("Hours" ,(table "top-genres-by-time.sql"))
+        `("Year" ,(table "top-genres-12-months.sql")))
       (▽ h2 "Top Years")
       (tabs "top-years"
         `("Plays" ,(table "top-years.sql"))
