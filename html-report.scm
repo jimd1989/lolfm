@@ -165,7 +165,8 @@
          (scalar-query "total-countries.sql") " countries in library.")
       (tabs "top-countries"
         `("Plays" ,(table "top-countries-by-plays.sql"))
-        `("Hours" ,(table "top-countries-by-time.sql")))
+        `("Hours" ,(table "top-countries-by-time.sql"))
+        `("Year" ,(table "top-countries-12-months.sql")))
       (▽ h2 "Top Genres")
       (▽ p
          (scalar-query "total-genres.sql") " genres in library.")

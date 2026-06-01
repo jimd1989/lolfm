@@ -7,7 +7,7 @@ WITH ranked AS (
          COUNT(songs.id) AS 'Plays' FROM plays
     JOIN songs   ON (plays.song   = songs.id) 
     JOIN artists ON (songs.artist = artists.id) 
-   WHERE date(plays.date, 'unixepoch', 'localtime') > date('now', '-11 months', 'localtime')
+   WHERE date(plays.date, 'unixepoch', 'localtime') > date('now', '-12 months', 'localtime')
    GROUP BY songs.id 
    ORDER BY Plays DESC 
    LIMIT 15

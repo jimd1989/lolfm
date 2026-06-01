@@ -7,7 +7,7 @@ WITH ranked AS (
     FROM plays
     JOIN albums  ON (plays.album   = albums.id)
     JOIN artists ON (albums.artist = artists.id)
-   WHERE date(plays.date, 'unixepoch', 'localtime') > date('now', '-11 months', 'localtime')
+   WHERE date(plays.date, 'unixepoch', 'localtime') > date('now', '-12 months', 'localtime')
    GROUP BY albums.id
    ORDER BY Plays DESC 
    LIMIT 15
