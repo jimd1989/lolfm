@@ -1,0 +1,5 @@
+(import (chicken load))
+(include-relative "syntax.scm")
+(include-relative "monad.scm")
+(← (ι n ω) (either (list-ref ω n)))
+(← (∈ k ω) (∃ ((α (assoc k ω))) (⊙ ↓ (ensure α (◇ "key not found: "k) α))))
