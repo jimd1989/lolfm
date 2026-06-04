@@ -2,23 +2,29 @@
 (include-relative "syntax.scm")
 
 (← (stream-cmd ω)
-  (∃ ((port (open-input-pipe ω)) (eof? #f))
-    (λ () (? eof? ∅ (∃ ((α (read-line port)))
-                      (? (eof-object? α)
-                        (begin (close-input-pipe port) (set! eof? #t) ∅)
-                        α))))))
-
+  (∃ ((port (open-input-pipe ω)) (eof? #f) (buffer ∅))
+    (λ (#!optional (mode 'pop) (γ  ∅))
+      (cond ((eq? mode 'push) (set! buffer (⊂ γ buffer)))
+            (eof? ∅)
+            ((not (∅? buffer)) (∃ ((β (↑ buffer))) (set! buffer (↓ buffer)) β))
+            (else (∃ ((α (read-line port)))
+                    (? (eof-object? α)
+                       (begin (close-input-pipe port) (set! eof? #t) ∅)
+                       α)))))))
 (← (stream-take n s) 
   (∃ ((ω (s))) (cond ((∅? ω) ∅) 
                      ((= n 1) `(,ω)) 
                      (else (⊂ ω (stream-take (- n 1) s))))))
 
+(← (stream-while p s)
+  (∃ ((ω (s)))
+    (cond ((∅? ω) ∅)
+          ((p ω) (⊂ ω (stream-while p s)))
+          (else (begin (s 'push ω) ∅)))))
+
 (← (stream-map f s)
   (∃ ((ω (s))) (? (∅? ω) ω (⊂ (f ω) (stream-map f s)))))
 
-(← (stream-until p s)
-  (∃ ((ω (s))) (cond ((∅? ω) ∅) ((p ω) `(,ω)) (else (⊂ ω (stream-until p s))))))
-
-(← (stream-close s) (stream-until (K #f) s))
+(← (stream-close s) (stream-while (K #t) s))
 
 (← (stream-sql db α) (stream-cmd (◇ "sqlite3 -tabs " db " " "\"" α "\"")))
