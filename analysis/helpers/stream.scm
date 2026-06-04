@@ -11,6 +11,7 @@
                     (? (eof-object? α)
                        (begin (close-input-pipe port) (set! eof? #t) ∅)
                        α)))))))
+
 (← (stream-take n s) 
   (∃ ((ω (s))) (cond ((∅? ω) ∅) 
                      ((= n 1) `(,ω)) 
@@ -21,6 +22,15 @@
     (cond ((∅? ω) ∅)
           ((p ω) (⊂ ω (stream-while p s)))
           (else (begin (s 'push ω) ∅)))))
+
+(← (stream-group f s #!optional (prev ∅))
+  (∃ ((ω (s))) 
+    (cond ((∅? ω) ∅)
+          ((∅? prev) (⊂ ω (stream-group f s (f ω))))
+          (else (∃ ((α (f ω)))
+                     (? (equal? α prev)
+                        (⊂ ω (stream-group f s α))
+                        (begin (s 'push ω) ∅)))))))
 
 (← (stream-map f s)
   (∃ ((ω (s))) (? (∅? ω) ω (⊂ (f ω) (stream-map f s)))))
