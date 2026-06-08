@@ -7,32 +7,48 @@
 (include-relative "../helpers/transducers.scm")
 
 (← countries-by-plays-query "
-  WITH top_plays AS (
-   SELECT countries.id, countries.name, COUNT(plays.song) AS 'plays'
-     FROM plays
-     JOIN songs     ON plays.song      = songs.id
-     JOIN artists   ON songs.artist    = artists.id
-     JOIN countries ON artists.country = countries.id
-    GROUP BY countries.name
-    ORDER BY Plays DESC
+  WITH
+  artist_plays AS (
+    SELECT artists.id        AS artist_id, 
+           artists.name      AS artist_name,
+           artists.country   AS country_id, 
+           countries.name    AS country_name,
+           COUNT(plays.song) AS artist_play_count
+      FROM plays
+      JOIN songs     ON plays.song      = songs.id
+      JOIN artists   ON songs.artist    = artists.id
+      JOIN countries ON artists.country = countries.id
+     GROUP BY artists.id, artists.name, artists.country, countries.id
   ),
-  plays_ranked AS (
-    SELECT ROW_NUMBER() OVER (ORDER BY top_plays.Plays DESC) AS 'row',
-           id,
-           name,
-           Plays
-      FROM top_plays
+  country_totals AS (
+    SELECT country_id,
+           SUM(artist_play_count) AS total_country_plays
+      FROM artist_plays
+     GROUP BY country_id
+  ),
+  rankings AS (
+    SELECT artist_plays.country_id,
+           artist_plays.country_name,
+           country_totals.total_country_plays,
+           artist_plays.artist_name,
+           artist_plays.artist_play_count,
+           ROW_NUMBER() OVER (
+             PARTITION BY artist_plays.country_id
+                 ORDER BY artist_plays.artist_play_count DESC
+           ) AS artist_rank_in_country
+      FROM artist_plays
+      JOIN country_totals ON artist_plays.country_id = country_totals.country_id
   )
-    SELECT plays_ranked.row, plays_ranked.id, plays_ranked.Plays, 
-           plays_ranked.name, artists.name, COUNT(songs.id) AS artist_play_count
-      FROM artists
-      JOIN countries    ON artists.country = countries.id
-      JOIN plays_ranked ON countries.id    = plays_ranked.id
-      JOIN songs        ON artists.id      = songs.artist
-      JOIN plays        ON songs.id        = plays.song
-     GROUP BY artists.id
-     ORDER BY plays_ranked.row ASC, artist_play_count DESC
-      ")
+  SELECT DENSE_RANK() OVER (ORDER BY total_country_plays DESC) AS country_row,
+         country_id,
+         total_country_plays,
+         country_name,
+         artist_name,
+         artist_play_count
+    FROM rankings
+   WHERE artist_rank_in_country <= 50
+   ORDER BY total_country_plays DESC, artist_play_count DESC
+   ")
 
 (← (stream-countries-by-plays db) (stream-sql db countries-by-plays-query))
 (← decode-countries-by-plays
@@ -44,11 +60,10 @@
                                ,(decoder 'artist-plays s⊥n))
                              ω))))
 
-(← (countries-by-plays n db)
+(← (countries-by-plays db)
   (transduce stream⇒
              (∘ decode-countries-by-plays 
-                (chunk-on ((C >>=) (λ (ω) (∈ 'country-id ω))))
-                (transducer ((C ↑n) n)))
+                (chunk-on ((C >>=) (λ (ω) (∈ 'country-id ω)))))
              ⊃ 
              ∅ 
              (stream-countries-by-plays db)))
