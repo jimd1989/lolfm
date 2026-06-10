@@ -63,7 +63,8 @@
 (← (countries-by-plays db)
   (transduce stream⇒
              (∘ decode-countries-by-plays 
-                (chunk-on ((C >>=) (λ (ω) (∈ 'country-id ω)))))
+                (chunk-on ((C >>=) (λ (ω) (∈ 'country-id ω))))
+                (transducer (∘ sequence)))
              ⊃ 
              ∅ 
              (stream-countries-by-plays db)))
