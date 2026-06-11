@@ -46,7 +46,7 @@
 
 (← (mux . fs)
   (λ (r)
-    (∃ ((gs (∀ ((C (⍨ $$)) ⊃) fs))) 
+    (∃ ((gs (∀ ((C &) ⊃) fs)))
       (λλ (() (r))
           ((acc) (⇐ $$ acc gs))
           ((acc ω) (∃ ((αs (⇐ (λ (α g) (g α ω)) ∅ gs))) (⇐ r acc αs)))))))
@@ -66,4 +66,4 @@
       (f (pipeline step)))
     (traversal f acc ωs)))
 
-(transduce ⇐ (∘ inc (mux (⊙t (K 100)) inc) inc)  ⊃ ∅ (list 1 2 3))
+(transduce ⇐ (∘ inc (mux (⊙t (K 100)) inc) (chunk 2))  ⊃ ∅ (list 1 2 3))
