@@ -52,19 +52,22 @@
 
 (← (stream-countries-by-plays db) (stream-sql db countries-by-plays-query))
 (← decode-countries-by-plays
-  (transducer (λ (ω) (decode `(,(decoder 'n s⊥n) 
-                               ,(decoder 'country-id s⊥n)
-                               ,(decoder 'country-plays s⊥n)
-                               ,(decoder 'country s⊥s)
-                               ,(decoder 'artist s⊥s)
-                               ,(decoder 'artist-plays s⊥n))
-                             ω))))
+  (⊙t (λ (ω) (decode `(,(decoder 'n s⊥n) 
+                       ,(decoder 'country-id s⊥n)
+                       ,(decoder 'country-plays s⊥n)
+                       ,(decoder 'country s⊥s)
+                       ,(decoder 'artist s⊥s)
+                       ,(decoder 'artist-plays s⊥n))
+                     ω))))
 
+; entry point should be non-reified transduction, allowing further reduction r
 (← (countries-by-plays db)
-  (transduce stream⇒
-             (∘ decode-countries-by-plays 
-                (chunk-on ((C >>=) (λ (ω) (∈ 'country-id ω))))
-                (transducer (∘ sequence)))
+  (λ (r) (transduce
+           stream⇒
+           (∘ decode-countries-by-plays 
+              (chunk-on ((C >>=) (λ (ω) (∈ 'country-id ω))))
+              (⊙t (∘ sequence))
+              r)
              ⊃ 
              ∅ 
-             (stream-countries-by-plays db)))
+             (stream-countries-by-plays db))))
