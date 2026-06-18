@@ -1,4 +1,4 @@
-(import (chicken io) (chicken load) (chicken process))
+(import (chicken io) (chicken load) (chicken process) srfi-1)
 (include-relative "prelude.scm")
 (include-relative "syntax.scm")
 
@@ -57,7 +57,7 @@
 
 ; possibly a more general "identity" helper: reify to list on dyadic, thing
 ; itself for unary.
-(← It (λλ ((α) α) ((acc ω) (⊃ acc ω))))
+(← It (λλ ((acc) acc) ((acc ω) (⊃ acc ω))))
 
 (← (mux . fs)
   (λ (r)
@@ -66,6 +66,28 @@
           ((acc) (∃ ((flushed (⇐ (λ (α g) (g α)) ∅ gs)))
                    (∃ ((αs (⇐ (λ (α ω) (r α ω)) acc flushed))) (r αs))))
           ((acc ω) (∃ ((αs (⇐ (λ (α g) (g α ω)) ∅ gs))) (⇐ r acc αs)))))))
+
+; another tricky one. holds ω in memory until n matches arrive, then releases
+; all grouped together. Unlike other transducers, does not flush anything
+; partial
+(← (join-on n f)
+  (λ (r)
+    (∃ ((matches ∅))
+      (λλ (() (r))
+          ((acc) acc)
+          ((acc ω)
+           (∃ ((key (f ω))
+               (match? (assoc key matches))
+               (all-matches (? match? `(,ω ,@(↓ match?)) `(,ω))))
+             (set! matches (alist-update key all-matches matches))
+             (? (= n (ρ all-matches))
+               (begin (set! matches (alist-update key ∅ matches))
+                      (r acc all-matches))
+               (begin (set! matches (alist-update key all-matches matches))
+                      acc))))))))
+
+(← (filter-t p)
+  (λ (r) (λλ (() (r)) ((acc) acc) ((acc ω) (? (p ω) (r acc ω) acc)))))
 
 ; traversal → how ωs is traversed: foldl, etc
 ; pipeline  → the pipeline, transducer itself
@@ -79,4 +101,5 @@
      (∃ ((res (traversal f acc ωs)))
        (? flush? (f res) res))))
 
-(transduce ⇐ (∘ inc (mux (⊙t (K 100)) inc) inc (chunk 4))  ⊃ ∅ (list 1 2 3) #t)
+;(transduce ⇐ (∘ inc (mux (⊙t (K 100)) inc) inc (chunk 4))  ⊃ ∅ (list 1 2 3) #t)
+;(transduce ⇐ (∘ (join-on ↑ 2))  ⊃ ∅ '((a 1) (b 2) (a 3) (c 1)) #t)
