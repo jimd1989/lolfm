@@ -1,5 +1,5 @@
 (import (chicken io) (chicken load) (chicken process))
-(include-relative "syntax.scm")
+(include-relative "../helpers/syntax.scm")
 
 (← (cmd→stream ω)
   (∃ ((port (open-input-pipe ω)))

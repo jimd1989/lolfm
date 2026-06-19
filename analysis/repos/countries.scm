@@ -2,9 +2,9 @@
 (include-relative "../helpers/decoder.scm")
 (include-relative "../helpers/monad.scm")
 (include-relative "../helpers/prelude.scm")
-(include-relative "../helpers/stream.scm")
 (include-relative "../helpers/syntax.scm")
 (include-relative "../helpers/transducers.scm")
+(include-relative "common.scm")
 
 (← countries-query "
   WITH

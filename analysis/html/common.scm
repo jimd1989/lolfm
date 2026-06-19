@@ -1,6 +1,6 @@
 (import (chicken load) (chicken string) sxml-transforms)
-(include-relative "monad.scm")
-(include-relative "syntax.scm")
+(include-relative "../helpers/monad.scm")
+(include-relative "../helpers/syntax.scm")
 
 ; figure out css, file naming, etc
 

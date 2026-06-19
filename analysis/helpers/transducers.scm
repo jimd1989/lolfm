@@ -67,6 +67,20 @@
                    (∃ ((αs (⇐ (λ (α ω) (r α ω)) acc flushed))) (r αs))))
           ((acc ω) (∃ ((αs (⇐ (λ (α g) (g α ω)) ∅ gs))) (⇐ r acc αs)))))))
 
+; for a void function f (not easy to inject monad here)
+; not ideal but might need "poisoned" transducers
+(← (tap . fs)
+   (∃ ((l (ρ fs)))
+     (∘ ($ mux (⊃ fs (⊙t I))) (chunk (+ 1 l)) (⊙t (D ↓n l)) (⊙t ↑))))
+
+; where f is $> or *>
+(← (tap-m f . fs)
+   (∃ ((l (ρ fs)))
+     (∘ ($ mux (⊃ fs (⊙t I)))
+        (chunk (+ 1 l)) 
+        (⊙t (λ (ω) (∃ ((voids (↑n l ω)) (α (↑ (↓n l ω))))
+                     (f (sequence voids) α)))))))
+
 ; another tricky one. holds ω in memory until n matches arrive, then releases
 ; all grouped together. Unlike other transducers, does not flush anything
 ; partial
@@ -74,7 +88,7 @@
   (λ (r)
     (∃ ((matches ∅))
       (λλ (() (r))
-          ((acc) acc)
+          ((acc) (r acc))
           ((acc ω)
            (∃ ((key (f ω))
                (match? (assoc key matches))

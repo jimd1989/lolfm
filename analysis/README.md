@@ -1,0 +1,11 @@
+- `helpers/`
+  - general core convenience functions
+- `repos/`
+  - SQL queries, decoders, and closure around a transducer stream
+  - entry point is `(get-<repo>)`
+- `transformers/`
+  - pure data manipulation inside transducer stream
+  - entry point is `(transform-<repo>)`
+- `html/`:
+  - final SXML transforms and HTML file writing functions
+  - entry point is `(render-<repo>)`
