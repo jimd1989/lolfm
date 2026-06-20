@@ -103,17 +103,29 @@
 (← (filter-t p)
   (λ (r) (λλ (() (r)) ((acc) acc) ((acc ω) (? (p ω) (r acc ω) acc)))))
 
+; testing early breaking
+; TODO: move this to tap-m and elsewhere
+(← (breaker msg)
+  (λ (r) (λλ (() (r))
+             ((acc) (r acc))
+             ((acc ω) (r msg)))))
+
 ; traversal → how ωs is traversed: foldl, etc
 ; pipeline  → the pipeline, transducer itself
 ; reduce    → combines all results into reified final value
 ; acc       → empty accumulator state, just like a fold
 ; ωs        → raw inputs, could be physical, could be port
+; OLD ONE MIGHT NOT NEED
+;(← (transduce traversal pipeline reduce acc ωs #!optional (flush? #t))
+;  (∃ ((step (λλ ((α ω) (reduce α ω)) ((α) α)))
+;      (f (pipeline step)))
+;     (∃ ((res (traversal f acc ωs)))
+;       (? flush? (f res) res))))
 
-(← (transduce traversal pipeline reduce acc ωs #!optional (flush? #t))
-  (∃ ((step (λλ ((α ω) (reduce α ω)) ((α) α)))
-      (f (pipeline step)))
-     (∃ ((res (traversal f acc ωs)))
-       (? flush? (f res) res))))
-
+(← (transduce traversal pipeline reduce acc ωs)
+   (call/cc (λ (△)
+              (∃ ((step (λλ ((α ω) (reduce α ω)) ((α) (△ α))))
+                  (f (pipeline step)))
+                (f (traversal f acc ωs))))))
 ;(transduce ⇐ (∘ inc (mux (⊙t (K 100)) inc) inc (chunk 4))  ⊃ ∅ (list 1 2 3) #t)
 ;(transduce ⇐ (∘ (join-on ↑ 2))  ⊃ ∅ '((a 1) (b 2) (a 3) (c 1)) #t)
