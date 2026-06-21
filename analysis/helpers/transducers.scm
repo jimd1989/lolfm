@@ -1,11 +1,12 @@
 (import (chicken io) (chicken load) (chicken process) srfi-1)
 (include-relative "prelude.scm")
+(include-relative "monad.scm")
 (include-relative "syntax.scm")
 
 ; Unlike iterators, transducers pre-compose chains of functions that are only
 ; reified against data later, not unlike Haskell fusion. A given transducer in 
 ; a composition chain is defined
-(← (⊙t f) (λ (r) (λλ (() (r))
+(← (t-pure f) (λ (r) (λλ (() (r))
                      ((acc) (r acc))
                      ((acc ω) (r acc (f ω))))))
 ; where
@@ -20,7 +21,22 @@
 ; definition of transducers, but it seems like a convenient constructor more
 ; than anything else
 
-(← inc (⊙t (λ (n) (+ n 1))))
+(← inc (t-pure (λ (n) (+ n 1))))
+
+; monadic control in terms of Either, where f is itself an actual transducer
+; applies reducer to f and runs it conditionally, short-circuiting with a
+; unilateral flush from dyadic branch on Left
+(← (t-m f wrap)
+  (λ (r)
+    (∃ ((g ((∘ f (t-pure wrap)) r)))
+      (λλ (() (r))
+          ((acc) (? (left? acc) (r acc) (g acc)))
+          ((acc ω) (? (left? ω) (r ω) (g acc (get ω))))))))
+
+(← (t-map f) (t-m f right))
+(← (t-bind f) (t-m f I))
+
+(← † t-pure) (← †⊙ t-map) (← †>>= t-bind)
 
 ; slightly more complex: stateful transducers can call reduce conditionally.
 ; f = item/buffer transformer
@@ -71,14 +87,14 @@
 ; not ideal but might need "poisoned" transducers
 (← (tap . fs)
    (∃ ((l (ρ fs)))
-     (∘ ($ mux (⊃ fs (⊙t I))) (chunk (+ 1 l)) (⊙t (D ↓n l)) (⊙t ↑))))
+     (∘ ($ mux (⊃ fs (t-pure I))) (chunk (+ 1 l)) (t-pure (D ↓n l)) (t-pure ↑))))
 
 ; where f is $> or *>
 (← (tap-m f . fs)
    (∃ ((l (ρ fs)))
-     (∘ ($ mux (⊃ fs (⊙t I)))
+     (∘ ($ mux (⊃ fs (t-pure I)))
         (chunk (+ 1 l)) 
-        (⊙t (λ (ω) (∃ ((voids (↑n l ω)) (α (↑ (↓n l ω))))
+        (t-pure (λ (ω) (∃ ((voids (↑n l ω)) (α (↑ (↓n l ω))))
                      (f (sequence voids) α)))))))
 
 ; another tricky one. holds ω in memory until n matches arrive, then releases
@@ -102,14 +118,6 @@
 
 (← (filter-t p)
   (λ (r) (λλ (() (r)) ((acc) acc) ((acc ω) (? (p ω) (r acc ω) acc)))))
-
-; testing early breaking
-; TODO: move this to tap-m and elsewhere
-(← (breaker msg)
-  (λ (r) (λλ (() (r))
-             ((acc) (r acc))
-             ((acc ω) (r msg)))))
-
 ; traversal → how ωs is traversed: foldl, etc
 ; pipeline  → the pipeline, transducer itself
 ; reduce    → combines all results into reified final value
@@ -127,5 +135,5 @@
               (∃ ((step (λλ ((α ω) (reduce α ω)) ((α) (△ α))))
                   (f (pipeline step)))
                 (f (traversal f acc ωs))))))
-;(transduce ⇐ (∘ inc (mux (⊙t (K 100)) inc) inc (chunk 4))  ⊃ ∅ (list 1 2 3) #t)
+;(transduce ⇐ (∘ inc (mux (t-pure (K 100)) inc) inc (chunk 4))  ⊃ ∅ (list 1 2 3) #t)
 ;(transduce ⇐ (∘ (join-on ↑ 2))  ⊃ ∅ '((a 1) (b 2) (a 3) (c 1)) #t)

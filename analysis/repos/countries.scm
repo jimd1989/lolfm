@@ -102,7 +102,7 @@
 
 (← (stream-countries db) (stream-sql db countries-query))
 (← decode-countries-row
-   (⊙t (λ (ω) (decode `(,(decoder 'country-rank-plays s⊥n) 
+   (t-pure (λ (ω) (decode `(,(decoder 'country-rank-plays s⊥n) 
                         ,(decoder 'country-id-plays s⊥n) 
                         ,(decoder 'country-plays s⊥n) 
                         ,(decoder 'country-name-plays s⊥s) 
