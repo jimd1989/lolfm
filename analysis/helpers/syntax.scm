@@ -9,4 +9,4 @@
 (← ↑ car) (← ↓ cdr) (← ↑↓ cadr) (← ↑↑ caar) (← ↓↓ cddr) (← ∘ compose)
 (← ≡ equal?) (← ∅ '()) (← ∅? null?) (← ρ length) (← ρs string-length) (← ◇ conc) 
 (← ⊂ cons) (← ∀ map) (← $ apply) (← ⊖ reverse) (← ($$ f ω) (f ω)) 
-(← ⇒ foldr) (← ⇐ foldl) (← ¬ not) (← ⍨ flip) (← ∀∀ for-each)
+(← ⇒ foldr) (← ⇐ foldl) (← ¬ not) (← ⍨ flip) (← ∀∀ for-each) (← ∞ +inf.0)

@@ -47,8 +47,6 @@
                  (hours ,hours)
                  (artists ,artists))))))
 
-; failure of this key does not short-circuit
-; Left/#f is simply registered in match table
 (← country-key (∘ (D ∈ 'id) ↑↓))
 
 (← (country-order α ω)
@@ -56,21 +54,20 @@
                        (← ωid (∈ 'rank ω))
                        (yield (< αid ωid)))))
 
-(← (country-artists-pipeline ω f) (∘ (†⊙ (chunk-on (D ∈ ω))) (†>>= († f))))
+(← (country-artists-pipeline ω f) (∘ (†⊙ (†⊆? (D ∈ ω))) (†>>= († f))))
 
 (← (top-countries-pipeline ω n)
    (∘ (†>>= († (D ∈ ω)))
       (†⊙ († (D alist-delete 'artists)))
-      (†⊙ (chunk +inf.0))
+      (†⊙ (†⊆ ∞))
       (†⊙ († (∘ (D ⊂ ω) (D ↑n n) (D ⍋ country-order))))))
 
 (← (transform-countries
-       #!optional (country-page-html (t-pure (λ (ω) (right (print 'html))))))
-  (∘ (mux (country-artists-pipeline 'country-id-plays rows⊥country-plays)
-          (country-artists-pipeline 'country-id-seconds rows⊥country-hours))
-     (†⊙ (join-on 2 country-key))
-     (tap-m *> country-page-html)
-     ; top country rankings next
-     (mux (top-countries-pipeline 'hours 15)
-          (top-countries-pipeline 'plays 15))
-     (†⊙ (chunk 2))))
+       #!optional (country-page-html († (λ (ω) (right (print 'html))))))
+  (∘ (†&&& (country-artists-pipeline 'country-id-plays rows⊥country-plays)
+           (country-artists-pipeline 'country-id-seconds rows⊥country-hours))
+     (†⊙ (†↕ 2 country-key))
+     (†<* country-page-html)
+     (†&&& (top-countries-pipeline 'plays 15)
+           (top-countries-pipeline 'hours 15))
+     (†⊙ (†⊆ 2))))

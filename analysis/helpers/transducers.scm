@@ -38,13 +38,53 @@
 
 (← † t-pure) (← †⊙ t-map) (← †>>= t-bind)
 
+; 1:n stream transducer → emit ω n times linearly
+(← (t-clone n)
+  (λ (r)
+    (λλ (() (r))
+        ((acc) 
+         (letrec ((▽ (λ (m α) (? (= m n) (r α) (▽ (+ 1 m) (r α))))))
+           (▽ 1 acc)))
+        ((acc ω)
+          (letrec ((▽ (λ (m) (? (= m n) (r acc ω) (r (▽ (+ 1 m)) ω)))))
+            (▽ 1))))))
+
+; statefully delegate (↑ fs) to ω
+(← (t-gear . fs)
+  (λ (r)
+    (∃ ((gs ($ circular-list
+               (∀ (λ (f) (f (λλ (() (r)) ((acc) acc) ((acc ω) (r acc ω))))) 
+                  fs))))
+      (λλ (() (r))
+          ((acc)
+           (letrec ((▽ (λ (n α hs)
+                         (? (= 0 n) (r α)  (▽ (- n 1) ((↑ hs) α) (↓ hs))))))
+             (▽ (ρ fs) acc gs)))
+          ((acc ω) (∃ ((α ((↑ gs) acc ω))) (set! gs (↓ gs)) α))))))
+
+; concurrently run fs sub-transducers → emit results linearly (can always chunk)
+(← (t-mux . fs) (∘ (t-clone (ρ fs)) ($ t-gear fs)))
+
+(← (t-unit) (λ (r) (λλ (() (r)) ((acc) acc) ((acc ω) acc))))
+
+; for void functions fs
+(← (tap . fs)
+  (∘ ($ t-mux (⊃ fs (t-pure I)))
+     ($ t-gear (⊃ (make-list (ρ fs) (t-unit)) (t-pure I)))))
+
+(← (tap-m . fs)
+  (∘ ($ t-mux (⊃ fs (t-pure I)))
+     ($ t-gear (⊃ (make-list (ρ fs) (†⊙ (t-unit))) (t-pure (◁ I))))))
+
+(← †&&& t-mux) (← †∅ t-unit) (← †>> tap) (← †<$ tap-m) (← (†<* f) (†⊙ (†<$ f))) 
+
 ; slightly more complex: stateful transducers can call reduce conditionally.
 ; f = item/buffer transformer
 ; p = buffer yield predicate
 ; g = buffer yield transformer
 ; h = buffer post-yield transformer
 ; i = optional flush buffer yield transformer
-(← (until f p g h #!optional (i g))
+(← (t-until f p g h #!optional (i g))
   (λ (r)
     (∃ ((buf ∅))
        (λλ (() (r))
@@ -54,53 +94,19 @@
             (set! buf (f ω buf))
             (? (p buf) (∃ ((α (g buf))) (set! buf (h buf)) (r acc α)) acc))))))
 
-(← (chunk n) (until ⊂ (∘ ((C =) n) ρ) ⊖ (K ∅)))
+(← (t-chunk n) (t-until ⊂ (∘ ((C =) n) ρ) ⊖ (K ∅)))
 
-(← (chunk-on f)
-  (until ⊂ 
+(← (t-chunk-on f)
+  (t-until ⊂ 
          (λ (buf) (∧ (> (ρ buf) 1) ((J (∘ ¬ ≡) (∘ f ↑) (∘ f ↑↓)) buf)))
          (∘ ⊖ ↓)
          (λ (buf) `(,(↑ buf)))
          ⊖))
 
-; more difficult: calling n child pipelines, then outputting them into a flat
-; stream. most complexity comes from proper flushing of all children.
-; needs to pass the unary case to all children to flush subordinate pipes, then
-; flatten them with the parent reducer, them emit that.
-; in both unary and dyadic cases, the result must be immediately reified to a
-; literal list before emitted into the rest of the pipeline.
-; honestly not 100% sure this shit works
-
-; possibly a more general "identity" helper: reify to list on dyadic, thing
-; itself for unary.
-(← It (λλ ((acc) acc) ((acc ω) (⊃ acc ω))))
-
-(← (mux . fs)
-  (λ (r)
-    (∃ ((gs (∀ ((C &) It) fs)))
-      (λλ (() (r))
-          ((acc) (∃ ((flushed (⇐ (λ (α g) (g α)) ∅ gs)))
-                   (∃ ((αs (⇐ (λ (α ω) (r α ω)) acc flushed))) (r αs))))
-          ((acc ω) (∃ ((αs (⇐ (λ (α g) (g α ω)) ∅ gs))) (⇐ r acc αs)))))))
-
-; for a void function f (not easy to inject monad here)
-; not ideal but might need "poisoned" transducers
-(← (tap . fs)
-   (∃ ((l (ρ fs)))
-     (∘ ($ mux (⊃ fs (t-pure I))) (chunk (+ 1 l)) (t-pure (D ↓n l)) (t-pure ↑))))
-
-; where f is $> or *>
-(← (tap-m f . fs)
-   (∃ ((l (ρ fs)))
-     (∘ ($ mux (⊃ fs (t-pure I)))
-        (chunk (+ 1 l)) 
-        (t-pure (λ (ω) (∃ ((voids (↑n l ω)) (α (↑ (↓n l ω))))
-                     (f (sequence voids) α)))))))
-
 ; another tricky one. holds ω in memory until n matches arrive, then releases
 ; all grouped together. Unlike other transducers, does not flush anything
 ; partial
-(← (join-on n f)
+(← (t-join-on n f)
   (λ (r)
     (∃ ((matches ∅))
       (λλ (() (r))
@@ -116,24 +122,18 @@
                (begin (set! matches (alist-update key all-matches matches))
                       acc))))))))
 
-(← (filter-t p)
+(← (t-filter p)
   (λ (r) (λλ (() (r)) ((acc) acc) ((acc ω) (? (p ω) (r acc ω) acc)))))
+
+(← †⊆ t-chunk) (← †⊆? t-chunk-on) (← †↕ t-join-on) (← †? t-filter)
+
 ; traversal → how ωs is traversed: foldl, etc
 ; pipeline  → the pipeline, transducer itself
 ; reduce    → combines all results into reified final value
 ; acc       → empty accumulator state, just like a fold
 ; ωs        → raw inputs, could be physical, could be port
-; OLD ONE MIGHT NOT NEED
-;(← (transduce traversal pipeline reduce acc ωs #!optional (flush? #t))
-;  (∃ ((step (λλ ((α ω) (reduce α ω)) ((α) α)))
-;      (f (pipeline step)))
-;     (∃ ((res (traversal f acc ωs)))
-;       (? flush? (f res) res))))
-
 (← (transduce traversal pipeline reduce acc ωs)
    (call/cc (λ (△)
               (∃ ((step (λλ ((α ω) (reduce α ω)) ((α) (△ α))))
                   (f (pipeline step)))
                 (f (traversal f acc ωs))))))
-;(transduce ⇐ (∘ inc (mux (t-pure (K 100)) inc) inc (chunk 4))  ⊃ ∅ (list 1 2 3) #t)
-;(transduce ⇐ (∘ (join-on ↑ 2))  ⊃ ∅ '((a 1) (b 2) (a 3) (c 1)) #t)
