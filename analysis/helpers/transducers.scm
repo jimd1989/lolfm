@@ -76,7 +76,8 @@
   (∘ ($ t-mux (⊃ fs (t-pure I)))
      ($ t-gear (⊃ (make-list (ρ fs) (†⊙ (t-unit))) (t-pure (◁ I))))))
 
-(← †&&& t-mux) (← †∅ t-unit) (← †>> tap) (← †<$ tap-m) (← (†<* f) (†⊙ (†<$ f))) 
+(← †*** t-gear) (← †&&& t-mux) (← †∅ t-unit) 
+(← †<< tap) (← †<$ tap-m) (← (†<* f) (†⊙ (†<$ f))) 
 
 ; slightly more complex: stateful transducers can call reduce conditionally.
 ; f = item/buffer transformer
@@ -137,3 +138,5 @@
               (∃ ((step (λλ ((α ω) (reduce α ω)) ((α) (△ α))))
                   (f (pipeline step)))
                 (f (traversal f acc ωs))))))
+
+(← †→ transduce)

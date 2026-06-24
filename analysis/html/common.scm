@@ -18,7 +18,6 @@
 (← column-transformer (∘ ↑ ↓↓))
 
 (← (row-transformer . columns)
-   (print `(COLUMNS ,columns))
   (∃ ((fs (∀ (λ (c) (∘ (◁ (D tag 'td))
                        (◁ (D $$ (column-transformer c)))
                        (D ∈ (column-key c)))) columns)))
@@ -38,13 +37,13 @@
     (for (inputs
           (∀ (λ (tab n) (∃ ((ω (◇ "recent-" n))
                             (name (tabbed-table-name tab)))
-                          `((input (@ (id ,ω) ,(type radio)))
+                          `((input (@ (id ,ω) (type radio)))
                             (label (@ (for ,ω)) name))))
                named-table-transformers
                (iota (ρ named-table-transformers) 1)))
          (← rendered 
            (∀ (λ (tab t)
-                `(section (@ (class tab-panel)) ((tabbed-table-f tab) t)))
+                `(section (@ (class tab-panel)) ,((tabbed-table-f tab) t)))
               named-table-transformers
               tables))
          (yield `(div (@ (class tabset))
@@ -56,7 +55,3 @@
    '(div (@ (id "content") checked)
          (h1 "Welcome")
          (p "This is a " (strong "nested") " layout.")))
-
-(← COLUMNS `(("Plays" plays ,n⊥s) ("Name" name ,I)))
-(← TABLE `(((plays 1234)(name "Assfort"))
-           ((name "Flux of Pink Indians")(plays 999))))

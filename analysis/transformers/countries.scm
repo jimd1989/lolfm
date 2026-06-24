@@ -62,6 +62,9 @@
       (†⊙ (†⊆ ∞))
       (†⊙ († (∘ (D ⊂ ω) (D ↑n n) (D ⍋ country-order))))))
 
+;scratch
+(include-relative "../html/countries.scm")
+
 (← (transform-countries
        #!optional (country-page-html († (λ (ω) (right (print 'html))))))
   (∘ (†&&& (country-artists-pipeline 'country-id-plays rows⊥country-plays)
@@ -70,4 +73,5 @@
      (†<* country-page-html)
      (†&&& (top-countries-pipeline 'plays 15)
            (top-countries-pipeline 'hours 15))
-     (†⊙ (†⊆ 2))))
+     (†⊙ (†⊆ 2))
+     (†>>= († (D render-top-countries))))) 

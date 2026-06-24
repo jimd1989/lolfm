@@ -1,4 +1,5 @@
 (import (chicken io) (chicken load) (chicken process))
+(include-relative "../helpers/prelude.scm")
 (include-relative "../helpers/syntax.scm")
 
 (← (cmd→stream ω)
@@ -6,15 +7,14 @@
     (λ () (∃ ((α (read-line port)))
       (? (eof-object? α) (begin (close-input-pipe port) α) α)))))
 
-; if transducer is using call/cc, consider something like this
-;(← (with-cmd→stream ω body-proc)
-;  (∃ ((port (open-input-pipe ω)))
+; if transducer is using call/cc, consider "mapping" in the resouce lifecycle:
+; things need to be a bit inside-out here. think about it
+;(← (cmd→stream cmd handler)
+;  (∃ ((port (open-input-pipe cmd)))
 ;    (dynamic-wind
 ;      (λ () #f)
-;      (λ () (body-proc (λ () 
-;                         (∃ ((α (read-line port))) 
-;                           α)))) ; Clean generator, no inline close needed
-;      (λ () (close-input-pipe port))))) ; GUARANTEED to close on early exit
+;      (λ () (handler (λ () (read-line port))))
+;      (λ () (close-input-pipe port)))))
 
 (← (stream⇒ f acc ωs)
   (∃ ((ω (ωs))) (? (eof-object? ω) acc (stream⇒ f (f acc ω) ωs))))
