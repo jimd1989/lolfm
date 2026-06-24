@@ -102,27 +102,23 @@
 
 (← (stream-countries db) (stream-sql db countries-query))
 (← decode-countries-row
-   (t-pure (λ (ω) (decode `(,(decoder 'country-rank-plays s⊥n) 
-                        ,(decoder 'country-id-plays s⊥n) 
-                        ,(decoder 'country-plays s⊥n) 
-                        ,(decoder 'country-name-plays s⊥s) 
-                        ,(decoder 'artist-rank-plays s⊥n) 
-                        ,(decoder 'artist-name-plays s⊥s) 
-                        ,(decoder 'artist-plays s⊥n) 
-                        ,(decoder 'country-rank-seconds s⊥n) 
-                        ,(decoder 'country-id-seconds s⊥n) 
-                        ,(decoder 'country-seconds s⊥n) 
-                        ,(decoder 'country-name-seconds s⊥s) 
-                        ,(decoder 'artist-rank-seconds s⊥n) 
-                        ,(decoder 'artist-name-seconds s⊥s) 
-                        ,(decoder 'artist-seconds s⊥n))
+   († (λ (ω) (decode `(,(decoder 'country-rank-plays s⊥n) 
+                       ,(decoder 'country-id-plays s⊥n) 
+                       ,(decoder 'country-plays s⊥n) 
+                       ,(decoder 'country-name-plays s⊥s) 
+                       ,(decoder 'artist-rank-plays s⊥n) 
+                       ,(decoder 'artist-name-plays s⊥s) 
+                       ,(decoder 'artist-plays s⊥n) 
+                       ,(decoder 'country-rank-seconds s⊥n) 
+                       ,(decoder 'country-id-seconds s⊥n) 
+                       ,(decoder 'country-seconds s⊥n) 
+                       ,(decoder 'country-name-seconds s⊥s) 
+                       ,(decoder 'artist-rank-seconds s⊥n) 
+                       ,(decoder 'artist-name-seconds s⊥s) 
+                       ,(decoder 'artist-seconds s⊥n))
                       ω))))
 
 ; entry point should be non-reified transduction, allowing further reduction r
 (← (get-countries db)
-  (λ (r) (transduce
-           stream⇒
-           (∘ decode-countries-row r)
-             ⊃ 
-             ∅ 
-             (stream-countries db))))
+  (λ (r)
+    (†⇒ stream⇒ (∘ decode-countries-row r) *> (right ∅) (stream-countries db))))

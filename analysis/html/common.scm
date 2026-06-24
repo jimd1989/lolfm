@@ -6,8 +6,11 @@
 (include-relative "../transformers/common.scm")
 
 ; figure out css, file naming, etc
-(← (write-html file ω)
-  (for (← written? (either (with-output-to-file file (λ () (SXML->HTML ω)))))
+(← (write-html dir file ω)
+  (for (← directory-created? (either (create-directory dir #t)))
+       (path (◇ dir "/" file))
+       (_ (print (◇ "writing " path)))
+       (← written? (either (with-output-to-file path (λ () (SXML->HTML ω)))))
        (← success? (ensure written? (◇ "Error writing html file: " file) #t))
        (yield success?)))
 
@@ -32,23 +35,23 @@
 (← tabbed-table-name ↑)
 (← tabbed-table-f ↑↓)
 
-(← (tabbed-table-transformer . named-table-transformers)
+(← (render-table-inputs named-transformer n)
+  (∃ ((ω (◇ "recent-" n)) (name (tabbed-table-name named-transformer)))
+    `((input (@ (id ,ω) (type radio)))
+      (label (@ (for ,ω)) ,name))))
+
+(← (render-table named-transformer table)
+  (⊙ (λ (ω) `(section (@ (class tab-panel)) ,ω))
+     ((tabbed-table-f named-transformer) table)))
+
+(← (render-tabbed-table inputs contents)
+  `(div (@ (class tabset)) ,@inputs (div (@ (class tab-panels)) ,@contents)))
+
+(← (tabbed-table-transformer . fs)
   (λ (tables)
-    (for (inputs
-          (∀ (λ (tab n) (∃ ((ω (◇ "recent-" n))
-                            (name (tabbed-table-name tab)))
-                          `((input (@ (id ,ω) (type radio)))
-                            (label (@ (for ,ω)) name))))
-               named-table-transformers
-               (iota (ρ named-table-transformers) 1)))
-         (← rendered 
-           (∀ (λ (tab t)
-                `(section (@ (class tab-panel)) ,((tabbed-table-f tab) t)))
-              named-table-transformers
-              tables))
-         (yield `(div (@ (class tabset))
-                   ,@inputs
-                   (div (@ (class tab-panels)) ,@rendered))))))
+    (for (inputs (∀ render-table-inputs fs (iota (ρ fs) 1)))
+         (← contents (sequence (∀ render-table fs tables)))
+         (yield (render-tabbed-table inputs contents)))))
 
 ; scratch
 (← EXAMPLE 

@@ -10,3 +10,4 @@
 (← ≡ equal?) (← ∅ '()) (← ∅? null?) (← ρ length) (← ρs string-length) (← ◇ conc) 
 (← ⊂ cons) (← ∀ map) (← $ apply) (← ⊖ reverse) (← ($$ f ω) (f ω)) 
 (← ⇒ foldr) (← ⇐ foldl) (← ¬ not) (← ⍨ flip) (← ∀∀ for-each) (← ∞ +inf.0)
+(← ⊆ list)

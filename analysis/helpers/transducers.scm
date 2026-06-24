@@ -139,4 +139,4 @@
                   (f (pipeline step)))
                 (f (traversal f acc ωs))))))
 
-(← †→ transduce)
+(← †⇒ transduce)
