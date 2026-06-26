@@ -8,3 +8,4 @@
 (← (s⊥s ω) (right ω))
 (← (decoder key f) (λ (ω) (⊙ (λ (α) `(,key ,α)) (f ω))))
 (← (decode decoders row) (sequence (∀ $$ decoders (string-split row "\t"))))
+(← (decode-record r parsers row) (⊙ (D $ r) (decode parsers row)))

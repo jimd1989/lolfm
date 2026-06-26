@@ -4,6 +4,7 @@
 (define-syntax ? (syntax-rules () ((_ . ω) (if . ω))))
 (define-syntax ← (syntax-rules () ((_ . ω) (define . ω))))
 (define-syntax ∃ (syntax-rules () ((_ . ω) (let* . ω))))
+(define-syntax ∃▽ (syntax-rules () ((_ . ω) (letrec . ω))))
 (define-syntax ∨ (syntax-rules () ((_ . ω) (or . ω))))
 (define-syntax ∧ (syntax-rules () ((_ . ω) (and . ω))))
 (← ↑ car) (← ↓ cdr) (← ↑↓ cadr) (← ↑↑ caar) (← ↓↓ cddr) (← ∘ compose)
