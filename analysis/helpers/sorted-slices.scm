@@ -21,13 +21,15 @@
       (n (bitwise-ior n (arithmetic-shift n -32))))
     (+ n 1)))
 
-(← (slice n) (make-slice 0 ∅ (make-vector (next-2 n))))
+(← (slice #!optional (n 128)) (make-slice 0 ∅ (make-vector (next-2 n))))
 
 (← ⊆v slice) (← ⊆vρ slice-length) (← ⊆vv slice-vec) (← ⊆v⍋ slice-sorts)
 (← ⊆vρ! slice-length-set!) (← ⊆vv! slice-vec-set!) (← ⊆v⍋! slice-sorts-set!)
 (← vρ vector-length)
 (← (vι n ω) (vector-ref ω n)) ; unsafe since slice checks length anyway
 (← (v! n α ω) (vector-set! ω n α))
+(← slice-null? (∘ (D = 0) ⊆vρ)) (← ⊆v∅? slice-null?)
+(← (slice-ref n ω) (vι (modulo n (⊆vρ ω)) (⊆vv ω))) (← ⊆vι slice-ref)
 
 (← (copy-vector! α ω n)
   (∃▽ ((▽ (λ (m) (? (= m n) #t (begin (v! m (vι m α) ω) (▽ (+ m 1))))))) (▽ 0)))

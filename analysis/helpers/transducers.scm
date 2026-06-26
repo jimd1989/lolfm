@@ -1,6 +1,7 @@
 (import (chicken io) (chicken load) (chicken process) srfi-1)
 (include-relative "prelude.scm")
 (include-relative "monad.scm")
+(include-relative "sorted-slices.scm")
 (include-relative "syntax.scm")
 
 ; Unlike iterators, transducers pre-compose chains of functions that are only
@@ -99,10 +100,26 @@
 
 (← (t-chunk-on f)
   (t-until ⊂ 
-         (λ (buf) (∧ (> (ρ buf) 1) ((J (∘ ¬ ≡) (∘ f ↑) (∘ f ↑↓)) buf)))
-         (∘ ⊖ ↓)
-         (λ (buf) `(,(↑ buf)))
-         ⊖))
+           (λ (buf) (∧ (> (ρ buf) 1) ((J (∘ ¬ ≡) (∘ f ↑) (∘ f ↑↓)) buf)))
+           (∘ ⊖ ↓)
+           (λ (buf) `(,(↑ buf)))
+           ⊖))
+
+(← (t-until-slice f p g #!optional (i g))
+  (λ (r)
+    (∃ ((buf (slice)))
+       (λλ (() (r))
+           ((acc)
+            (? (⊆v∅? buf)
+              (r acc)
+              (∃ ((α (i buf))) (set! buf (slice)) (r (r acc α)))))
+           ((acc ω)
+            (set! buf (slice-append! (f ω) buf))
+            (? (p buf) (∃ ((α (g buf))) (set! buf (slice)) (r acc α)) acc))))))
+
+(← (t-chunk-slice n) (t-until-slice I (∘ (D = n) ⊆vρ) I))
+; t-chunk-on-slice needs h returned somehow
+
 
 ; another tricky one. holds ω in memory until n matches arrive, then releases
 ; all grouped together. Unlike other transducers, does not flush anything
