@@ -1,5 +1,5 @@
-(import (chicken bitwise) (chicken fixnum) (chicken load) (chicken sort) srfi-1
-        srfi-4)
+(import (chicken bitwise) (chicken fixnum) (chicken format)
+        (chicken load) (chicken sort) srfi-1 srfi-4)
 (include-relative "monad.scm")
 (include-relative "prelude.scm")
 (include-relative "syntax.scm")
@@ -10,6 +10,9 @@
   (length slice-length slice-length-set!)
   (sorts slice-sorts slice-sorts-set!)
   (vec slice-vec slice-vec-set!))
+
+(define-record-printer (slice ω port)
+  (fprintf port "#~S~S" (∀ ↑ (⊆v⍋ ω)) (⊆v⊥xs ω)))
 
 (← (next-2 n)
   (∃ ((n (- n 1))
@@ -24,35 +27,45 @@
 (← (slice #!optional (n 128)) (make-slice 0 ∅ (make-vector (next-2 n))))
 
 (← ⊆v slice) (← ⊆vρ slice-length) (← ⊆vv slice-vec) (← ⊆v⍋ slice-sorts)
-(← ⊆vρ! slice-length-set!) (← ⊆vv! slice-vec-set!) (← ⊆v⍋! slice-sorts-set!)
+(← (⊆vρ! n ω) (slice-length-set! ω n) ω)
+(← (⊆vv! v ω) (slice-vec-set! ω v) ω)
+(← (⊆v⍋! s ω) (slice-sorts-set! ω s) ω)
+
 (← vρ vector-length)
 (← (vι n ω) (vector-ref ω n)) ; unsafe since slice checks length anyway
 (← (v! n α ω) (vector-set! ω n α))
-(← slice-null? (∘ (D = 0) ⊆vρ)) (← ⊆v∅? slice-null?)
-(← (slice-ref n ω) (vι (modulo n (⊆vρ ω)) (⊆vv ω))) (← ⊆vι slice-ref)
+
+(← slice-null? (∘ (D = 0) ⊆vρ))
+(← (slice-ref n ω) (vι (modulo n (⊆vρ ω)) (⊆vv ω)))
+(← ⊆vι slice-ref) (← ⊆v∅? slice-null?)
 
 (← (copy-vector! α ω n)
-  (∃▽ ((▽ (λ (m) (? (= m n) #t (begin (v! m (vι m α) ω) (▽ (+ m 1))))))) (▽ 0)))
+  (∃▽ ((▽ (λ (m) (? (= m n) ω (begin (v! m (vι m α) ω) (▽ (+ m 1))))))) (▽ 0)))
 
 (← (grow-slice! α)
   (∃ ((l (vρ (⊆vv α))))
     (? (> (⊆vρ α) (fx/ l 2))
       (∃ ((ω (make-vector (fx* 2 l))))
          (copy-vector! (⊆vv α) ω (⊆vρ α))
-         (⊆vv! α ω) α)
+         (⊆vv! ω α))
       α)))
 
 (← (slice-append! α ω)
   (∃ ((l (⊆vρ ω)))
-     (v! l α (⊆vv ω)) (⊆vρ! ω (+ l 1)) (⊆v⍋! ω ∅) (grow-slice! ω)))
+     (v! l α (⊆vv ω)) (⊆vρ! (+ l 1) ω) (⊆v⍋! ∅ ω) (grow-slice! ω)))
+
+(← (copy-slice ω)
+  (∃ ((l (⊆vρ ω)) (v (⊆vv ω)) (vl (vρ v)))
+    (make-slice l (⊆v⍋ ω) (copy-vector! v (make-vector vl) l))))
 
 (← (slice->vector ω) (subvector (slice-vec ω) 0 (slice-length ω)))
-(← ⊆v⊥v slice->vector) (← ⊆v⊥xs (∘ vector->list ⊆v⊥v))
+(← ⊆v⊥v slice->vector) (← ⊆v⊥xs (∘ vector->list ⊆v⊥v)) (← ⊆v⊥⊆v copy-slice)
+(← ⊆v⊂ slice-append!)
 
-(← (ordering f ω n) (list->u64vector (⍋ (O f (D (⍨ vι) ω)) (iota n))))
-(← (slice-sort f ω) (ordering f (⊆vv ω) (⊆vρ ω)))
+(← (slice-ordering f ω n) (list->u64vector (⍋ (O f (D (⍨ vι) ω)) (iota n))))
+(← (slice-sort f ω) (slice-ordering f (⊆vv ω) (⊆vρ ω)))
 (← (slice-sort! α f ω)
-  (∃ ((⍋s (⊆v⍋ ω))) (⊆v⍋! ω `((,α ,(slice-sort f ω)) ,@⍋s))) ω)
+  (∃ ((⍋s (⊆v⍋ ω))) (⊆v⍋! `((,α ,(slice-sort f ω)) ,@⍋s) ω)) ω)
 (← ⍋⊆v! slice-sort!)
 
 (← (sort-fold f acc ω ⍋ω)

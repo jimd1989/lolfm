@@ -105,7 +105,7 @@
            (λ (buf) `(,(↑ buf)))
            ⊖))
 
-(← (t-until-slice f p g #!optional (i g))
+(← (t-until-slice f p g h #!optional (i g))
   (λ (r)
     (∃ ((buf (slice)))
        (λλ (() (r))
@@ -114,12 +114,19 @@
               (r acc)
               (∃ ((α (i buf))) (set! buf (slice)) (r (r acc α)))))
            ((acc ω)
-            (set! buf (slice-append! (f ω) buf))
-            (? (p buf) (∃ ((α (g buf))) (set! buf (slice)) (r acc α)) acc))))))
+            (set! buf (f ω buf))
+            (? (p buf) (∃ ((α (g buf))) (set! buf (h buf)) (r acc α)) acc))))))
 
-(← (t-chunk-slice n) (t-until-slice I (∘ (D = n) ⊆vρ) I))
-; t-chunk-on-slice needs h returned somehow
+(← (t-chunk-slice n) (t-until-slice ⊆v⊂ (∘ (D = n) ⊆vρ) ⊆v⊥⊆v (D ⊆vρ! 0) I))
 
+(← (t-chunk-on-slice f)
+  (t-until-slice
+    ⊆v⊂
+    (λ (buf) (∧ (> (⊆vρ buf) 1)
+                ((J (∘ ¬ ≡) (∘ f (D ⊆vι -1)) (∘ f (D ⊆vι -2))) buf)))
+    (J ⊆vρ! (∘ (D + -1) ⊆vρ) ⊆v⊥⊆v)
+    (λ (buf) (v! 0 (⊆vι -1 buf) (⊆vv buf)) (⊆vρ! 1 buf))
+    I))
 
 ; another tricky one. holds ω in memory until n matches arrive, then releases
 ; all grouped together. Unlike other transducers, does not flush anything
@@ -143,7 +150,8 @@
 (← (t-filter p)
   (λ (r) (λλ (() (r)) ((acc) acc) ((acc ω) (? (p ω) (r acc ω) acc)))))
 
-(← †⊆ t-chunk) (← †⊆? t-chunk-on) (← †↕ t-join-on) (← †? t-filter)
+(← †⊆ t-chunk) (← †⊆? t-chunk-on) (← †⊆v t-chunk-slice)
+(← †⊆v? t-chunk-on-slice) (← †↕ t-join-on) (← †? t-filter)
 
 ; traversal → how ωs is traversed: foldl, etc
 ; pipeline  → the pipeline, transducer itself
