@@ -101,24 +101,33 @@
    ")
 
 (← (stream-countries db) (stream-sql db countries-query))
-(← decode-countries-row
-   († (λ (ω) (decode `(,(decoder 'country-rank-plays s⊥n) 
-                       ,(decoder 'country-id-plays s⊥n) 
-                       ,(decoder 'country-plays s⊥n) 
-                       ,(decoder 'country-name-plays s⊥s) 
-                       ,(decoder 'artist-rank-plays s⊥n) 
-                       ,(decoder 'artist-name-plays s⊥s) 
-                       ,(decoder 'artist-plays s⊥n) 
-                       ,(decoder 'country-rank-seconds s⊥n) 
-                       ,(decoder 'country-id-seconds s⊥n) 
-                       ,(decoder 'country-seconds s⊥n) 
-                       ,(decoder 'country-name-seconds s⊥s) 
-                       ,(decoder 'artist-rank-seconds s⊥n) 
-                       ,(decoder 'artist-name-seconds s⊥s) 
-                       ,(decoder 'artist-seconds s⊥n))
-                      ω))))
+
+(define-record-type countries-row
+  (make-countries-row country-rank-plays country-id-plays country-plays 
+                      country-name-plays artist-rank-plays artist-name-plays
+                      artist-plays country-rank-seconds country-id-seconds
+                      country-seconds country-name-seconds artist-rank-seconds
+                      artist-name-seconds artist-seconds)
+  countries-row?
+  (country-rank-plays   countries-row-country-rank-plays)
+  (country-id-plays     countries-row-country-id-plays)
+  (country-plays        countries-row-country-plays)
+  (country-name-plays   countries-row-country-name-plays)
+  (artist-rank-plays    countries-row-artist-rank-plays)
+  (artist-name-plays    countries-row-artist-name-plays)
+  (artist-plays         countries-row-artist-plays)
+  (country-rank-seconds countries-row-country-rank-seconds)
+  (country-id-seconds   countries-row-country-id-seconds)
+  (country-seconds      countries-row-country-seconds)
+  (country-name-seconds countries-row-country-name-seconds)
+  (artist-rank-seconds  countries-row-artist-rank-seconds)
+  (artist-name-seconds  countries-row-artist-name-seconds) 
+  (artist-seconds       countries-row-artist-seconds))
+
+(← (decode-countries-row ω)
+  (decode-record make-countries-row
+    (⊆ s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n) ω))
 
 ; entry point should be non-reified transduction, allowing further reduction r
 (← (get-countries db)
-  (λ (r)
-    (†⇒ stream⇒ (∘ decode-countries-row r) *> (right ∅) (stream-countries db))))
+  (λ (r) (†⇒ stream⇒ (∘ († decode-countries-row) r) ⊃ ∅ (stream-countries db))))

@@ -21,16 +21,15 @@
 (← column-transformer (∘ ↑ ↓↓))
 
 (← (row-transformer . columns)
-  (∃ ((fs (∀ (λ (c) (∘ (◁ (D tag 'td))
-                       (◁ (D $$ (column-transformer c)))
-                       (D ∈ (column-key c)))) columns)))
-    (λ (row) (⊙ (D $ tag 'tr) (traverse (D & row) fs)))))
+  (∃ ((fs (∀ (λ (c) (∘ (D tag 'td) (column-transformer c) (column-key c)))
+             columns)))
+    (λ (row) (⊙ (D $ tag 'tr) (∀ (D & row) fs)))))
 
 (← (table-transformer . columns)
   (∃ ((titles (⊂ 'tr (∀ (∘ (D tag 'th) column-title) columns)))
       (row-f ($ row-transformer columns))
       (wrapper (∘ (D tag 'table) (D tag 'tbody))))
-    (λ (table) (⊙ (∘ wrapper (D ⊂ titles)) (traverse row-f table)))))
+    (λ (table) ((∘ wrapper (D ⊂ titles)) (∀ row-f table)))))
 
 (← tabbed-table-name ↑)
 (← tabbed-table-f ↑↓)
@@ -50,7 +49,7 @@
 (← (tabbed-table-transformer . fs)
   (λ (tables)
     (for (inputs (∀ render-table-inputs fs (iota (ρ fs) 1)))
-         (← contents (sequence (∀ render-table fs tables)))
+         (contents (sequence (∀ render-table fs tables)))
          (yield (render-tabbed-table inputs contents)))))
 
 ; scratch

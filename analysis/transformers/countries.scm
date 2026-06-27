@@ -4,6 +4,7 @@
 (include-relative "../helpers/syntax.scm")
 (include-relative "../helpers/transducers.scm")
 (include-relative "../html/countries.scm")
+(include-relative "../repos/countries.scm")
 (include-relative "../transformers/common.scm")
 
 (← (row⊥country-artist-plays row)
@@ -73,11 +74,21 @@
        (yield `((plays ,(↑n 15 plays)) (hours ,(↑n 15 hours))))))
 
 (← transform-countries
-  (∘ (†&&& (country-top-artists 'country-id-plays rows⊥country-plays)
-           (country-top-artists 'country-id-seconds rows⊥country-hours))
-     (†⊙ (†↕ 2 country-key))
+  (∘ (†⊙ (†⊆v? countries-row-country-id-plays))
+     (†⊙ († (D ⍋⊆v! 'plays (O < countries-row-artist-rank-plays))))
+     (†⊙ († (D ⍋⊆v! 'seconds (O < countries-row-artist-rank-seconds))))
      (†<* († render-country-artists))
-     (†&&& (top-countries 'plays) (top-countries 'hours))
-     (†⊙ (†⊆ 2))
-     (†<* († render-top-countries))
-     (†>>= († top-countries-summary))))
+     ; render html
+     ; take one row
+     (†⊙ († (D ⊆vι 0)))))
+
+; OUTDATED
+;(← transform-countries
+;  (∘ (†&&& (country-top-artists 'country-id-plays rows⊥country-plays)
+;           (country-top-artists 'country-id-seconds rows⊥country-hours))
+;     (†⊙ (†↕ 2 country-key))
+;     (†<* († render-country-artists))
+;     (†&&& (top-countries 'plays) (top-countries 'hours))
+;     (†⊙ (†⊆ 2))
+;     (†<* († render-top-countries))
+;     (†>>= († top-countries-summary))))
