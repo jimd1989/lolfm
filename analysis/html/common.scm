@@ -1,8 +1,8 @@
 (import (chicken load) (chicken string) srfi-1 sxml-transforms)
 (include-relative "../helpers/monad.scm")
 (include-relative "../helpers/prelude.scm")
+(include-relative "../helpers/sorted-slices.scm")
 (include-relative "../helpers/syntax.scm")
-(include-relative "../helpers/transducers.scm")
 (include-relative "../transformers/common.scm")
 
 ; figure out css, file naming, etc
@@ -23,13 +23,13 @@
 (← (row-transformer . columns)
   (∃ ((fs (∀ (λ (c) (∘ (D tag 'td) (column-transformer c) (column-key c)))
              columns)))
-    (λ (row) (⊙ (D $ tag 'tr) (∀ (D & row) fs)))))
+    (λ (row) (⊂ 'tr (∀ (D & row) fs)))))
 
-(← (table-transformer . columns)
+(← (table-transformer sort-key . columns)
   (∃ ((titles (⊂ 'tr (∀ (∘ (D tag 'th) column-title) columns)))
       (row-f ($ row-transformer columns))
       (wrapper (∘ (D tag 'table) (D tag 'tbody))))
-    (λ (table) ((∘ wrapper (D ⊂ titles)) (∀ row-f table)))))
+    (λ (table) ((∘ (◁ wrapper) (◁ (D ⊂ titles))) (⊆v⍋∀ row-f sort-key table)))))
 
 (← tabbed-table-name ↑)
 (← tabbed-table-f ↑↓)
@@ -39,21 +39,15 @@
     `((input (@ (id ,ω) (type radio)))
       (label (@ (for ,ω)) ,name))))
 
-(← (render-table named-transformer table)
+(← (render-table rows named-transformer)
   (⊙ (λ (ω) `(section (@ (class tab-panel)) ,ω))
-     ((tabbed-table-f named-transformer) table)))
+     ((tabbed-table-f named-transformer) rows)))
 
 (← (render-tabbed-table inputs contents)
   `(div (@ (class tabset)) ,@inputs (div (@ (class tab-panels)) ,@contents)))
 
 (← (tabbed-table-transformer . fs)
-  (λ (tables)
+  (λ (rows)
     (for (inputs (∀ render-table-inputs fs (iota (ρ fs) 1)))
-         (contents (sequence (∀ render-table fs tables)))
+         (← contents (traverse (D render-table rows) fs))
          (yield (render-tabbed-table inputs contents)))))
-
-; scratch
-(← EXAMPLE 
-   '(div (@ (id "content") checked)
-         (h1 "Welcome")
-         (p "This is a " (strong "nested") " layout.")))

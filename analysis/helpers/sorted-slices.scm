@@ -78,4 +78,7 @@
 (← (sorted-slice-fold f acc k ω)
   (for (← ⍋ω (∈ k (⊆v⍋ ω)))
        (yield (sort-fold f acc (⊆vv ω) ⍋ω))))
-(← ⊆v⍋⇒ sorted-slice-fold)
+
+(← (sorted-slice-map f k ω) (sorted-slice-fold (λ (α acc) (⊂ (f α) acc)) ∅ k ω))
+
+(← ⊆v⍋⇒ sorted-slice-fold) (← ⊆v⍋∀ sorted-slice-map)

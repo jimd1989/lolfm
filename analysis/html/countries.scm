@@ -3,32 +3,33 @@
 (include-relative "../helpers/prelude.scm")
 (include-relative "../helpers/syntax.scm")
 (include-relative "../html/common.scm")
+(include-relative "../repos/countries.scm")
 (include-relative "../transformers/common.scm")
 
 (← render-country-artists-table
   (tabbed-table-transformer
-    `("Plays" ,(table-transformer
-                 `("#" rank ,I)
-                 `("Artist" name ,I)
-                 `("Plays" plays ,I)))
-    `("Hours" ,(table-transformer
-                 `("#" rank ,I)
-                 `("Artist" name ,I)
-                 `("Hours" hours ,I)))))
+    `("Plays"
+       ,(table-transformer 'plays
+         `("#" ,countries-row-artist-rank-plays ,I)
+         `("Artist" ,countries-row-artist-name-plays ,I)
+         `("Plays" ,countries-row-artist-plays ,n⊥s)))
+    `("Hours"
+       ,(table-transformer 'seconds
+         `("#" ,countries-row-artist-rank-seconds ,I)
+         `("Artist" ,countries-row-artist-name-seconds ,I)
+         `("Hours" ,countries-row-artist-seconds ,seconds⊥hours)))))
 
-(← (render-country-artists ω)
-  (for (← plays (∈ 'plays ω))
-       (← hours (∈ 'hours ω))
-       (← id (∈ 'id plays))
-       (← name (∈ 'name plays))
-       (← plays-artists (∈ 'artists plays))
-       (← hours-artists (∈ 'artists hours))
-       (← table (render-country-artists-table `(,plays-artists ,hours-artists)))
+(← (render-country-artists rows)
+  (for (← table (render-country-artists-table rows))
+       (← head (either (⊆vι 0 rows)))
+       (name (countries-row-country-name-plays head))
+       (id (countries-row-country-id-plays head))
        (html `(html (head (title ,name)) (body (h1 ,name) ,table)))
        (filename (◇ id ".html"))
        (← ok? (write-html "/tmp/lolfm/countries" filename html))
        (yield ok?)))
 
+; OLD AND WRONG
 (← render-top-countries-table
   (tabbed-table-transformer
     `("Plays" ,(table-transformer

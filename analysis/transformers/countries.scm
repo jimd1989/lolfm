@@ -1,94 +1,11 @@
-(import (chicken load) srfi-1)
-(include-relative "../helpers/monad.scm")
-(include-relative "../helpers/prelude.scm")
+(import (chicken load))
 (include-relative "../helpers/syntax.scm")
 (include-relative "../helpers/transducers.scm")
 (include-relative "../html/countries.scm")
-(include-relative "../repos/countries.scm")
-(include-relative "../transformers/common.scm")
-
-(← (row⊥country-artist-plays row)
- (for (← rank (∈ 'artist-rank-plays row))
-      (← name (∈ 'artist-name-plays row))
-      (← plays (∈ 'artist-plays row))
-      (yield `((rank ,(n⊥s rank)) (name ,name) (plays ,(n⊥s plays))))))
-
-(← (rows⊥country-plays rows)
-  (for (← row (either (↑ rows)))
-       (← rank (∈ 'country-rank-plays row))
-       (← id (∈ 'country-id-plays row))
-       (← name (∈ 'country-name-plays row))
-       (href `(a (@ href ,(◇ "/tmp/lolfm/countries/" id ".html")) ,name))
-       (← plays (∈ 'country-plays row))
-       (← artists (traverse row⊥country-artist-plays rows))
-       (yield `(plays
-                ((rank ,rank)
-                 (id ,id)
-                 (name ,name)
-                 (href ,href)
-                 (plays ,(n⊥s plays))
-                 (artists ,artists))))))
-
-(← (row⊥country-artist-hours row)
- (for (← rank (∈ 'artist-rank-seconds row))
-      (← name (∈ 'artist-name-seconds row))
-      (← seconds (∈ 'artist-seconds row))
-      (hours (seconds⊥hours seconds))
-      (yield `((rank ,(n⊥s rank)) (name ,name) (hours ,hours)))))
-
-(← (rows⊥country-hours rows)
-  (for (← row (either (↑ rows)))
-       (← rank (∈ 'country-rank-seconds row))
-       (← id (∈ 'country-id-seconds row))
-       (← name (∈ 'country-name-seconds row))
-       (href `(a (@ href ,(◇ "/tmp/lolfm/countries/" id ".html")) ,name))
-       (← seconds (∈ 'country-seconds row))
-       (hours (seconds⊥hours seconds))
-       (← artists (traverse row⊥country-artist-hours rows))
-       (yield `(hours
-                ((rank ,rank)
-                 (id ,id)
-                 (name ,name)
-                 (href ,href)
-                 (hours ,hours)
-                 (artists ,artists))))))
-
-(← country-key (∘ (D ∈ 'id) ↑↓))
-
-(← (country-order α ω)
-  (get-or-else #f (for (← αid (∈ 'rank α))
-                       (← ωid (∈ 'rank ω))
-                       (yield (< αid ωid)))))
-
-(← (country-top-artists ω f) (∘ (†⊙ (†⊆? (D ∈ ω))) (†>>= († f))))
-
-(← (top-countries ω)
-   (∘ (†>>= († (D ∈ ω)))
-      (†⊙ († (D alist-delete 'artists)))
-      (†⊙ (†⊆ ∞))
-      (†⊙ († (∘ (D ⊂ ω) (D ⊆) (D ⍋ country-order))))))
-
-(← (top-countries-summary ω)
-  (for (← plays (∈ 'plays ω))
-       (← hours (∈ 'hours ω))
-       (yield `((plays ,(↑n 15 plays)) (hours ,(↑n 15 hours))))))
 
 (← transform-countries
   (∘ (†⊙ (†⊆v? countries-row-country-id-plays))
      (†⊙ († (D ⍋⊆v! 'plays (O < countries-row-artist-rank-plays))))
      (†⊙ († (D ⍋⊆v! 'seconds (O < countries-row-artist-rank-seconds))))
      (†<* († render-country-artists))
-     ; render html
-     ; take one row
      (†⊙ († (D ⊆vι 0)))))
-
-; OUTDATED
-;(← transform-countries
-;  (∘ (†&&& (country-top-artists 'country-id-plays rows⊥country-plays)
-;           (country-top-artists 'country-id-seconds rows⊥country-hours))
-;     (†⊙ (†↕ 2 country-key))
-;     (†<* († render-country-artists))
-;     (†&&& (top-countries 'plays) (top-countries 'hours))
-;     (†⊙ (†⊆ 2))
-;     (†<* († render-top-countries))
-;     (†>>= († top-countries-summary))))
