@@ -1,4 +1,5 @@
 (import (chicken io) (chicken load) (chicken process))
+(include-relative "../helpers/monad.scm")
 (include-relative "../helpers/prelude.scm")
 (include-relative "../helpers/syntax.scm")
 
@@ -20,3 +21,11 @@
   (∃ ((ω (ωs))) (? (eof-object? ω) acc (stream⇒ f (f acc ω) ωs))))
 
 (← (stream-sql db α) (cmd→stream (◇ "sqlite3 -tabs " db " " "\"" α "\"")))
+
+(← (s⊥ f e ω) (>>= (λ (α) (ensure α (◇ e ": " ω) α)) (either (f ω))))
+(← (s⊥n ω) (s⊥ string->number "not number" ω))
+(← (s⊥x ω) (s⊥ string->symbol "not valid symbol" ω))
+(← (s⊥s ω) (right ω))
+(← (decoder key f) (λ (ω) (⊙ (λ (α) `(,key ,α)) (f ω))))
+(← (decode decoders row) (sequence (∀ $$ decoders (string-split row "\t"))))
+(← (decode-record r parsers row) (⊙ (D $ r) (decode parsers row)))

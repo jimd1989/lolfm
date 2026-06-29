@@ -1,9 +1,8 @@
-(import (chicken load) (chicken string) srfi-1 sxml-transforms)
+(import (chicken fixnum) (chicken load) (chicken string) srfi-1 sxml-transforms)
 (include-relative "../helpers/monad.scm")
 (include-relative "../helpers/prelude.scm")
 (include-relative "../helpers/sorted-slices.scm")
 (include-relative "../helpers/syntax.scm")
-(include-relative "../transformers/common.scm")
 
 ; figure out css, file naming, etc
 (← (write-html dir file ω)
@@ -51,3 +50,12 @@
     (for (inputs (∀ render-table-inputs fs (iota (ρ fs) 1)))
          (← contents (traverse (D render-table rows) fs))
          (yield (render-tabbed-table inputs contents)))))
+
+(← (n⊥s n)
+  (letrec ((ωs (string->list (number->string n)))
+           (▽ (λ (αs θ) (cond ((∅? αs) ∅)
+                              ((= θ 3) (⊂ #\, (▽ αs 0)))
+                              (else (⊂ (↑ αs) (▽ (↓ αs) (+ θ 1))))))))
+    ($ ◇ (⊖ (▽ (⊖ ωs) 0)))))
+
+(← (seconds⊥hours n) (n⊥s (fx/ (fx/ n 60) 60)))

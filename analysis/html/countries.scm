@@ -4,7 +4,6 @@
 (include-relative "../helpers/syntax.scm")
 (include-relative "../html/common.scm")
 (include-relative "../repos/countries.scm")
-(include-relative "../transformers/common.scm")
 
 (← render-country-artists-table
   (tabbed-table-transformer

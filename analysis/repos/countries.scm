@@ -1,7 +1,4 @@
 (import (chicken load))
-(include-relative "../helpers/decoder.scm")
-(include-relative "../helpers/monad.scm")
-(include-relative "../helpers/prelude.scm")
 (include-relative "../helpers/syntax.scm")
 (include-relative "../helpers/transducers.scm")
 (include-relative "common.scm")
@@ -97,7 +94,9 @@
          top_time.artist_name,
          artist_play_seconds
     FROM top_time
-    JOIN top ON top_n_time = top_n
+    JOIN top  ON top.country_id         = top_time.country_id
+             AND artist_rank_in_country = artist_rank_time_in_country
+   ORDER BY country_row ASC, artist_rank_in_country ASC
    ")
 
 (← (stream-countries db) (stream-sql db countries-query))
@@ -128,6 +127,5 @@
   (decode-record make-countries-row
     (⊆ s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n) ω))
 
-; entry point should be non-reified transduction, allowing further reduction r
 (← (get-countries db)
   (λ (r) (†⇒ stream⇒ (∘ († decode-countries-row) r) ⊃ ∅ (stream-countries db))))
