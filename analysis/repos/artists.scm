@@ -1,0 +1,90 @@
+(import (chicken load))
+(include-relative "../helpers/syntax.scm")
+(include-relative "../helpers/transducers.scm")
+(include-relative "common.scm")
+
+(← artists-query "
+  WITH
+  artist_plays AS (
+    SELECT artists.id          AS artist_id, 
+           artists.name        AS artist_name,
+           COUNT(plays.song)   AS artist_play_count,
+           SUM(plays.duration) AS artist_play_seconds
+      FROM plays
+      JOIN songs   ON plays.song   = songs.id
+      JOIN artists ON songs.artist = artists.id
+     GROUP BY artists.id
+  ),
+  rankings AS (
+    SELECT artist_plays.artist_id AS rank_id,
+           ROW_NUMBER() OVER (
+             ORDER BY artist_plays.artist_play_count DESC
+           ) AS artist_rank_plays,
+           ROW_NUMBER() OVER (
+             ORDER BY artist_plays.artist_play_seconds DESC
+           ) AS artist_rank_seconds
+      FROM artist_plays
+  ),
+  top_plays AS (
+    SELECT artist_plays.artist_id         AS top_plays_artist_id,
+           artist_plays.artist_name       AS top_plays_artist_name,
+           artist_plays.artist_play_count AS top_plays_count,
+           rankings.artist_rank_plays     AS top_plays_rank,
+           DENSE_RANK() OVER (
+            ORDER BY rankings.artist_rank_plays DESC
+           ) AS top_plays_row
+      FROM artist_plays
+      JOIN rankings ON artist_plays.artist_id = rankings.rank_id
+  ),
+  top_seconds AS (
+    SELECT artist_plays.artist_id           AS top_seconds_artist_id,
+           artist_plays.artist_name         AS top_seconds_artist_name,
+           artist_plays.artist_play_seconds AS top_seconds_count,
+           rankings.artist_rank_seconds     AS top_seconds_rank,
+           DENSE_RANK() OVER (
+            ORDER BY rankings.artist_rank_seconds DESC
+           ) AS top_seconds_row
+      FROM artist_plays
+      JOIN rankings ON artist_plays.artist_id = rankings.rank_id
+  )
+  SELECT top_plays_artist_id,
+         top_plays_artist_name,
+         top_plays_count,
+         top_plays_rank,
+         top_plays_row,
+         top_seconds_artist_id,
+         top_seconds_artist_name,
+         top_seconds_count,
+         top_seconds_rank,
+         top_seconds_row
+    FROM top_plays
+    JOIN top_seconds ON top_plays_rank = top_seconds_rank
+   ORDER BY top_plays_rank
+   ")
+
+(← (stream-artists db) (stream-sql db artists-query))
+
+(define-record-type artists-row
+  (make-artists-row top-plays-artist-id top-plays-artist-name top-plays-count
+                    top-plays-rank top-plays-row top-seconds-artist-id
+                    top-seconds-artist-name top-seconds-count top-seconds-rank
+                    top-seconds-row)
+  artists-row?
+  (top-plays-artist-id     artists-row-top-plays-artist-id)
+  (top-plays-artist-name   artists-row-top-plays-artist-name)
+  (top-plays-count         artists-row-top-plays-count)
+  (top-plays-rank          artists-row-top-plays-rank)
+  (top-plays-row           artists-row-top-plays-row)
+  (top-seconds-artist-id   artists-row-top-seconds-artist-id)
+  (top-seconds-artist-name artists-row-top-seconds-artist-name)
+  (top-seconds-count       artists-row-top-seconds-count)
+  (top-seconds-rank        artists-row-top-seconds-rank)
+  (top-seconds-row         artists-row-top-seconds-row)
+  )
+
+(← (decode-artists-row ω)
+  (decode-record make-artists-row 
+    (⊆ s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥n s⊥n) ω))
+
+(← (get-artists db)
+  (λ (r) (†⇒ stream⇒ (∘ († decode-artists-row) r) ⊃ ∅ (stream-artists db))))
