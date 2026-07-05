@@ -1,4 +1,5 @@
 (import (chicken load))
+(include-relative "../helpers/monad.scm")
 (include-relative "../helpers/syntax.scm")
 (include-relative "../helpers/transducers.scm")
 (include-relative "common.scm")
@@ -87,4 +88,8 @@
     (⊆ s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥n s⊥n) ω))
 
 (← (get-artists db)
-  (λ (r) (†⇒ stream⇒ (∘ († decode-artists-row) r) ⊃ ∅ (stream-artists db))))
+  (λ (r) (†⇒ stream⇒
+             (∘ († decode-artists-row) r) 
+             (λ (acc ω) (lift2 ⊃ acc ω))
+             (right ∅) 
+             (stream-artists db))))

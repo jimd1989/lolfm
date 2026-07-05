@@ -1,4 +1,5 @@
 (import (chicken load))
+(include-relative "../helpers/monad.scm")
 (include-relative "../helpers/syntax.scm")
 (include-relative "../helpers/transducers.scm")
 (include-relative "common.scm")
@@ -128,4 +129,8 @@
     (⊆ s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n) ω))
 
 (← (get-countries db)
-  (λ (r) (†⇒ stream⇒ (∘ († decode-countries-row) r) ⊃ ∅ (stream-countries db))))
+  (λ (r) (†⇒ stream⇒ 
+             (∘ († decode-countries-row) r)
+             (λ (acc ω) (lift2 ⊃ acc ω)) 
+             (right ∅) 
+             (stream-countries db))))
