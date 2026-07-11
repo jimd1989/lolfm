@@ -11,5 +11,5 @@
 (pp
   (for (← all-countries ((get-countries DB) transform-individual-countries))
        (← top-artists ((get-artists DB) transform-top-artists))
-       (yield top-artists))
+       (yield all-countries))
 )

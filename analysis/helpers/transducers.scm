@@ -61,7 +61,8 @@
            (letrec ((▽ (λ (n α hs)
                          (? (= 0 n) (r α)  (▽ (- n 1) ((↑ hs) α) (↓ hs))))))
              (▽ (ρ fs) acc gs)))
-          ((acc ω) (∃ ((α ((↑ gs) acc ω))) (set! gs (↓ gs)) α))))))
+          ((acc ω) 
+           (∃ ((α ((↑ gs) acc ω))) (set! gs (↓ gs)) α))))))
 
 ; concurrently run fs sub-transducers → emit results linearly (can always chunk)
 (← (t-mux . fs) (∘ (t-clone (ρ fs)) ($ t-gear fs)))
@@ -75,7 +76,7 @@
 
 (← (tap-m . fs)
   (∘ ($ t-mux (⊃ fs (t-pure I)))
-     ($ t-gear (⊃ (make-list (ρ fs) (†⊙ (t-unit))) (t-pure (◁ I))))))
+     ($ t-gear (⊃ (make-list (ρ fs) (†>>= (t-unit))) (t-pure I)))))
 
 (← †*** t-gear) (← †&&& t-mux) (← †∅ t-unit) 
 (← †<< tap) (← †<$ tap-m) (← (†<* f) (†⊙ (†<$ f))) 
