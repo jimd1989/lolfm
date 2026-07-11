@@ -69,17 +69,14 @@
 
 (← (t-unit) (λ (r) (λλ (() (r)) ((acc) acc) ((acc ω) acc))))
 
-; for void functions fs
-(← (tap . fs)
-  (∘ ($ t-mux (⊃ fs (t-pure I)))
-     ($ t-gear (⊃ (make-list (ρ fs) (t-unit)) (t-pure I)))))
-
-(← (tap-m . fs)
-  (∘ ($ t-mux (⊃ fs (t-pure I)))
-     ($ t-gear (⊃ (make-list (ρ fs) (†>>= (t-unit))) (t-pure I)))))
-
 (← †*** t-gear) (← †&&& t-mux) (← †∅ t-unit) 
-(← †<< tap) (← †<$ tap-m) (← (†<* f) (†⊙ (†<$ f))) 
+
+; for void functions fs
+(← (tap f) (∘ (t-mux f (t-pure I)) (t-gear (t-unit) (t-pure I))))
+
+(← (tap-m f) (∘ (t-mux f (t-pure right)) (†⊙ (t-gear (t-unit) (t-pure I)))))
+
+(← †<< tap) (← †<$ tap-m) (← (†<* f) (†>>= (†<$ f))) 
 
 ; slightly more complex: stateful transducers can call reduce conditionally.
 ; f = item/buffer transformer
