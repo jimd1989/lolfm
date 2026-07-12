@@ -29,21 +29,21 @@
        (yield ok?)))
 
 ; OLD AND WRONG
-(← render-top-countries-table
-  (tabbed-table-transformer
-    `("Plays" ,(table-transformer
-                 `("#" countries-row-country-rank-plays ,n⊥s)
-                 `("Country" countries-row-country-name-plays ,I)
-                 `("Plays" countries-row-country-plays ,n⊥s)))
-    `("Hours" ,(table-transformer
-                 `("#" countries-row-country-rank-seconds ,n⊥s)
-                 `("Country" countries-row-artist-name-seconds ,I)
-                 `("Hours" countries-row-country-seconds ,seconds⊥hours)))))
-
-(← (render-top-countries ω)
-  (for (table (render-top-countries-table `(,plays ,hours)))
-       (html `(html (head (title "Top countries"))
-                    (body (h1 "Top countries") ,table)))
-       (_ (print html))
-       (← ok? (write-html "/tmp/lolfm/countries" "index.html" html))
-       (yield ok?)))
+;(← render-top-countries-table
+;  (tabbed-table-transformer
+;    `("Plays" ,(table-transformer
+;                 `("#" countries-row-country-rank-plays ,n⊥s)
+;                 `("Country" countries-row-country-name-plays ,I)
+;                 `("Plays" countries-row-country-plays ,n⊥s)))
+;    `("Hours" ,(table-transformer
+;                 `("#" countries-row-country-rank-seconds ,n⊥s)
+;                 `("Country" countries-row-artist-name-seconds ,I)
+;                 `("Hours" countries-row-country-seconds ,seconds⊥hours)))))
+;
+;(← (render-top-countries ω)
+;  (for (table (render-top-countries-table `(,plays ,hours)))
+;       (html `(html (head (title "Top countries"))
+;                    (body (h1 "Top countries") ,table)))
+;       (_ (print html))
+;       (← ok? (write-html "/tmp/lolfm/countries" "index.html" html))
+;       (yield ok?)))

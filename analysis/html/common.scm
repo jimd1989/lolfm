@@ -28,7 +28,10 @@
   (∃ ((titles (⊂ 'tr (∀ (∘ (D tag 'th) column-title) columns)))
       (row-f ($ row-transformer columns))
       (wrapper (∘ (D tag 'table) (D tag 'tbody))))
-    (λ (table) ((∘ (◁ wrapper) (◁ (D ⊂ titles))) (⊆v⍋∀ row-f sort-key table)))))
+    (λ (table) ((∘ (◁ wrapper) (◁ (D ⊂ titles))) 
+                   (? (list? table) 
+                      (right (∀ row-f table))
+                      (⊆v⍋∀ row-f sort-key table))))))
 
 (← tabbed-table-name ↑)
 (← tabbed-table-f ↑↓)
