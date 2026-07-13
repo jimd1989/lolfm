@@ -9,7 +9,8 @@
 (← DB "~/.config/cmus/lolfm.db")
 
 (pp
-  (for (← all-countries ((get-countries DB) transform-individual-countries))
+  (for (← _ (write-css "/tmp/lolfm" "style.css" css))
+       (← all-countries ((get-countries DB) transform-individual-countries))
        (← top-artists ((get-artists DB) transform-top-artists))
        (yield all-countries))
 )

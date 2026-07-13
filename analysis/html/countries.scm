@@ -23,9 +23,10 @@
        (← head (either (⊆vι 0 rows)))
        (name (countries-row-country-name-plays head))
        (id (countries-row-country-id-plays head))
-       (html `(html (head (title ,name)) (body (h1 ,name) ,table)))
+       (contents (html name `(h1 ,name) table))
+       ;(html `(html (head (title ,name)) (body (h1 ,name) ,table)))
        (filename (◇ id ".html"))
-       (← ok? (write-html "/tmp/lolfm/countries" filename html))
+       (← ok? (write-html "/tmp/lolfm/countries" filename contents))
        (yield ok?)))
 
 ; OLD AND WRONG
