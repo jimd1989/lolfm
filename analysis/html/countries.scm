@@ -24,7 +24,6 @@
        (name (countries-row-country-name-plays head))
        (id (countries-row-country-id-plays head))
        (contents (html name `(h1 ,name) table))
-       ;(html `(html (head (title ,name)) (body (h1 ,name) ,table)))
        (filename (◇ id ".html"))
        (← ok? (write-html "/tmp/lolfm/countries" filename contents))
        (yield ok?)))

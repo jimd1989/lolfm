@@ -19,12 +19,29 @@
       JOIN countries ON artists.country = countries.id
      GROUP BY artists.id, artists.name, artists.country, countries.id
   ),
+  artist_plays_year AS (
+    SELECT artists.country     AS country_id_year, 
+           COUNT(plays.song)   AS artist_play_count_year
+      FROM plays
+      JOIN songs     ON plays.song      = songs.id
+      JOIN artists   ON songs.artist    = artists.id
+      JOIN countries ON artists.country = countries.id
+     WHERE date(plays.date, 'unixepoch', 'localtime') > 
+           date('now', '-12 months', 'localtime')
+     GROUP BY artists.id, artists.name, artists.country, countries.id
+  ),
   country_totals AS (
     SELECT country_id,
            SUM(artist_play_count) AS total_country_plays,
            SUM(artist_play_seconds) AS total_country_seconds
       FROM artist_plays
      GROUP BY country_id
+  ),
+  country_totals_year AS (
+    SELECT country_id_year,
+           SUM(artist_play_count_year) AS total_country_plays_year
+      FROM artist_plays_year
+     GROUP BY country_id_year
   ),
   rankings AS (
     SELECT artist_plays.country_id,
@@ -51,6 +68,14 @@
            ) AS artist_rank_time_in_country
       FROM artist_plays
       JOIN country_totals ON artist_plays.country_id = country_totals.country_id
+  ),
+  rankings_year AS (
+    SELECT country_id_year,
+           total_country_plays_year,
+           ROW_NUMBER() OVER (
+                 ORDER BY total_country_plays_year DESC
+           ) AS country_rank_year
+      FROM country_totals_year
   ),
   top AS ( 
   SELECT ROW_NUMBER() OVER (ORDER BY total_country_plays DESC) AS top_n,
@@ -93,10 +118,13 @@
          top_time.country_name,
          artist_rank_time_in_country,
          top_time.artist_name,
-         artist_play_seconds
+         artist_play_seconds,
+         COALESCE(country_rank_year, -1),
+         COALESCE(total_country_plays_year, -1)
     FROM top_time
     JOIN top  ON top.country_id         = top_time.country_id
              AND artist_rank_in_country = artist_rank_time_in_country
+    LEFT JOIN rankings_year ON top.country_id = rankings_year.country_id_year
    ORDER BY country_row ASC, artist_rank_in_country ASC
    ")
 
@@ -107,7 +135,8 @@
                       country-name-plays artist-rank-plays artist-name-plays
                       artist-plays country-rank-seconds country-id-seconds
                       country-seconds country-name-seconds artist-rank-seconds
-                      artist-name-seconds artist-seconds)
+                      artist-name-seconds artist-seconds country-rank-year
+                      country-plays-year)
   countries-row?
   (country-rank-plays   countries-row-country-rank-plays)
   (country-id-plays     countries-row-country-id-plays)
@@ -122,11 +151,13 @@
   (country-name-seconds countries-row-country-name-seconds)
   (artist-rank-seconds  countries-row-artist-rank-seconds)
   (artist-name-seconds  countries-row-artist-name-seconds) 
-  (artist-seconds       countries-row-artist-seconds))
+  (artist-seconds       countries-row-artist-seconds)
+  (country-rank-year    countries-row-country-rank-year)
+  (country-plays-year   countries-row-country-plays-year))
 
 (← (decode-countries-row ω)
   (decode-record make-countries-row
-    (⊆ s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n) ω))
+    (⊆ s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥n) ω))
 
 (← (get-countries db)
   (λ (r) (†⇒ stream⇒ 
