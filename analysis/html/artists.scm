@@ -13,7 +13,12 @@
        ,(table-transformer 'seconds
          `("#" ,artists-row-top-seconds-rank ,I)
          `("Artist" ,artists-row-top-seconds-artist-name ,I)
-         `("Hours" ,artists-row-top-seconds-count ,seconds⊥hours)))))
+         `("Hours" ,artists-row-top-seconds-count ,seconds⊥hours)))
+    `("Year"
+       ,(table-transformer 'plays
+         `("#" ,artists-row-year-plays-rank ,I)
+         `("Artist" ,artists-row-year-plays-artist-name ,I)
+         `("Plays" ,artists-row-year-plays-count ,n⊥s)))))
 
 (← (render-top-artists paginated-rows)
   (for (← page (ι 0 paginated-rows))

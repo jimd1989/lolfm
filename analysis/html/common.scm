@@ -42,8 +42,8 @@
       (wrapper (∘ (D tag 'table) (D tag 'tbody))))
     (λ (table) ((∘ (◁ wrapper) (◁ (D ⊂ titles)) (◁ (D ∀? (∘ not ∅?))))
                    (? (list? table) 
-                      (right (∀ row-f table))
-                      (⊆v⍋∀ row-f sort-key table))))))
+                     (right (∀ row-f table))
+                     (⊆v⍋∀ row-f sort-key table))))))
 
 (← (table-transformer-truncated n sort-key . columns)
   (∃ ((titles (⊂ 'tr (∀ (∘ (D tag 'th) column-title) columns)))
@@ -52,8 +52,8 @@
     (λ (table) ((∘ (◁ wrapper) (◁ (D ⊂ titles)) (◁ (D ↑n n))
                    (◁ (D ∀? (∘ not ∅?))))
                    (? (list? table) 
-                      (right (∀ row-f table))
-                      (⊆v⍋∀ row-f sort-key table))))))
+                     (right (∀ row-f table))
+                     (⊆v⍋∀ row-f sort-key table))))))
 
 (← tabbed-table-name ↑)
 (← tabbed-table-f ↑↓)
