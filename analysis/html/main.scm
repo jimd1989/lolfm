@@ -31,7 +31,7 @@
          `("Plays" ,artists-row-year-plays-count ,n⊥s)))))
 
 (← (render-main-top-artists artists)
-  (for (title '(h1 "Artists"))
+  (for (title '(h2 "Artists"))
        (← count (ι 0 artists))
        (← top-artists (ι 1 artists))
        (← table (render-main-top-artists-table (↑n 50 top-artists)))
@@ -66,7 +66,7 @@
          `("Plays" ,countries-row-country-plays-year ,n⊥s)))))
 
 (← (render-main-countries countries)
-  (for (title '(h1 "Countries"))
+  (for (title '(h2 "Countries"))
        (desc `(p ,(n⊥s (⊆vρ countries)) " countries explored."))
        (← table (render-main-country-table countries))
        (more '(h3 (a (@ (href "./countries/countries.html")) "More")))

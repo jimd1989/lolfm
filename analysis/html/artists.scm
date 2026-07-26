@@ -27,7 +27,7 @@
        (← table (render-top-artists-table rows))
        (name "Artists")
        (next-link (? next `(h3 (a (@ (href ,(◇ "./" next ".html"))) "More")) ∅))
-       (contents (html name `(h1 ,name) table next-link))
+       (contents (html name `(h2 ,name) table next-link))
        (filename (◇ page ".html"))
        (← ok? (write-html "/tmp/lolfm/artists" filename contents))
        (yield ok?)))
