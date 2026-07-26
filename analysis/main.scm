@@ -12,5 +12,5 @@
   (for (← _ (write-css "/tmp/lolfm" "style.css" css))
        (← all-countries ((get-countries DB) transform-individual-countries))
        (← all-artists ((get-artists DB) transform-top-artists))
-       (yield (∀ countries-row-country-rank-year all-countries)))
+       (yield all-countries))
 )

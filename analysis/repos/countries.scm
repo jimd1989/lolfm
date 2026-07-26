@@ -1,5 +1,6 @@
 (import (chicken load))
 (include-relative "../helpers/monad.scm")
+(include-relative "../helpers/sorted-slices.scm")
 (include-relative "../helpers/syntax.scm")
 (include-relative "../helpers/transducers.scm")
 (include-relative "common.scm")
@@ -162,6 +163,6 @@
 (← (get-countries db)
   (λ (r) (†⇒ stream⇒ 
              (∘ († decode-countries-row) r)
-             (λ (acc ω) (lift2 ⊃ acc ω)) 
-             (right ∅) 
+             (λ (acc ω) (lift2 ⊆v⊂ ω acc))
+             (right (slice)) 
              (stream-countries db))))
