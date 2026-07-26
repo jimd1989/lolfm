@@ -6,7 +6,7 @@
 (include-relative "../repos/countries.scm")
 
 (← render-country-artists-table
-  (tabbed-table-transformer
+  (tabbed-table-transformer "country"
     `("Plays"
        ,(table-transformer 'plays
          `("#" ,countries-row-artist-rank-plays ,I)

@@ -44,10 +44,10 @@
 (← tabbed-table-name ↑)
 (← tabbed-table-f ↑↓)
 
-(← (render-table-inputs named-transformer n)
-  (∃ ((ω (◇ "recent-" n)) (name (tabbed-table-name named-transformer))
-      (checked? (? (= 0 n) 'checked ∅)))
-    `((input (@ (id ,ω) (name "recent") (type radio) ,checked?))
+(← (render-table-inputs title named-transformer n)
+  (∃ ((ω (◇ title "-" n)) (name (tabbed-table-name named-transformer))
+      (checked? (? (= 0 n) " checked" ∅)))
+    `((input (@ (id ,ω) (name ,title) (type radio) ,checked?))
       (label (@ (for ,ω)) ,name))))
 
 (← (render-table rows named-transformer)
@@ -57,9 +57,9 @@
 (← (render-tabbed-table inputs contents)
   `(div (@ (class tabset)) ,@inputs (div (@ (class tab-panels)) ,@contents)))
 
-(← (tabbed-table-transformer . fs)
+(← (tabbed-table-transformer title . fs)
   (λ (rows)
-    (for (inputs (∀ render-table-inputs fs (iota (ρ fs))))
+    (for (inputs (∀ (λ (α ω) (render-table-inputs title α ω)) fs (iota (ρ fs))))
          (← contents (traverse (D render-table rows) fs))
          (yield (render-tabbed-table inputs contents)))))
 

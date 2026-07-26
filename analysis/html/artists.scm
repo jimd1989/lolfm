@@ -3,7 +3,7 @@
 (include-relative "../repos/artists.scm")
 
 (← render-top-artists-table
-  (tabbed-table-transformer
+  (tabbed-table-transformer "artists"
     `("Plays"
        ,(table-transformer 'plays
          `("#" ,artists-row-top-plays-rank ,I)

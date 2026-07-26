@@ -13,6 +13,6 @@
   (for (← _ (write-css "/tmp/lolfm" "style.css" css))
        (← all-countries ((get-countries DB) transform-individual-countries))
        (← top-artists ((get-artists DB) transform-top-artists))
-       (← ok? (render-main top-artists))
-       (yield ok?))
+       (← ok? (render-main top-artists all-countries))
+       (yield all-countries))
 )
