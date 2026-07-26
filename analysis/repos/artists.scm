@@ -16,6 +16,17 @@
       JOIN artists ON songs.artist = artists.id
      GROUP BY artists.id
   ),
+  artist_plays_year AS (
+    SELECT artists.id        AS artist_id_year, 
+           artists.name      AS artist_name_year,
+           COUNT(plays.song) AS artist_play_count_year
+      FROM plays
+      JOIN songs     ON plays.song      = songs.id
+      JOIN artists   ON songs.artist    = artists.id
+     WHERE date(plays.date, 'unixepoch', 'localtime') > 
+           date('now', '-12 months', 'localtime')
+     GROUP BY artists.id, artists.name 
+  ),
   rankings AS (
     SELECT artist_plays.artist_id AS rank_id,
            ROW_NUMBER() OVER (
@@ -25,6 +36,15 @@
              ORDER BY artist_plays.artist_play_seconds DESC
            ) AS artist_rank_seconds
       FROM artist_plays
+  ),
+  rankings_year AS (
+    SELECT artist_id_year         AS year_plays_artist_id,
+           artist_name_year       AS year_plays_artist_name,
+           artist_play_count_year AS year_plays_count,
+           ROW_NUMBER() OVER (
+                 ORDER BY artist_play_count_year DESC
+           ) AS year_plays_rank
+      FROM artist_plays_year
   ),
   top_plays AS (
     SELECT artist_plays.artist_id         AS top_plays_artist_id,
@@ -57,9 +77,14 @@
          top_seconds_artist_name,
          top_seconds_count,
          top_seconds_rank,
-         top_seconds_row
+         top_seconds_row,
+         COALESCE(year_plays_artist_id, -1),
+         COALESCE(year_plays_artist_name, '∅'),
+         COALESCE(year_plays_count, -1),
+         COALESCE(year_plays_rank, -1)
     FROM top_plays
     JOIN top_seconds ON top_plays_rank = top_seconds_rank
+    LEFT JOIN rankings_year ON top_plays_rank = year_plays_rank
    ORDER BY top_plays_rank
    ")
 
@@ -69,7 +94,8 @@
   (make-artists-row top-plays-artist-id top-plays-artist-name top-plays-count
                     top-plays-rank top-plays-row top-seconds-artist-id
                     top-seconds-artist-name top-seconds-count top-seconds-rank
-                    top-seconds-row)
+                    top-seconds-row year-plays-artist-id year-plays-artist-name
+                    year-plays-count year-plays-rank)
   artists-row?
   (top-plays-artist-id     artists-row-top-plays-artist-id)
   (top-plays-artist-name   artists-row-top-plays-artist-name)
@@ -81,11 +107,15 @@
   (top-seconds-count       artists-row-top-seconds-count)
   (top-seconds-rank        artists-row-top-seconds-rank)
   (top-seconds-row         artists-row-top-seconds-row)
+  (year-plays-artist-id    artists-row-year-plays-artist-id)
+  (year-plays-artist-name  artists-row-year-plays-artist-name)
+  (year-plays-count        artists-row-year-plays-count)
+  (year-plays-rank         artists-row-year-plays-rank)
   )
 
 (← (decode-artists-row ω)
   (decode-record make-artists-row 
-    (⊆ s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥n s⊥n) ω))
+    (⊆ s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥n) ω))
 
 (← (keep-first-page acc ω)
   (∃ ((n (↑ acc)) (α (↑↓ acc)) (l (ρ ω)))
