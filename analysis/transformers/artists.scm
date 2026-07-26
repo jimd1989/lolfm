@@ -7,4 +7,5 @@
 (← transform-top-artists
   (∘ (†⊙ (†⊆ 512))
      (†⊙ (†§))
-     (†<* († render-top-artists))))
+     (†<* († render-top-artists))
+     (†>>= († (D ι 2)))))

@@ -87,9 +87,13 @@
   (decode-record make-artists-row 
     (⊆ s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥n s⊥n) ω))
 
+(← (keep-first-page acc ω)
+  (∃ ((n (↑ acc)) (α (↑↓ acc)) (l (ρ ω)))
+    (? (∅? α) `(,l ,ω) `(,(+ n l) ,α))))
+
 (← (get-artists db)
   (λ (r) (†⇒ stream⇒
              (∘ († decode-artists-row) r) 
-             (λ (acc ω) (lift2 ⊃ acc ω))
-             (right ∅) 
+             (λ (acc ω) (lift2 keep-first-page acc ω))
+             (right `(0 ,∅)) 
              (stream-artists db))))
