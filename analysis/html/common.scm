@@ -21,6 +21,8 @@
        (← success? (ensure written? (◇ "Error writing html file: " file) #t))
        (yield success?)))
 
+(← (link path id name) `(a (@ (href ,(◇ path id ".html"))) ,name))
+
 (← (tag α . ω) (⊂ α ω))
 
 (← column-title ↑)
@@ -151,6 +153,9 @@ th:last-child {
 }
 td {
   padding:5px 0;
+}
+td a {
+  color: inherit;
 }
 td + td {
   padding-left:5px;

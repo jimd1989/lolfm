@@ -28,22 +28,30 @@
        (← ok? (write-html "/tmp/lolfm/countries" filename contents))
        (yield ok?)))
 
+(← (top-country-link id name) (λ (ω) (link "./" (id ω) (name ω))))
+(← top-country-link-plays 
+  (top-country-link countries-row-country-id-plays 
+                    countries-row-country-name-plays))
+(← top-country-link-seconds
+  (top-country-link countries-row-country-id-seconds 
+                    countries-row-country-name-seconds))
+
 (← render-top-countries-table
   (tabbed-table-transformer "top-countries"
     `("Plays"
        ,(table-transformer 'plays
          `("#" ,countries-row-country-rank-plays ,I)
-         `("Country" ,countries-row-country-name-plays ,I)
+         `("Country" ,I ,top-country-link-plays)
          `("Plays" ,countries-row-country-plays ,n⊥s)))
     `("Hours"
        ,(table-transformer 'seconds
          `("#" ,countries-row-country-rank-seconds ,I)
-         `("Country" ,countries-row-country-name-seconds ,I)
+         `("Country" ,I ,top-country-link-seconds)
          `("Hours" ,countries-row-country-seconds ,seconds⊥hours)))
     `("Year"
       ,(table-transformer 'year
          `("#" ,countries-row-country-rank-year ,I)
-         `("Country" ,countries-row-country-name-plays ,I)
+         `("Country" ,I ,top-country-link-plays)
          `("Plays" ,countries-row-country-plays-year ,n⊥s)))))
 
 (← (render-top-countries countries)

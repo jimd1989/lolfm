@@ -34,22 +34,30 @@
        (more '(h3 (a (@ (href "./artists/1.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
+(← (main-country-link id name) (λ (ω) (link "./countries/" (id ω) (name ω))))
+(← main-country-link-plays 
+  (main-country-link countries-row-country-id-plays 
+                    countries-row-country-name-plays))
+(← main-country-link-seconds
+  (main-country-link countries-row-country-id-seconds 
+                    countries-row-country-name-seconds))
+
 (← render-main-country-table
   (tabbed-table-transformer "main-countries"
     `("Plays"
        ,(table-transformer-truncated 15 'plays
          `("#" ,countries-row-country-rank-plays ,I)
-         `("Country" ,countries-row-country-name-plays ,I)
+         `("Country" ,I ,main-country-link-plays)
          `("Plays" ,countries-row-country-plays ,n⊥s)))
     `("Hours"
        ,(table-transformer-truncated 15 'seconds
          `("#" ,countries-row-country-rank-seconds ,I)
-         `("Country" ,countries-row-country-name-seconds ,I)
+         `("Country" ,I ,main-country-link-seconds)
          `("Hours" ,countries-row-country-seconds ,seconds⊥hours)))
     `("Year"
       ,(table-transformer-truncated 15 'year
          `("#" ,countries-row-country-rank-year ,I)
-         `("Country" ,countries-row-country-name-plays ,I)
+         `("Country" ,I ,main-country-link-plays)
          `("Plays" ,countries-row-country-plays-year ,n⊥s)))))
 
 (← (render-main-countries countries)
