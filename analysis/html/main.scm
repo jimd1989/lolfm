@@ -26,7 +26,7 @@
          `("Hours" ,artists-row-top-seconds-count ,seconds⊥hours)))))
 
 (← (render-main-top-artists artists)
-  (for (title '(h1 "Top Artists"))
+  (for (title '(h1 "Artists"))
        (← count (ι 0 artists))
        (← top-artists (ι 1 artists))
        (← table (render-main-top-artists-table (↑n 50 top-artists)))
@@ -35,24 +35,29 @@
        (yield `(,title ,desc ,table ,more))))
 
 (← render-main-country-table
-  (tabbed-table-transformer "top-countries"
+  (tabbed-table-transformer "main-countries"
     `("Plays"
-       ,(table-transformer 'plays
+       ,(table-transformer-truncated 15 'plays
          `("#" ,countries-row-country-rank-plays ,I)
-         `("Artist" ,countries-row-country-name-plays ,I)
+         `("Country" ,countries-row-country-name-plays ,I)
          `("Plays" ,countries-row-country-plays ,n⊥s)))
     `("Hours"
-       ,(table-transformer 'seconds
+       ,(table-transformer-truncated 15 'seconds
          `("#" ,countries-row-country-rank-seconds ,I)
-         `("Artist" ,countries-row-country-name-seconds ,I)
-         `("Hours" ,countries-row-country-seconds ,seconds⊥hours)))))
+         `("Country" ,countries-row-country-name-seconds ,I)
+         `("Hours" ,countries-row-country-seconds ,seconds⊥hours)))
+    `("Year"
+      ,(table-transformer-truncated 15 'year
+         `("#" ,countries-row-country-rank-year ,I)
+         `("Country" ,countries-row-country-name-plays ,I)
+         `("Plays" ,countries-row-country-plays-year ,n⊥s)))))
 
 (← (render-main-countries countries)
-  (for (title '(h1 "Top Countries"))
-       (_ (⍋⊆v! 'plays (O < countries-row-country-rank-plays) countries))
-       (_ (⍋⊆v! 'seconds (O < countries-row-country-rank-seconds) countries))
+  (for (title '(h1 "Countries"))
+       (desc `(p ,(n⊥s (⊆vρ countries)) " countries explored."))
        (← table (render-main-country-table countries))
-       (yield `(,title ,table))))
+       (more '(h3 (a (@ (href "./countries/countries.html")) "More")))
+       (yield `(,title ,desc ,table ,more))))
 
 (← (render-main artists countries)
   (for (name "lol.fm")

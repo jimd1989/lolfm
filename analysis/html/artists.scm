@@ -20,7 +20,7 @@
        (← next (ι 1 paginated-rows))
        (← rows (ι 2 paginated-rows))
        (← table (render-top-artists-table rows))
-       (name "Top artists")
+       (name "Artists")
        (next-link (? next `(h3 (a (@ (href ,(◇ "./" next ".html"))) "More")) ∅))
        (contents (html name `(h1 ,name) table next-link))
        (filename (◇ page ".html"))

@@ -28,22 +28,28 @@
        (← ok? (write-html "/tmp/lolfm/countries" filename contents))
        (yield ok?)))
 
-; OLD AND WRONG
-;(← render-top-countries-table
-;  (tabbed-table-transformer
-;    `("Plays" ,(table-transformer
-;                 `("#" countries-row-country-rank-plays ,n⊥s)
-;                 `("Country" countries-row-country-name-plays ,I)
-;                 `("Plays" countries-row-country-plays ,n⊥s)))
-;    `("Hours" ,(table-transformer
-;                 `("#" countries-row-country-rank-seconds ,n⊥s)
-;                 `("Country" countries-row-artist-name-seconds ,I)
-;                 `("Hours" countries-row-country-seconds ,seconds⊥hours)))))
-;
-;(← (render-top-countries ω)
-;  (for (table (render-top-countries-table `(,plays ,hours)))
-;       (html `(html (head (title "Top countries"))
-;                    (body (h1 "Top countries") ,table)))
-;       (_ (print html))
-;       (← ok? (write-html "/tmp/lolfm/countries" "index.html" html))
-;       (yield ok?)))
+(← render-top-countries-table
+  (tabbed-table-transformer "top-countries"
+    `("Plays"
+       ,(table-transformer 'plays
+         `("#" ,countries-row-country-rank-plays ,I)
+         `("Country" ,countries-row-country-name-plays ,I)
+         `("Plays" ,countries-row-country-plays ,n⊥s)))
+    `("Hours"
+       ,(table-transformer 'seconds
+         `("#" ,countries-row-country-rank-seconds ,I)
+         `("Country" ,countries-row-country-name-seconds ,I)
+         `("Hours" ,countries-row-country-seconds ,seconds⊥hours)))
+    `("Year"
+      ,(table-transformer 'year
+         `("#" ,countries-row-country-rank-year ,I)
+         `("Country" ,countries-row-country-name-plays ,I)
+         `("Plays" ,countries-row-country-plays-year ,n⊥s)))))
+
+(← (render-top-countries countries)
+  (for (name "Countries")
+       (filename "countries.html") 
+       (← table (render-top-countries-table countries))
+       (contents (html name `(h1 ,name) table))
+       (← ok? (write-html "/tmp/lolfm/countries" filename contents))
+       (yield ok?)))

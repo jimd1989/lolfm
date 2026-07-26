@@ -5,7 +5,7 @@
 (include-relative "../html/countries.scm")
 
 (← transform-top-artists
-  (∘ (†⊙ (†⊆ 512))
+  (∘ (†⊙ (†⊆ 256))
      (†⊙ (†§))
      (†<* († render-top-artists))
      (†>>= († (D ι 2)))))

@@ -1,4 +1,4 @@
-(import (chicken string))
+(import (chicken string) srfi-1)
 (define-syntax λ (syntax-rules () ((_ . ω) (lambda . ω))))
 (define-syntax λλ (syntax-rules () ((_ . ω) (case-lambda . ω))))
 (define-syntax ? (syntax-rules () ((_ . ω) (if . ω))))
@@ -11,4 +11,4 @@
 (← ≡ equal?) (← ∅ '()) (← ∅? null?) (← ρ length) (← ρs string-length) (← ◇ conc) 
 (← ⊂ cons) (← ∀ map) (← $ apply) (← ⊖ reverse) (← ($$ f ω) (f ω)) 
 (← ⇒ foldr) (← ⇐ foldl) (← ¬ not) (← ⍨ flip) (← ∀∀ for-each) (← ∞ +inf.0)
-(← ⊆ list)
+(← ⊆ list) (← ∀? filter)
