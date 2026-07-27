@@ -2,8 +2,10 @@
 (include-relative "./helpers/monad.scm")
 (include-relative "./helpers/syntax.scm")
 (include-relative "./html/main.scm")
+(include-relative "./repos/artist-pages.scm")
 (include-relative "./repos/artists.scm")
 (include-relative "./repos/countries.scm")
+(include-relative "./transformers/artist-pages.scm")
 (include-relative "./transformers/artists.scm")
 (include-relative "./transformers/countries.scm")
 
@@ -11,6 +13,7 @@
 
 (pp
   (for (← _ (write-css "/tmp/lolfm" "style.css" css))
+       (← artist-pages ((get-artist-pages DB) transform-artist-pages))
        (← all-countries ((get-countries DB) transform-individual-countries))
        (top-countries (sort-top-countries all-countries))
        (← _ (render-top-countries top-countries))

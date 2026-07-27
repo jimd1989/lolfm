@@ -1,6 +1,5 @@
 (import (chicken load))
 (include-relative "../helpers/monad.scm")
-(include-relative "../helpers/sorted-slices.scm")
 (include-relative "../helpers/syntax.scm")
 (include-relative "../helpers/transducers.scm")
 (include-relative "common.scm")
@@ -76,7 +75,7 @@ WITH
 )
 
 (← (decode-artist-page-row ω)
-  (decode-record make-artist-page-row (⊆ s⊥n s⊥s s⊥n s⊥s s⊥n s⊥s s⊥s s⊥n) ω))
+  (decode-record make-artist-page-row (⊆ s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥s s⊥n) ω))
 
 (← (get-artist-pages db)
   (λ (r) (†⇒ stream⇒ 

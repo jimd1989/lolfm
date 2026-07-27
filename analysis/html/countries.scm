@@ -23,7 +23,7 @@
        (← head (either (⊆vι 0 rows)))
        (name (countries-row-country-name-plays head))
        (id (countries-row-country-id-plays head))
-       (contents (html name `(h2 ,name) table))
+       (contents (html name `(h1 ,name) table))
        (filename (◇ id ".html"))
        (← ok? (write-html "/tmp/lolfm/countries" filename contents))
        (yield ok?)))
