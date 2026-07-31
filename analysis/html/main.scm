@@ -2,6 +2,7 @@
 (include-relative "../helpers/sorted-slices.scm")
 (include-relative "../html/common.scm")
 (include-relative "../repos/artists.scm")
+(include-relative "../repos/artist-pages.scm")
 (include-relative "../repos/countries.scm")
 
 (← (render-main-head)
@@ -12,22 +13,33 @@
        (a (@ (href "https://github.com/jimd1989/lolfm")) "Github")
        ".")))
 
+(← (main-artist-page-link id name) 
+  (λ (ω) (link "./artist-page/" (id ω) (name ω))))
+
+(← main-artist-page-link-plays
+  (main-artist-page-link artists-row-top-plays-artist-id 
+                         artists-row-top-plays-artist-name))
+
+(← main-artist-page-link-seconds
+  (main-artist-page-link artists-row-top-seconds-artist-id 
+                         artists-row-top-seconds-artist-name))
+
 (← render-main-top-artists-table
   (tabbed-table-transformer "top-artists"
     `("Plays"
        ,(table-transformer 'plays
          `("#" ,artists-row-top-plays-rank ,I)
-         `("Artist" ,artists-row-top-plays-artist-name ,I)
+         `("Artist" ,I ,main-artist-page-link-plays)
          `("Plays" ,artists-row-top-plays-count ,n⊥s)))
     `("Hours"
        ,(table-transformer 'seconds
          `("#" ,artists-row-top-seconds-rank ,I)
-         `("Artist" ,artists-row-top-seconds-artist-name ,I)
+         `("Artist" ,I ,main-artist-page-link-seconds)
          `("Hours" ,artists-row-top-seconds-count ,seconds⊥hours)))
     `("Year"
        ,(table-transformer 'plays
          `("#" ,artists-row-year-plays-rank ,I)
-         `("Artist" ,artists-row-year-plays-artist-name ,I)
+         `("Artist" ,I ,main-artist-page-link-plays)
          `("Plays" ,artists-row-year-plays-count ,n⊥s)))))
 
 (← (render-main-top-artists artists)

@@ -9,7 +9,7 @@
 (include-relative "./transformers/artists.scm")
 (include-relative "./transformers/countries.scm")
 
-(← DB "~/.config/cmus/lolfm.db")
+(← DB "./lolfm.db")
 
 (pp
   (for (← _ (write-css "/tmp/lolfm" "style.css" css))

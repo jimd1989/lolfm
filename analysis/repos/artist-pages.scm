@@ -17,6 +17,7 @@ WITH
     SELECT artists.id        AS artist_id,
            songs.title       AS song_title,
            COUNT(plays.song) AS song_total_plays,
+           EXISTS (SELECT 1 FROM loved WHERE loved.song = songs.id) AS loved,
            ROW_NUMBER() OVER (
              PARTITION BY artists.id ORDER BY COUNT(plays.song) DESC
            ) AS song_rank
@@ -39,7 +40,7 @@ WITH
   ),
   sequence AS (
     SELECT DISTINCT artist_id, song_rank  AS rank FROM ranked_songs
-    UNION
+     UNION
     SELECT DISTINCT artist_id, album_rank AS rank FROM ranked_albums
   )
   SELECT all_artists.artist_id,
@@ -47,6 +48,7 @@ WITH
          COALESCE(song_rank, -1),
          COALESCE(song_title, '∅'),
          COALESCE(song_total_plays, -1),
+         --COALESCE(loved, 0),
          COALESCE(album_rank, -1),
          COALESCE(album_title, '∅'),
          COALESCE(album_total_plays, -1)

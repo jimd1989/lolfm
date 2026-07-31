@@ -26,6 +26,7 @@
 (← (s⊥n ω) (s⊥ string->number "not number" ω))
 (← (s⊥x ω) (s⊥ string->symbol "not valid symbol" ω))
 (← (s⊥s ω) (right ω))
+(← s⊥b (∘ (◁ (D = 1)) s⊥n))
 (← (decoder key f) (λ (ω) (⊙ (λ (α) `(,key ,α)) (f ω))))
 (← (decode decoders row) (sequence (∀ $$ decoders (string-split row "\t"))))
 (← (decode-record r parsers row) (⊙ (D $ r) (decode parsers row)))
