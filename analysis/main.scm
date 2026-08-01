@@ -8,12 +8,14 @@
 (include-relative "./repos/countries.scm")
 (include-relative "./repos/genres.scm")
 (include-relative "./repos/songs.scm")
+(include-relative "./repos/years.scm")
 (include-relative "./transformers/albums.scm")
 (include-relative "./transformers/artist-pages.scm")
 (include-relative "./transformers/artists.scm")
 (include-relative "./transformers/countries.scm")
 (include-relative "./transformers/genres.scm")
 (include-relative "./transformers/songs.scm")
+(include-relative "./transformers/years.scm")
 
 (← DB "~/.config/cmus/lolfm.db")
 
@@ -27,7 +29,8 @@
        (← top-albums ((get-albums DB) transform-albums))
        (← top-songs ((get-songs DB) transform-songs))
        (← top-genres ((get-genres DB) transform-genres))
+       (← top-years ((get-years DB) transform-years))
        (← ok? (render-main top-artists top-albums top-songs top-genres
-                           all-countries))
+                           all-countries top-years))
        (yield all-countries))
 )

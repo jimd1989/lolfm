@@ -7,6 +7,7 @@
 (include-relative "../repos/countries.scm")
 (include-relative "../repos/genres.scm")
 (include-relative "../repos/songs.scm")
+(include-relative "../repos/years.scm")
 
 (← (render-main-head)
   `((h1 "lol.fm")
@@ -197,7 +198,34 @@
        (more '(h3 (a (@ (href "./countries/countries.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
-(← (render-main artists albums songs genres countries)
+(← render-main-years-table
+  (tabbed-table-transformer "top-years"
+    `("Plays"
+       ,(table-transformer 'plays
+         `("#" ,year-row-rank-plays ,I)
+         `("Year" ,year-row-year-plays ,I)
+         `("Plays" ,year-row-plays ,n⊥s)))
+    `("Hours"
+       ,(table-transformer 'seconds
+         `("#" ,year-row-rank-seconds ,I)
+         `("Year" ,year-row-year-seconds ,I)
+         `("Hours" ,year-row-seconds ,seconds⊥hours)))
+    `("Year"
+       ,(table-transformer 'plays
+         `("#" ,year-row-rank-year ,I)
+         `("Year" ,year-row-year-year ,I)
+         `("Plays" ,year-row-plays-year ,n⊥s)))))
+
+(← (render-main-years years)
+  (for (title '(h2 "Years"))
+       (← count (ι 0 years))
+       (← top-years (ι 1 years))
+       (← table (render-main-years-table (↑n 15 top-years)))
+       (desc `(p ,(n⊥s count) " different years explored."))
+       (more '(h3 (a (@ (href "./years/1.html")) "More")))
+       (yield `(,title ,desc ,table ,more))))
+
+(← (render-main artists albums songs genres countries years)
   (for (name "lol.fm")
        (head (render-main-head))
        (← artists-html (render-main-top-artists artists))
@@ -205,8 +233,10 @@
        (← songs-html (render-main-songs songs))
        (← genres-html (render-main-genres genres))
        (← countries-html (render-main-countries countries))
+       (← years-html (render-main-years years))
        (contents ($ html `(,name ,@head ,artists-html ,albums-html 
-                           ,songs-html ,genres-html ,countries-html)))
+                           ,songs-html ,genres-html ,countries-html
+                           ,years-html)))
        (filename "lolfm.html")
        (← ok? (write-html "/tmp/lolfm" filename contents))
        (yield ok?)))
