@@ -5,6 +5,7 @@
 (include-relative "../repos/artists.scm")
 (include-relative "../repos/artist-pages.scm")
 (include-relative "../repos/countries.scm")
+(include-relative "../repos/genres.scm")
 (include-relative "../repos/songs.scm")
 
 (← (render-main-head)
@@ -136,6 +137,33 @@
        (more '(h3 (a (@ (href "./songs/1.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
+(← render-main-genres-table
+  (tabbed-table-transformer "top-genres"
+    `("Plays"
+       ,(table-transformer 'plays
+         `("#" ,genre-row-rank-plays ,I)
+         `("Genre" ,genre-row-genre-name-plays ,I)
+         `("Plays" ,genre-row-plays ,n⊥s)))
+    `("Hours"
+       ,(table-transformer 'seconds
+         `("#" ,genre-row-rank-seconds ,I)
+         `("Genre" ,genre-row-genre-name-seconds ,I)
+         `("Hours" ,genre-row-seconds ,seconds⊥hours)))
+    `("Year"
+       ,(table-transformer 'plays
+         `("#" ,genre-row-rank-year ,I)
+         `("Genre" ,genre-row-genre-name-year ,I)
+         `("Plays" ,genre-row-plays-year ,n⊥s)))))
+
+(← (render-main-genres genres)
+  (for (title '(h2 "Genres"))
+       (← count (ι 0 genres))
+       (← top-genres (ι 1 genres))
+       (← table (render-main-genres-table (↑n 15 top-genres)))
+       (desc `(p ,(n⊥s count) " genres explored."))
+       (more '(h3 (a (@ (href "./genres/1.html")) "More")))
+       (yield `(,title ,desc ,table ,more))))
+
 (← (main-country-link id name) (λ (ω) (link "./countries/" (id ω) (name ω))))
 (← main-country-link-plays 
   (main-country-link countries-row-country-id-plays 
@@ -169,15 +197,16 @@
        (more '(h3 (a (@ (href "./countries/countries.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
-(← (render-main artists albums songs countries)
+(← (render-main artists albums songs genres countries)
   (for (name "lol.fm")
        (head (render-main-head))
        (← artists-html (render-main-top-artists artists))
        (← albums-html (render-main-albums albums))
        (← songs-html (render-main-songs songs))
+       (← genres-html (render-main-genres genres))
        (← countries-html (render-main-countries countries))
        (contents ($ html `(,name ,@head ,artists-html ,albums-html 
-                           ,songs-html ,countries-html)))
+                           ,songs-html ,genres-html ,countries-html)))
        (filename "lolfm.html")
        (← ok? (write-html "/tmp/lolfm" filename contents))
        (yield ok?)))
