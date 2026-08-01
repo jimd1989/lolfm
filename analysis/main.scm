@@ -6,10 +6,12 @@
 (include-relative "./repos/artist-pages.scm")
 (include-relative "./repos/artists.scm")
 (include-relative "./repos/countries.scm")
+(include-relative "./repos/songs.scm")
 (include-relative "./transformers/albums.scm")
 (include-relative "./transformers/artist-pages.scm")
 (include-relative "./transformers/artists.scm")
 (include-relative "./transformers/countries.scm")
+(include-relative "./transformers/songs.scm")
 
 (← DB "~/.config/cmus/lolfm.db")
 
@@ -21,6 +23,7 @@
        (← _ (render-top-countries top-countries))
        (← top-artists ((get-artists DB) transform-top-artists))
        (← top-albums ((get-albums DB) transform-albums))
-       (← ok? (render-main top-artists top-albums all-countries))
+       (← top-songs ((get-songs DB) transform-songs))
+       (← ok? (render-main top-artists top-albums top-songs all-countries))
        (yield all-countries))
 )

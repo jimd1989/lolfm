@@ -5,6 +5,7 @@
 (include-relative "../repos/artists.scm")
 (include-relative "../repos/artist-pages.scm")
 (include-relative "../repos/countries.scm")
+(include-relative "../repos/songs.scm")
 
 (← (render-main-head)
   `((h1 "lol.fm")
@@ -28,7 +29,6 @@
 (← main-artist-page-link-year-plays
   (main-artist-page-link artists-row-year-plays-artist-id 
                          artists-row-year-plays-artist-name))
-
 
 (← render-main-top-artists-table
   (tabbed-table-transformer "top-artists"
@@ -95,6 +95,47 @@
        (more '(h3 (a (@ (href "./albums/1.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
+(← (main-song-link id name) (λ (ω) (link "./artist-page/" (id ω) (name ω))))
+(← main-song-link-plays 
+  (main-song-link song-row-artist-id-plays song-row-artist-name-plays))
+(← main-song-link-seconds 
+  (main-song-link song-row-artist-id-seconds song-row-artist-name-seconds))
+(← main-song-link-year
+  (main-song-link song-row-artist-id-year song-row-artist-name-year))
+
+(← render-main-songs-table
+  (tabbed-table-transformer "top-songs"
+    `("Plays"
+       ,(table-transformer 'plays
+         `("#" ,song-row-rank-plays ,I)
+         `("Artist" ,I ,main-song-link-plays)
+         `("Song" ,song-row-song-title-plays ,I)
+         `(,(loved #t) ,song-row-loved?-plays ,loved)
+         `("Plays" ,song-row-plays ,n⊥s)))
+    `("Hours"
+       ,(table-transformer 'seconds
+         `("#" ,song-row-rank-seconds ,I)
+         `("Artist" ,I ,main-song-link-seconds)
+         `("Song" ,song-row-song-title-seconds ,I)
+         `(,(loved #t) ,song-row-loved?-seconds ,loved)
+         `("Hours" ,song-row-seconds ,seconds⊥hours)))
+    `("Year"
+       ,(table-transformer 'plays
+         `("#" ,song-row-rank-year ,I)
+         `("Artist" ,I ,main-song-link-year)
+         `("Song" ,song-row-song-title-year ,I)
+         `(,(loved #t) ,song-row-loved?-year ,loved)
+         `("Plays" ,song-row-plays-year ,n⊥s)))))
+
+(← (render-main-songs songs)
+  (for (title '(h2 "Songs"))
+       (← count (ι 0 songs))
+       (← top-songs (ι 1 songs))
+       (← table (render-main-songs-table (↑n 15 top-songs)))
+       (desc `(p ,(n⊥s count) " different songs played."))
+       (more '(h3 (a (@ (href "./songs/1.html")) "More")))
+       (yield `(,title ,desc ,table ,more))))
+
 (← (main-country-link id name) (λ (ω) (link "./countries/" (id ω) (name ω))))
 (← main-country-link-plays 
   (main-country-link countries-row-country-id-plays 
@@ -128,14 +169,15 @@
        (more '(h3 (a (@ (href "./countries/countries.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
-(← (render-main artists albums countries)
+(← (render-main artists albums songs countries)
   (for (name "lol.fm")
        (head (render-main-head))
        (← artists-html (render-main-top-artists artists))
        (← albums-html (render-main-albums albums))
+       (← songs-html (render-main-songs songs))
        (← countries-html (render-main-countries countries))
        (contents ($ html `(,name ,@head ,artists-html ,albums-html 
-                                 ,countries-html)))
+                           ,songs-html ,countries-html)))
        (filename "lolfm.html")
        (← ok? (write-html "/tmp/lolfm" filename contents))
        (yield ok?)))

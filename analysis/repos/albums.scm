@@ -12,10 +12,7 @@
              SUM(plays.duration) AS album_seconds,
              albums.title        AS album_title,
              artists.id          AS artist_id,
-             artists.name        AS artist_name,
-             ROW_NUMBER() OVER (
-               ORDER BY COUNT(plays.album) DESC
-             ) AS album_rank
+             artists.name        AS artist_name
         FROM plays
         JOIN albums  ON plays.album   = albums.id
         JOIN artists ON albums.artist = artists.id
