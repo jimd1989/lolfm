@@ -2,17 +2,25 @@
 (include-relative "../html/common.scm")
 (include-relative "../repos/artists.scm")
 
+(← (top-artist-link id name) (λ (ω) (link "../artist-page/" (id ω) (name ω))))
+(← top-artist-link-plays 
+  (top-artist-link artists-row-top-plays-artist-id
+                   artists-row-top-plays-artist-name))
+(← top-artist-link-seconds 
+  (top-artist-link artists-row-top-seconds-artist-id
+                   artists-row-top-seconds-artist-name))
+
 (← render-top-artists-table
   (tabbed-table-transformer "artists"
     `("Plays"
        ,(table-transformer 'plays
          `("#" ,artists-row-top-plays-rank ,I)
-         `("Artist" ,artists-row-top-plays-artist-name ,I)
+         `("Artist" ,I ,top-artist-link-plays)
          `("Plays" ,artists-row-top-plays-count ,n⊥s)))
     `("Hours"
        ,(table-transformer 'seconds
          `("#" ,artists-row-top-seconds-rank ,I)
-         `("Artist" ,artists-row-top-seconds-artist-name ,I)
+         `("Artist" ,I ,top-artist-link-seconds)
          `("Hours" ,artists-row-top-seconds-count ,seconds⊥hours)))
     `("Year"
        ,(table-transformer 'plays

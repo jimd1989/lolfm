@@ -106,7 +106,6 @@
   (year-plays-count        s⊥n)
   (year-plays-rank         s⊥n))
 
-
 (← (keep-first-page acc ω)
   (∃ ((n (↑ acc)) (α (↑↓ acc)) (l (ρ ω)))
     (? (∅? α) `(,l ,ω) `(,(+ n l) ,α))))

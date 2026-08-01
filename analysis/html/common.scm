@@ -21,7 +21,10 @@
        (← success? (ensure written? (◇ "Error writing html file: " file) #t))
        (yield success?)))
 
-(← (link path id name) `(a (@ (href ,(◇ path id ".html"))) ,name))
+(← (link path id name)
+   (? (string=? "Various Artists" name)
+      name
+      `(a (@ (href ,(◇ path id ".html"))) ,name)))
 
 (← (loved loved?)
   (? loved? `(span (@ (style "font-family: 'Times New Roman', serif;")) "♥") ∅))
