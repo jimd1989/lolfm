@@ -58,6 +58,6 @@
   (for (name "Countries")
        (filename "countries.html") 
        (← table (render-top-countries-table countries))
-       (contents (html name `(h2 ,name) table))
+       (contents (html name `(h1 ,name) table))
        (← ok? (write-html "/tmp/lolfm/countries" filename contents))
        (yield ok?)))

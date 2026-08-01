@@ -90,32 +90,22 @@
 
 (← (stream-artists db) (stream-sql db artists-query))
 
-(define-record-type artists-row
-  (make-artists-row top-plays-artist-id top-plays-artist-name top-plays-count
-                    top-plays-rank top-plays-row top-seconds-artist-id
-                    top-seconds-artist-name top-seconds-count top-seconds-rank
-                    top-seconds-row year-plays-artist-id year-plays-artist-name
-                    year-plays-count year-plays-rank)
-  artists-row?
-  (top-plays-artist-id     artists-row-top-plays-artist-id)
-  (top-plays-artist-name   artists-row-top-plays-artist-name)
-  (top-plays-count         artists-row-top-plays-count)
-  (top-plays-rank          artists-row-top-plays-rank)
-  (top-plays-row           artists-row-top-plays-row)
-  (top-seconds-artist-id   artists-row-top-seconds-artist-id)
-  (top-seconds-artist-name artists-row-top-seconds-artist-name)
-  (top-seconds-count       artists-row-top-seconds-count)
-  (top-seconds-rank        artists-row-top-seconds-rank)
-  (top-seconds-row         artists-row-top-seconds-row)
-  (year-plays-artist-id    artists-row-year-plays-artist-id)
-  (year-plays-artist-name  artists-row-year-plays-artist-name)
-  (year-plays-count        artists-row-year-plays-count)
-  (year-plays-rank         artists-row-year-plays-rank)
-  )
+(define-sql-record artists-row
+  (top-plays-artist-id     s⊥n)
+  (top-plays-artist-name   s⊥s)
+  (top-plays-count         s⊥n)
+  (top-plays-rank          s⊥n)
+  (top-plays-row           s⊥n)
+  (top-seconds-artist-id   s⊥n)
+  (top-seconds-artist-name s⊥s)
+  (top-seconds-count       s⊥n)
+  (top-seconds-rank        s⊥n)
+  (top-seconds-row         s⊥n)
+  (year-plays-artist-id    s⊥n)
+  (year-plays-artist-name  s⊥s)
+  (year-plays-count        s⊥n)
+  (year-plays-rank         s⊥n))
 
-(← (decode-artists-row ω)
-  (decode-record make-artists-row 
-    (⊆ s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥n) ω))
 
 (← (keep-first-page acc ω)
   (∃ ((n (↑ acc)) (α (↑↓ acc)) (l (ρ ω)))

@@ -24,6 +24,11 @@
   (main-artist-page-link artists-row-top-seconds-artist-id 
                          artists-row-top-seconds-artist-name))
 
+(← main-artist-page-link-year-plays
+  (main-artist-page-link artists-row-year-plays-artist-id 
+                         artists-row-year-plays-artist-name))
+
+
 (← render-main-top-artists-table
   (tabbed-table-transformer "top-artists"
     `("Plays"
@@ -39,7 +44,7 @@
     `("Year"
        ,(table-transformer 'plays
          `("#" ,artists-row-year-plays-rank ,I)
-         `("Artist" ,I ,main-artist-page-link-plays)
+         `("Artist" ,I ,main-artist-page-link-year-plays)
          `("Plays" ,artists-row-year-plays-count ,n⊥s)))))
 
 (← (render-main-top-artists artists)

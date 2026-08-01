@@ -13,6 +13,7 @@
        ,(table-transformer 'song-plays
          `("#" ,artist-page-row-song-rank ,I)
          `("Song" ,artist-page-row-song-title ,I)
+         `(,(loved #t) ,artist-page-row-loved? ,loved)
          `("Plays" ,artist-page-row-song-plays ,n⊥s)))))
 
 (← (render-artist-pages rows)

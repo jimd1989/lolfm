@@ -48,7 +48,7 @@ WITH
          COALESCE(song_rank, -1),
          COALESCE(song_title, '∅'),
          COALESCE(song_total_plays, -1),
-         --COALESCE(loved, 0),
+         COALESCE(loved, 0),
          COALESCE(album_rank, -1),
          COALESCE(album_title, '∅'),
          COALESCE(album_total_plays, -1)
@@ -62,22 +62,16 @@ WITH
 
 (← (stream-artist-pages db) (stream-sql db artist-pages-query))
 
-(define-record-type artist-page-row
-  (make-artist-page-row artist-id artist-name song-rank song-title song-plays
-                        album-rank album-title album-plays)
-  artist-page-row?
-  (artist-id   artist-page-row-artist-id)
-  (artist-name artist-page-row-artist-name)
-  (song-rank   artist-page-row-song-rank)
-  (song-title  artist-page-row-song-title)
-  (song-plays  artist-page-row-song-plays)
-  (album-rank  artist-page-row-album-rank)
-  (album-title artist-page-row-album-title)
-  (album-plays artist-page-row-album-plays)
-)
-
-(← (decode-artist-page-row ω)
-  (decode-record make-artist-page-row (⊆ s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥s s⊥n) ω))
+(define-sql-record artist-page-row
+  (artist-id   s⊥n)
+  (artist-name s⊥s)
+  (song-rank   s⊥n)
+  (song-title  s⊥s)
+  (song-plays  s⊥n)
+  (loved?      s⊥b)
+  (album-rank  s⊥n)
+  (album-title s⊥s)
+  (album-plays s⊥n))
 
 (← (get-artist-pages db)
   (λ (r) (†⇒ stream⇒ 

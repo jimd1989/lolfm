@@ -131,34 +131,23 @@
 
 (← (stream-countries db) (stream-sql db countries-query))
 
-(define-record-type countries-row
-  (make-countries-row country-rank-plays country-id-plays country-plays 
-                      country-name-plays artist-rank-plays artist-name-plays
-                      artist-plays country-rank-seconds country-id-seconds
-                      country-seconds country-name-seconds artist-rank-seconds
-                      artist-name-seconds artist-seconds country-rank-year
-                      country-plays-year)
-  countries-row?
-  (country-rank-plays   countries-row-country-rank-plays)
-  (country-id-plays     countries-row-country-id-plays)
-  (country-plays        countries-row-country-plays)
-  (country-name-plays   countries-row-country-name-plays)
-  (artist-rank-plays    countries-row-artist-rank-plays)
-  (artist-name-plays    countries-row-artist-name-plays)
-  (artist-plays         countries-row-artist-plays)
-  (country-rank-seconds countries-row-country-rank-seconds)
-  (country-id-seconds   countries-row-country-id-seconds)
-  (country-seconds      countries-row-country-seconds)
-  (country-name-seconds countries-row-country-name-seconds)
-  (artist-rank-seconds  countries-row-artist-rank-seconds)
-  (artist-name-seconds  countries-row-artist-name-seconds) 
-  (artist-seconds       countries-row-artist-seconds)
-  (country-rank-year    countries-row-country-rank-year)
-  (country-plays-year   countries-row-country-plays-year))
-
-(← (decode-countries-row ω)
-  (decode-record make-countries-row
-    (⊆ s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥n s⊥n s⊥s s⊥n s⊥s s⊥n s⊥n s⊥n) ω))
+(define-sql-record countries-row
+  (country-rank-plays   s⊥n)
+  (country-id-plays     s⊥n)
+  (country-plays        s⊥n)
+  (country-name-plays   s⊥s)
+  (artist-rank-plays    s⊥n)
+  (artist-name-plays    s⊥s)
+  (artist-plays         s⊥n)
+  (country-rank-seconds s⊥n)
+  (country-id-seconds   s⊥n)
+  (country-seconds      s⊥n)
+  (country-name-seconds s⊥s)
+  (artist-rank-seconds  s⊥n)
+  (artist-name-seconds  s⊥s) 
+  (artist-seconds       s⊥n)
+  (country-rank-year    s⊥n)
+  (country-plays-year   s⊥n))
 
 (← (get-countries db)
   (λ (r) (†⇒ stream⇒ 

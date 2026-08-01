@@ -23,6 +23,9 @@
 
 (← (link path id name) `(a (@ (href ,(◇ path id ".html"))) ,name))
 
+(← (loved loved?)
+  (? loved? `(span (@ (style "font-family: 'Times New Roman', serif;")) "♥") ∅))
+
 (← (tag α . ω) (⊂ α ω))
 
 (← column-title ↑)
