@@ -5,17 +5,25 @@
 (include-relative "../html/common.scm")
 (include-relative "../repos/countries.scm")
 
+(← (countries-link id name) (λ (ω) (link "../artist-page/" (id ω) (name ω))))
+(← countries-link-plays 
+  (countries-link 
+    countries-row-artist-id-plays countries-row-artist-name-plays))
+(← countries-link-seconds 
+  (countries-link 
+    countries-row-artist-id-seconds countries-row-artist-name-seconds))
+
 (← render-country-artists-table
   (tabbed-table-transformer "country"
     `("Plays"
        ,(table-transformer 'plays
          `("#" ,countries-row-artist-rank-plays ,I)
-         `("Artist" ,countries-row-artist-name-plays ,I)
+         `("Artist" ,I ,countries-link-plays)
          `("Plays" ,countries-row-artist-plays ,n⊥s)))
     `("Hours"
        ,(table-transformer 'seconds
          `("#" ,countries-row-artist-rank-seconds ,I)
-         `("Artist" ,countries-row-artist-name-seconds ,I)
+         `("Artist" ,I ,countries-link-seconds)
          `("Hours" ,countries-row-artist-seconds ,seconds⊥hours)))))
 
 (← (render-country-artists rows)

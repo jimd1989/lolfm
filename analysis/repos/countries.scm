@@ -48,6 +48,7 @@
     SELECT artist_plays.country_id,
            artist_plays.country_name,
            country_totals.total_country_plays,
+           artist_plays.artist_id,
            artist_plays.artist_name,
            artist_plays.artist_play_count,
            ROW_NUMBER() OVER (
@@ -61,6 +62,7 @@
     SELECT artist_plays.country_id,
            artist_plays.country_name,
            country_totals.total_country_seconds,
+           artist_plays.artist_id,
            artist_plays.artist_name,
            artist_plays.artist_play_seconds,
            ROW_NUMBER() OVER (
@@ -85,6 +87,7 @@
          total_country_plays,
          country_name,
          artist_rank_in_country,
+         artist_id,
          artist_name,
          artist_play_count
     FROM rankings
@@ -100,6 +103,7 @@
          total_country_seconds,
          country_name,
          artist_rank_time_in_country,
+         artist_id,
          artist_name,
          artist_play_seconds
     FROM rankings_time
@@ -111,6 +115,7 @@
          total_country_plays,
          top.country_name,
          artist_rank_in_country,
+         top.artist_id,
          top.artist_name,
          artist_play_count,
          country_row_time,
@@ -118,6 +123,7 @@
          total_country_seconds,
          top_time.country_name,
          artist_rank_time_in_country,
+         top_time.artist_id,
          top_time.artist_name,
          artist_play_seconds,
          COALESCE(country_rank_year, -1),
@@ -137,6 +143,7 @@
   (country-plays        s⊥n)
   (country-name-plays   s⊥s)
   (artist-rank-plays    s⊥n)
+  (artist-id-plays      s⊥n) 
   (artist-name-plays    s⊥s)
   (artist-plays         s⊥n)
   (country-rank-seconds s⊥n)
@@ -144,6 +151,7 @@
   (country-seconds      s⊥n)
   (country-name-seconds s⊥s)
   (artist-rank-seconds  s⊥n)
+  (artist-id-seconds    s⊥n) 
   (artist-name-seconds  s⊥s) 
   (artist-seconds       s⊥n)
   (country-rank-year    s⊥n)
