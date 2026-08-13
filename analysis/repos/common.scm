@@ -17,7 +17,9 @@
 (← (stream⇒ f acc ωs)
   (∃ ((ω (ωs))) (? (eof-object? ω) acc (stream⇒ f (f acc ω) ωs))))
 
-(← (stream-sql db α) (cmd→stream (◇ "sqlite3 -tabs " db " " "\"" α "\"")))
+(← (stream-sql db α)
+  (cmd→stream (◇ "sqlite3 -cmd '.mode tabs --quote off' "
+                 db " " "\"" α "\"")))
 
 (← (s⊥ f e ω) (>>= (λ (α) (ensure α (◇ e ": " ω) α)) (either (f ω))))
 (← (s⊥n ω) (s⊥ string->number "not number" ω))
