@@ -1,7 +1,3 @@
-(include-relative "../helpers/prelude.scm")
-(include-relative "../html/common.scm")
-(include-relative "../repos/genres.scm")
-
 (← render-genres-table
   (tabbed-table-transformer "genres"
     `("Plays"

@@ -1,7 +1,3 @@
-(include-relative "../helpers/prelude.scm")
-(include-relative "../html/common.scm")
-(include-relative "../repos/artists.scm")
-
 (← (top-artist-link id name) (λ (ω) (link "../artist-page/" (id ω) (name ω))))
 (← top-artist-link-plays 
   (top-artist-link artists-row-top-plays-artist-id

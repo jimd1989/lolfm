@@ -1,7 +1,3 @@
-(include-relative "../helpers/prelude.scm")
-(include-relative "../html/common.scm")
-(include-relative "../repos/years.scm")
-
 (← render-years-table
   (tabbed-table-transformer "years"
     `("Plays"

@@ -1,9 +1,3 @@
-(import (chicken load))
-(include-relative "../helpers/monad.scm")
-(include-relative "../helpers/syntax.scm")
-(include-relative "../helpers/transducers.scm")
-(include-relative "common.scm")
-
 (← albums-query "
   WITH
     all_albums AS (

@@ -1,7 +1,3 @@
-(include-relative "../helpers/syntax.scm")
-(include-relative "../html/common.scm")
-(include-relative "../repos/artist-pages.scm")
-
 (← render-artist-page-table
   (tabbed-table-transformer "artist-page"
     `("Albums"

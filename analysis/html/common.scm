@@ -1,9 +1,4 @@
-(import (chicken fixnum) (chicken load) (chicken string) srfi-1 sxml-transforms)
-(include-relative "../helpers/monad.scm")
-(include-relative "../helpers/prelude.scm")
-(include-relative "../helpers/sorted-slices.scm")
-(include-relative "../helpers/syntax.scm")
-
+(import (chicken file) (chicken fixnum) (chicken string) srfi-1 sxml-transforms)
 ; figure out css, file naming, etc
 (← (write-html dir file ω)
   (for (← directory-created? (either (create-directory dir #t)))

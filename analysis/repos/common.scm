@@ -1,7 +1,4 @@
-(import (chicken io) (chicken load) (chicken process))
-(include-relative "../helpers/monad.scm")
-(include-relative "../helpers/prelude.scm")
-(include-relative "../helpers/syntax.scm")
+(import (chicken io) (chicken process))
 
 (← (cmd→stream ω)
   (∃ ((port (open-input-pipe ω)))

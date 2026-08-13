@@ -1,8 +1,5 @@
-(import (chicken bitwise) (chicken fixnum) (chicken format)
-        (chicken load) (chicken sort) srfi-1 srfi-4)
-(include-relative "monad.scm")
-(include-relative "prelude.scm")
-(include-relative "syntax.scm")
+(import (chicken bitwise) (chicken fixnum) (chicken format)  (chicken sort) 
+        srfi-1 srfi-4)
 
 (define-record-type slice
   (make-slice length sorts vec)

@@ -1,7 +1,3 @@
-(include-relative "../helpers/prelude.scm")
-(include-relative "../html/common.scm")
-(include-relative "../repos/songs.scm")
-
 (← (song-link id name) (λ (ω) (link "../artist-page/" (id ω) (name ω))))
 (← song-link-plays 
   (song-link song-row-artist-id-plays song-row-artist-name-plays))

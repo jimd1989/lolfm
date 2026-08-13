@@ -1,14 +1,3 @@
-(include-relative "../helpers/prelude.scm")
-(include-relative "../helpers/sorted-slices.scm")
-(include-relative "../html/common.scm")
-(include-relative "../repos/albums.scm")
-(include-relative "../repos/artists.scm")
-(include-relative "../repos/artist-pages.scm")
-(include-relative "../repos/countries.scm")
-(include-relative "../repos/genres.scm")
-(include-relative "../repos/songs.scm")
-(include-relative "../repos/years.scm")
-
 (← (render-main-head)
   `((h1 "lol.fm")
     (p "lolfm is an industry leading amazingly simple scrobbler (ASS). " 

@@ -1,10 +1,3 @@
-(import (chicken load))
-(include-relative "../helpers/monad.scm")
-(include-relative "../helpers/sorted-slices.scm")
-(include-relative "../helpers/syntax.scm")
-(include-relative "../helpers/transducers.scm")
-(include-relative "common.scm")
-
 (← countries-query "
   WITH
   artist_plays AS (

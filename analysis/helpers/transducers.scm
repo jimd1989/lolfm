@@ -1,8 +1,4 @@
-(import (chicken io) (chicken load) (chicken process) srfi-1)
-(include-relative "prelude.scm")
-(include-relative "monad.scm")
-(include-relative "sorted-slices.scm")
-(include-relative "syntax.scm")
+(import (chicken io) (chicken process) srfi-1)
 
 ; Unlike iterators, transducers pre-compose chains of functions that are only
 ; reified against data later, not unlike Haskell fusion. A given transducer in 

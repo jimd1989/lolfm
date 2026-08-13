@@ -1,10 +1,4 @@
-(import (chicken file) (chicken load) (chicken string) srfi-1 sxml-transforms)
-(include-relative "../helpers/monad.scm")
-(include-relative "../helpers/prelude.scm")
-(include-relative "../helpers/syntax.scm")
-(include-relative "../html/common.scm")
-(include-relative "../repos/countries.scm")
-
+(import (chicken file) (chicken string) srfi-1)
 (← (countries-link id name) (λ (ω) (link "../artist-page/" (id ω) (name ω))))
 (← countries-link-plays 
   (countries-link 
