@@ -7,6 +7,7 @@
 (include-relative "./repos/artists.scm")
 (include-relative "./repos/countries.scm")
 (include-relative "./repos/genres.scm")
+(include-relative "./repos/plays.scm")
 (include-relative "./repos/songs.scm")
 (include-relative "./repos/years.scm")
 (include-relative "./transformers/albums.scm")
@@ -14,6 +15,7 @@
 (include-relative "./transformers/artists.scm")
 (include-relative "./transformers/countries.scm")
 (include-relative "./transformers/genres.scm")
+(include-relative "./transformers/plays.scm")
 (include-relative "./transformers/songs.scm")
 (include-relative "./transformers/years.scm")
 
@@ -30,6 +32,7 @@
        (← top-songs ((get-songs DB) transform-songs))
        (← top-genres ((get-genres DB) transform-genres))
        (← top-years ((get-years DB) transform-years))
+       (← recent-plays ((get-plays DB) transform-plays))
        (← ok? (render-main top-artists top-albums top-songs top-genres
                            all-countries top-years))
        (yield all-countries))
