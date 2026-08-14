@@ -82,8 +82,6 @@
    ORDER BY top_plays_rank
    ")
 
-(← (stream-artists db) (stream-sql db artists-query))
-
 (define-sql-record artists-row
   (top-plays-artist-id     s⊥n)
   (top-plays-artist-name   s⊥s)
@@ -105,8 +103,6 @@
     (? (∅? α) `(,l ,ω) `(,(+ n l) ,α))))
 
 (← (get-artists db)
-  (λ (r) (†⇒ stream⇒
-             (∘ († decode-artists-row) r) 
-             (λ (acc ω) (lift2 keep-first-page acc ω))
-             (right `(0 ,∅)) 
-             (stream-artists db))))
+  (get-sql db artists-query decode-artists-row
+           (λ (acc ω) (lift2 keep-first-page acc ω))
+           (right `(0 ,∅))))

@@ -85,8 +85,6 @@
       ORDER BY song_rank_plays ASC
 ")
 
-(← (stream-songs db) (stream-sql db songs-query))
-
 (define-sql-record song-row
   (song-id-plays       s⊥n)
   (plays               s⊥n)
@@ -115,8 +113,6 @@
     (? (∅? α) `(,l ,ω) `(,(+ n l) ,α))))
 
 (← (get-songs db)
-  (λ (r) (†⇒ stream⇒ 
-             (∘ († decode-song-row) r)
-             (λ (acc ω) (lift2 keep-first-page acc ω))
-             (right `(0 ,∅)) 
-             (stream-songs db))))
+  (get-sql db songs-query decode-song-row
+           (λ (acc ω) (lift2 keep-first-page acc ω))
+           (right `(0 ,∅))))

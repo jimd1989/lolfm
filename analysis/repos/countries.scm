@@ -128,8 +128,6 @@
    ORDER BY country_row ASC, artist_rank_in_country ASC
    ")
 
-(← (stream-countries db) (stream-sql db countries-query))
-
 (define-sql-record countries-row
   (country-rank-plays   s⊥n)
   (country-id-plays     s⊥n)
@@ -151,8 +149,6 @@
   (country-plays-year   s⊥n))
 
 (← (get-countries db)
-  (λ (r) (†⇒ stream⇒ 
-             (∘ († decode-countries-row) r)
-             (λ (acc ω) (lift2 ⊆v⊂ ω acc))
-             (right (slice)) 
-             (stream-countries db))))
+  (get-sql db countries-query decode-countries-row 
+           (λ (acc ω) (lift2 ⊆v⊂ ω acc))
+           (right (slice))))

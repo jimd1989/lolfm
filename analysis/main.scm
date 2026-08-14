@@ -15,5 +15,5 @@
        (← recent-plays ((get-plays DB) transform-plays))
        (← ok? (render-main top-artists top-albums top-songs top-genres
                            all-countries top-years))
-       (yield all-countries))
+       (yield top-albums))
 )

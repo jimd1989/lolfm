@@ -51,8 +51,6 @@
       ORDER BY year_rank_plays ASC
 ")
 
-(← (stream-years db) (stream-sql db years-query))
-
 (define-sql-record year-row
   (year-plays   s⊥n)
   (plays        s⊥n)
@@ -69,8 +67,6 @@
     (? (∅? α) `(,l ,ω) `(,(+ n l) ,α))))
 
 (← (get-years db)
-  (λ (r) (†⇒ stream⇒ 
-             (∘ († decode-year-row) r)
-             (λ (acc ω) (lift2 keep-first-page acc ω))
-             (right `(0 ,∅)) 
-             (stream-years db))))
+  (get-sql db years-query decode-year-row
+           (λ (acc ω) (lift2 keep-first-page acc ω))
+           (right `(0 ,∅))))

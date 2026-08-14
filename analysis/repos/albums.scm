@@ -74,8 +74,6 @@
       ORDER BY album_rank_plays ASC
 ")
 
-(← (stream-albums db) (stream-sql db albums-query))
-
 (define-sql-record album-row
   (album-id-plays      s⊥n)
   (plays               s⊥n)
@@ -101,8 +99,5 @@
     (? (∅? α) `(,l ,ω) `(,(+ n l) ,α))))
 
 (← (get-albums db)
-  (λ (r) (†⇒ stream⇒ 
-             (∘ († decode-album-row) r)
-             (λ (acc ω) (lift2 keep-first-page acc ω))
-             (right `(0 ,∅)) 
-             (stream-albums db))))
+  (get-sql db albums-query decode-album-row 
+           (λ (acc ω) (lift2 keep-first-page acc ω)) (right `(0 ,∅))))

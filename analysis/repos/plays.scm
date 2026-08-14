@@ -10,8 +10,6 @@
    ORDER BY date DESC 
 ")
 
-(← (stream-plays db) (stream-sql db plays-query))
-
 (define-sql-record plays-row
   (date s⊥s)
   (artist-id s⊥n)
@@ -24,8 +22,6 @@
     (? (∅? α) `(,l ,ω) `(,(+ n l) ,α))))
 
 (← (get-plays db)
-  (λ (r) (†⇒ stream⇒ 
-             (∘ († decode-plays-row) r)
-             (λ (acc ω) (lift2 keep-first-page acc ω))
-             (right `(0 ,∅)) 
-             (stream-plays db))))
+  (get-sql db plays-query decode-plays-row
+           (λ (acc ω) (lift2 keep-first-page acc ω))
+           (right `(0 ,∅))))

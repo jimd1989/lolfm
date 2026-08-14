@@ -60,8 +60,6 @@
       ORDER BY genre_rank_plays ASC
 ")
 
-(← (stream-genres db) (stream-sql db genres-query))
-
 (define-sql-record genre-row
   (genre-id-plays     s⊥n)
   (plays              s⊥n)
@@ -81,8 +79,6 @@
     (? (∅? α) `(,l ,ω) `(,(+ n l) ,α))))
 
 (← (get-genres db)
-  (λ (r) (†⇒ stream⇒ 
-             (∘ († decode-genre-row) r)
-             (λ (acc ω) (lift2 keep-first-page acc ω))
-             (right `(0 ,∅)) 
-             (stream-genres db))))
+  (get-sql db genres-query decode-genre-row
+           (λ (acc ω) (lift2 keep-first-page acc ω))
+           (right `(0 ,∅))))

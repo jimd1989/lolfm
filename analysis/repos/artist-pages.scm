@@ -54,8 +54,6 @@ WITH
                             AND ranked_albums.album_rank = sequence.rank
 ")
 
-(← (stream-artist-pages db) (stream-sql db artist-pages-query))
-
 (define-sql-record artist-page-row
   (artist-id   s⊥n)
   (artist-name s⊥s)
@@ -68,8 +66,6 @@ WITH
   (album-plays s⊥n))
 
 (← (get-artist-pages db)
-  (λ (r) (†⇒ stream⇒ 
-             (∘ († decode-artist-page-row) r)
-             (λ (_ ω) (⊙ (K #t) ω))
-             (right #t) 
-             (stream-artist-pages db))))
+  (get-sql db artist-pages-query decode-artist-page-row
+           (λ (_ ω) (⊙ (K #t) ω)) 
+           (right #t)))

@@ -1,9 +1,16 @@
 (import (chicken io) (chicken process))
 
 (← (cmd→stream ω)
-  (∃ ((port (open-input-pipe ω)))
-    (λ () (∃ ((α (read-line port)))
-      (? (eof-object? α) (begin (close-input-pipe port) α) α)))))
+  (for (← port (either (open-input-pipe ω)))
+       (eof? (eof-object? (peek-char port)))
+       (exit-code (? eof? (close-input-pipe port) -1)) ; close to read any error
+       (error? (> exit-code 0))
+       (new-port (? (∧ (not error?) eof?) (open-input-pipe ω) port))
+       (← _ (ensure (not error?) (◇ "SQL error " exit-code) #f))
+       (reader 
+         (λ () (∃ ((α (read-line new-port)))
+          (? (eof-object? α) (begin (close-input-pipe new-port) α) α))))
+       (yield reader)))
 
 ; if transducer is using call/cc, consider "mapping" in the resouce lifecycle:
 ; things need to be a bit inside-out here. think about it
@@ -20,6 +27,12 @@
 (← (stream-sql db α)
   (cmd→stream (◇ "sqlite3 -cmd '.mode tabs --quote off' "
                  db " " "\"" α "\"")))
+
+(← (get-sql db query decode reduce acc)
+  (λ (r)
+    (for (← stream (stream-sql db query))
+         (← result (†⇒ stream⇒ (∘ († decode) r) reduce acc stream))
+         (yield result))))
 
 (← (s⊥ f e ω) (>>= (λ (α) (ensure α (◇ e ": " ω) α)) (either (f ω))))
 (← (s⊥n ω) (s⊥ string->number "not number" ω))
