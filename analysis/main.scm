@@ -1,8 +1,9 @@
 (import (chicken pretty-print))
-(← DB "./lolfm.db")
+(← DB "~/.config/cmus/lolfm.db")
 
 (pp
   (for (← _ (write-css "/tmp/lolfm" "style.css" css))
+       (← discoveries ((get-discoveries DB) (†⊙ (†↑n 15))))
        (← artist-pages ((get-artist-pages DB) transform-artist-pages))
        (← all-countries ((get-countries DB) transform-individual-countries))
        (top-countries (sort-top-countries all-countries))
@@ -13,7 +14,7 @@
        (← top-genres ((get-genres DB) transform-genres))
        (← top-years ((get-years DB) transform-years))
        (← recent-plays ((get-plays DB) transform-plays))
-       (← ok? (render-main top-artists top-albums top-songs top-genres
-                           all-countries top-years))
-       (yield top-albums))
+       (← ok? (render-main recent-plays discoveries top-artists top-albums 
+                           top-songs top-genres all-countries top-years))
+       (yield discoveries))
 )

@@ -214,16 +214,36 @@
        (more '(h3 (a (@ (href "./years/1.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
-(← (render-main artists albums songs genres countries years)
+(← render-summary-table
+  (tabbed-table-transformer "plays"
+    `("Plays"
+       ,(table-transformer 'plays
+         `("Date" ,plays-row-date ,I)
+         `("Artist" ,plays-row-artist-name ,I)
+         `(,(loved #t) ,plays-row-loved? ,loved)
+         `("Song" ,plays-row-title ,I)))))
+
+(← (render-summary recent-plays discoveries)
+  (for (title '(h2 "Activity"))
+       (← total-plays (ι 0 recent-plays))
+       (← plays (⊙ (D ↑n 15) (ι 1 recent-plays)))
+       (← table (render-summary-table plays))
+       (desc `(p ,(n⊥s total-plays) " plays."))
+       (more '(h3 (a (@ (href "./plays/1.html")) "More")))
+       (yield `(,title ,desc ,table ,more))))
+
+(← (render-main recent-plays discoveries artists albums songs genres countries 
+                years)
   (for (name "lol.fm")
        (head (render-main-head))
+       (← summary-html (render-summary recent-plays discoveries))
        (← artists-html (render-main-top-artists artists))
        (← albums-html (render-main-albums albums))
        (← songs-html (render-main-songs songs))
        (← genres-html (render-main-genres genres))
        (← countries-html (render-main-countries countries))
        (← years-html (render-main-years years))
-       (contents ($ html `(,name ,@head ,artists-html ,albums-html 
+       (contents ($ html `(,name ,@head ,summary-html ,artists-html ,albums-html 
                            ,songs-html ,genres-html ,countries-html
                            ,years-html)))
        (filename "lolfm.html")

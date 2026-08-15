@@ -121,6 +121,30 @@
     (J ⊆vρ! (∘ (D + -1) ⊆vρ) ⊆v⊥⊆v)
     (λ (buf) (v! 0 (⊆vι -1 buf) (⊆vv buf)) (⊆vρ! 1 buf))
     I))
+
+(← (t-take n)
+  (λ (r)
+    (∃ ((count n))
+      (λλ (() (r))
+          ((acc) (r acc))
+          ((acc ω)
+           (set! count (- count 1))
+           (? (> count 0) (r acc ω) (r (r acc ω))))))))
+
+(← (t-take n)
+  (λ (r)
+    (∃ ((count n))
+      (λλ (() (r))
+          ((acc) (r acc))
+          ((acc ω)
+           (? (> count 0)
+              (begin
+                (set! count (- count 1))
+                (? (= count 0)
+                   (r (r acc ω))
+                   (r acc ω)))
+              (r acc)))))))
+
 ; another tricky one. holds ω in memory until n matches arrive, then releases
 ; all grouped together. Unlike other transducers, does not flush anything
 ; partial
@@ -160,7 +184,7 @@
 
 (← †⊆ t-chunk) (← †⊆? t-chunk-on) (← †⊆v t-chunk-slice)
 (← †⊆v? t-chunk-on-slice) (← †↕ t-join-on) (← †? t-filter)
-(← †§ t-paginate)
+(← †§ t-paginate) (← †↑n t-take)
 
 ; traversal → how ωs is traversed: foldl, etc
 ; pipeline  → the pipeline, transducer itself
