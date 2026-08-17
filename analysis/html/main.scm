@@ -214,29 +214,52 @@
        (more '(h3 (a (@ (href "./years/1.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
+(← main-plays-summary-link
+  (main-artist-page-link plays-row-artist-id plays-row-artist-name))
+
+(← main-discoveries-summary-link
+  (main-artist-page-link discoveries-row-artist-id discoveries-row-artist-name))
+
+(← main-loved-summary-link
+  (main-artist-page-link loved-row-artist-id loved-row-artist-name))
+
 (← render-summary-table
   (tabbed-table-transformer "plays"
     `("Plays"
        ,(table-transformer 'plays
-         `("Date" ,plays-row-date ,I)
-         `("Artist" ,plays-row-artist-name ,I)
-         `(,(loved #t) ,plays-row-loved? ,loved)
-         `("Song" ,plays-row-title ,I)))))
+         `("Date" ,(∘ plays-row-date ↑) ,I)
+         `("Artist" ,↑ ,main-plays-summary-link)
+         `(,(loved #t) ,(∘ plays-row-loved? ↑) ,loved)
+         `("Song" ,(∘ plays-row-title ↑) ,I)))
+    `("Discoveries"
+       ,(table-transformer 'plays
+         `("Date" ,(∘ discoveries-row-date ↑↓) ,I)
+         `("Artist" ,↑↓ ,main-discoveries-summary-link)
+         `("Title" ,(∘ discoveries-row-title ↑↓) ,I)))
+    `("Loves"
+       ,(table-transformer 'plays
+         `("Date" ,(∘ loved-row-date ↑↓ ↓) ,I)
+         `("Artist" ,(∘ ↑↓ ↓) ,main-loved-summary-link)
+         `("Song" ,(∘ loved-row-title ↑↓ ↓) ,I)))))
 
-(← (render-summary recent-plays discoveries)
+(← (render-summary plays discoveries loved)
   (for (title '(h2 "Activity"))
-       (← total-plays (ι 0 recent-plays))
-       (← plays (⊙ (D ↑n 15) (ι 1 recent-plays)))
-       (← table (render-summary-table plays))
+       (← total-plays (ι 0 plays))
+       (← recent-plays (⊙ (D ↑n 15) (ι 1 plays)))
+       (recent-discoveries (↑n 15 discoveries))
+       (recent-loved (↑n 15 loved))
+       (summary (∀ (λ (α β ω) `(,α ,β ,ω)) 
+                   recent-plays recent-discoveries recent-loved))
+       (← table (render-summary-table summary))
        (desc `(p ,(n⊥s total-plays) " plays."))
        (more '(h3 (a (@ (href "./plays/1.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
-(← (render-main recent-plays discoveries artists albums songs genres countries 
-                years)
+(← (render-main recent-plays discoveries loved artists albums 
+                songs genres countries years)
   (for (name "lol.fm")
        (head (render-main-head))
-       (← summary-html (render-summary recent-plays discoveries))
+       (← summary-html (render-summary recent-plays discoveries loved))
        (← artists-html (render-main-top-artists artists))
        (← albums-html (render-main-albums albums))
        (← songs-html (render-main-songs songs))

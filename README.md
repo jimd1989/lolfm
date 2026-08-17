@@ -6,7 +6,7 @@ Listens to cmus status and populates a sqlite database with playback data, like 
 
 Intended for people who know how to script/pipe/etc and query SQL. No support offered.
 
-[Demo here](http://dalrym.pl/lolfm.html)
+[Demo here](http://dalrym.pl/lolfm/lolfm.html)
 
 ## New in 2025
 
@@ -111,3 +111,5 @@ I have some writeups and helper scripts in the `conversion-notes` folder. This w
 ## Analysis
 
 Write whatever SQL scripts you'd like and make cron jobs for them. See the `db` folder for examples. The `html-report.scm` script also demonstrates how they might be incorporated into a static html template.
+
+A more complete frontend can be generated with `make analysis` if you have Chicken Scheme. I am on OpenBSD and your Chicken command might just be `csi` rather than `chicken-csi`. You can change this. This rebuilds the entire world and can take some time, but I still prefer it to exposing a full dynamic app.
