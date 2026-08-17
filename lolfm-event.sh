@@ -1,3 +1,3 @@
 #!/bin/sh
 
-lolfm event /path/to/your/db.sql
+lolfm event /home/jim/.config/cmus/lolfm.db

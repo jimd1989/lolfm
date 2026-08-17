@@ -352,6 +352,8 @@ pub fn run(db: &Connection) -> Result<(), Er> {
     SELECT id, name, 0 FROM artists_old;
     
     DROP TABLE artists_old;
+
+    UPDATE countries SET name = 'Turkey' WHERE id = 230;
     ";
     Ok(db.execute(query)?)
 }
