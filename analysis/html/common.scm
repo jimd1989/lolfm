@@ -201,7 +201,7 @@ table {
   color:white;
   background-color:#0493DD;
 }
-h1 span.artist-flag a {
+h1 span.country-flag a {
   text-decoration: none;
 }
 "

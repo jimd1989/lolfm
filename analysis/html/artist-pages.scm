@@ -13,7 +13,7 @@
          `("Plays" ,artist-page-row-song-plays ,n⊥s)))))
 
 (← (render-artist-page-flag code id)
-   `(span (@ (class "artist-flag")) 
+   `(span (@ (class "country-flag")) 
           ,(link "../countries/" id (render-flag code))))
 
 (← (render-artist-pages rows)

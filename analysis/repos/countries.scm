@@ -1,12 +1,13 @@
 (← countries-query "
   WITH
   artist_plays AS (
-    SELECT artists.id          AS artist_id, 
-           artists.name        AS artist_name,
-           artists.country     AS country_id, 
-           countries.name      AS country_name,
-           COUNT(plays.song)   AS artist_play_count,
-           SUM(plays.duration) AS artist_play_seconds
+    SELECT artists.id             AS artist_id, 
+           artists.name           AS artist_name,
+           artists.country        AS country_id, 
+           countries.name         AS country_name,
+           countries.abbreviation AS country_code,
+           COUNT(plays.song)      AS artist_play_count,
+           SUM(plays.duration)    AS artist_play_seconds
       FROM plays
       JOIN songs     ON plays.song      = songs.id
       JOIN artists   ON songs.artist    = artists.id
@@ -39,6 +40,7 @@
   ),
   rankings AS (
     SELECT artist_plays.country_id,
+           artist_plays.country_code,
            artist_plays.country_name,
            country_totals.total_country_plays,
            artist_plays.artist_id,
@@ -53,6 +55,7 @@
   ),
   rankings_time AS (
     SELECT artist_plays.country_id,
+           artist_plays.country_code,
            artist_plays.country_name,
            country_totals.total_country_seconds,
            artist_plays.artist_id,
@@ -77,6 +80,7 @@
   SELECT ROW_NUMBER() OVER (ORDER BY total_country_plays DESC) AS top_n,
          DENSE_RANK() OVER (ORDER BY total_country_plays DESC) AS country_row,
          country_id,
+         country_code,
          total_country_plays,
          country_name,
          artist_rank_in_country,
@@ -93,6 +97,7 @@
          DENSE_RANK()
                  OVER (ORDER BY total_country_seconds DESC) AS country_row_time,
          country_id,
+         country_code,
          total_country_seconds,
          country_name,
          artist_rank_time_in_country,
@@ -105,6 +110,7 @@
    )
   SELECT country_row,
          top.country_id,
+         top.country_code,
          total_country_plays,
          top.country_name,
          artist_rank_in_country,
@@ -113,6 +119,7 @@
          artist_play_count,
          country_row_time,
          top_time.country_id,
+         top_time.country_code,
          total_country_seconds,
          top_time.country_name,
          artist_rank_time_in_country,
@@ -131,6 +138,7 @@
 (define-sql-record countries-row
   (country-rank-plays   s⊥n)
   (country-id-plays     s⊥n)
+  (country-code-plays   s⊥s)
   (country-plays        s⊥n)
   (country-name-plays   s⊥s)
   (artist-rank-plays    s⊥n)
@@ -139,6 +147,7 @@
   (artist-plays         s⊥n)
   (country-rank-seconds s⊥n)
   (country-id-seconds   s⊥n)
+  (country-code-seconds s⊥s)
   (country-seconds      s⊥n)
   (country-name-seconds s⊥s)
   (artist-rank-seconds  s⊥n)

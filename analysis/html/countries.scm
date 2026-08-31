@@ -7,6 +7,10 @@
   (countries-link 
     countries-row-artist-id-seconds countries-row-artist-name-seconds))
 
+(← (render-country-page-flag code id)
+   `(span (@ (class "country-flag")) 
+          ,(link "./" id (render-flag code))))
+
 (← render-country-artists-table
   (tabbed-table-transformer "country"
     `("Plays"
@@ -23,9 +27,11 @@
 (← (render-country-artists rows)
   (for (← table (render-country-artists-table rows))
        (← head (either (⊆vι 0 rows)))
-       (name (countries-row-country-name-plays head))
+       (name (◇ " " (countries-row-country-name-plays head)))
+       (flag (render-country-page-flag (countries-row-country-code-plays head)
+                                       (countries-row-country-id-plays head)))
        (id (countries-row-country-id-plays head))
-       (contents (html name `(h1 ,name) table))
+       (contents (html name `(h1 ,flag ,name) table))
        (filename (◇ id ".html"))
        (← ok? (write-html "/tmp/lolfm/countries" filename contents))
        (yield ok?)))
