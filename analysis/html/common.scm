@@ -1,4 +1,5 @@
-(import (chicken file) (chicken fixnum) (chicken string) srfi-1 sxml-transforms)
+(import (chicken bitwise) (chicken blob) (chicken file) (chicken fixnum) 
+        (chicken string) srfi-1 srfi-4 sxml-transforms)
 ; figure out css, file naming, etc
 (← (write-html dir file ω)
   (for (← directory-created? (either (create-directory dir #t)))
@@ -101,6 +102,20 @@
                                "../style.css")))))
           (body ,@body)))
 
+(import (chicken bitwise) (chicken blob) srfi-4)
+
+(← (flag-bytes code)
+  (list (bitwise-ior 240 (arithmetic-shift code -18))
+        (bitwise-ior 128 (bitwise-and 63 (arithmetic-shift code -12)))
+        (bitwise-ior 128 (bitwise-and 63 (arithmetic-shift code -6)))
+        (bitwise-ior 128 (bitwise-and 63 code))))
+
+(← (render-flag code)
+  (∃ ((chars (string->list code))
+      (code-points (∀ (λ (c) (+ 127397 (char->integer c))) chars))
+      (byte-list ($ append (∀ flag-bytes code-points))))
+    (blob->string (u8vector->blob (list->u8vector byte-list)))))
+
 (← css
 "
 .tabset > input[type=\"radio\"] {
@@ -185,6 +200,9 @@ table {
 .tabset > input:checked + label {
   color:white;
   background-color:#0493DD;
+}
+h1 span.artist-flag a {
+  text-decoration: none;
 }
 "
 )

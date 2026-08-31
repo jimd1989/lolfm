@@ -1,11 +1,14 @@
 (← artist-pages-query "
 WITH 
   all_artists AS (
-    SELECT DISTINCT artists.id AS artist_id, 
-                    artists.name AS artist_name
+    SELECT DISTINCT artists.id             AS artist_id, 
+                    artists.name           AS artist_name,
+                    artists.country        AS artist_country_id,
+                    countries.abbreviation AS artist_country_code
      FROM plays
-     JOIN songs   ON plays.song = songs.id
-     JOIN artists ON songs.artist = artists.id
+     JOIN songs     ON plays.song = songs.id
+     JOIN artists   ON songs.artist = artists.id
+     JOIN countries ON artists.country = countries.id
   ),
   ranked_songs AS (
     SELECT artists.id        AS artist_id,
@@ -39,6 +42,8 @@ WITH
   )
   SELECT all_artists.artist_id,
          all_artists.artist_name,
+         all_artists.artist_country_id,
+         all_artists.artist_country_code,
          COALESCE(song_rank, -1),
          COALESCE(song_title, '∅'),
          COALESCE(song_total_plays, -1),
@@ -57,6 +62,8 @@ WITH
 (define-sql-record artist-page-row
   (artist-id   s⊥n)
   (artist-name s⊥s)
+  (country-id s⊥n)
+  (country-code s⊥s)
   (song-rank   s⊥n)
   (song-title  s⊥s)
   (song-plays  s⊥n)
