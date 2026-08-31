@@ -1,9 +1,13 @@
+(← (plays-artist-page-link row)
+  (link "../artist-page/" (plays-row-artist-id row)
+                          (plays-row-artist-name row)))
+
 (← render-plays-table
   (tabbed-table-transformer "plays"
     `("Plays"
        ,(table-transformer 'plays
          `("Date" ,plays-row-date ,I)
-         `("Artist" ,plays-row-artist-name ,I)
+         `("Artist" ,I ,plays-artist-page-link)
          `(,(loved #t) ,plays-row-loved? ,loved)
          `("Song" ,plays-row-title ,I)))))
 
