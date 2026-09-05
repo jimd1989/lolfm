@@ -10,6 +10,7 @@
      (← top-artists ((get-artists DB) transform-top-artists))
      (← top-albums ((get-albums DB) transform-albums))
      (← top-songs ((get-songs DB) transform-songs))
+     (← genre-pages ((get-genre-pages DB) transform-genre-pages))
      (← top-genres ((get-genres DB) transform-genres))
      (← top-years ((get-years DB) transform-years))
      (← recent-plays ((get-plays DB) transform-plays))

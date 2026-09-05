@@ -127,22 +127,30 @@
        (more '(h3 (a (@ (href "./songs/1.html")) "More")))
        (yield `(,title ,desc ,table ,more))))
 
+(← (main-genre-link id name) (λ (ω) (link "./genre-page/" (id ω) (name ω))))
+(← main-genre-link-plays 
+  (main-genre-link genre-row-genre-id-plays genre-row-genre-name-plays))
+(← main-genre-link-seconds
+  (main-genre-link genre-row-genre-id-seconds genre-row-genre-name-seconds))
+(← main-genre-link-year
+  (main-genre-link genre-row-genre-id-year genre-row-genre-name-year))
+
 (← render-main-genres-table
   (tabbed-table-transformer "top-genres"
     `("Plays"
        ,(table-transformer 'plays
          `("#" ,genre-row-rank-plays ,I)
-         `("Genre" ,genre-row-genre-name-plays ,I)
+         `("Genre" ,main-genre-link-plays ,I)
          `("Plays" ,genre-row-plays ,n⊥s)))
     `("Hours"
        ,(table-transformer 'seconds
          `("#" ,genre-row-rank-seconds ,I)
-         `("Genre" ,genre-row-genre-name-seconds ,I)
+         `("Genre" ,main-genre-link-seconds ,I)
          `("Hours" ,genre-row-seconds ,seconds⊥hours)))
     `("Year"
        ,(table-transformer 'plays
          `("#" ,genre-row-rank-year ,I)
-         `("Genre" ,genre-row-genre-name-year ,I)
+         `("Genre" ,main-genre-link-year ,I)
          `("Plays" ,genre-row-plays-year ,n⊥s)))))
 
 (← (render-main-genres genres)

@@ -1,14 +1,20 @@
+(← (genre-link id name) (λ (ω) (link "../genre-page/" (id ω) (name ω))))
+(← genre-link-plays 
+  (genre-link genre-row-genre-id-plays genre-row-genre-name-plays))
+(← genre-link-seconds
+  (genre-link genre-row-genre-id-seconds genre-row-genre-name-seconds))
+
 (← render-genres-table
   (tabbed-table-transformer "genres"
     `("Plays"
        ,(table-transformer 'plays
          `("#" ,genre-row-rank-plays ,I)
-         `("Genre" ,genre-row-genre-name-plays ,I)
+         `("Genre" ,genre-link-plays ,I)
          `("Plays" ,genre-row-plays ,n⊥s)))
     `("Hours"
        ,(table-transformer 'seconds
          `("#" ,genre-row-rank-seconds ,I)
-         `("Genre" ,genre-row-genre-name-seconds ,I)
+         `("Genre" ,genre-link-seconds ,I)
          `("Hours" ,genre-row-seconds ,seconds⊥hours)))
     `("Year"
        ,(table-transformer 'plays
