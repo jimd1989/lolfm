@@ -30,7 +30,7 @@
           ((acc) (? (left? acc) (r acc) (g acc)))
           ((acc ω) (? (left? ω) (r ω) (g acc (get ω))))))))
 
-(← (t-map f) (t-m f right))
+(← (t-map f) (t-m f make-right))
 (← (t-bind f) (t-m f I))
 
 (← † t-pure) (← †⊙ t-map) (← †>>= t-bind)
@@ -70,7 +70,8 @@
 ; for void functions fs
 (← (tap f) (∘ (t-mux f (t-pure I)) (t-gear (t-unit) (t-pure I))))
 
-(← (tap-m f) (∘ (t-mux f (t-pure right)) (†⊙ (t-gear (t-unit) (t-pure I)))))
+(← (tap-m f) (∘ (t-mux f (t-pure make-right)) 
+                (†⊙ (t-gear (t-unit) (t-pure I)))))
 
 (← †<< tap) (← †<$ tap-m) (← (†<* f) (†>>= (†<$ f))) 
 

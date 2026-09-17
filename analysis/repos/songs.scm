@@ -115,4 +115,4 @@
 (← (get-songs db)
   (get-sql db songs-query decode-song-row
            (λ (acc ω) (lift2 keep-first-page acc ω))
-           (right `(0 ,∅))))
+           (make-right `(0 ,∅))))

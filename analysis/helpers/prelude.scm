@@ -13,6 +13,7 @@
 (← ≡ equal?) (← ∅ '()) (← ∅? null?) (← ρ length) (← ρs string-length) (← ◇ conc) 
 (← ⊂ cons) (← ∀ map) (← $ apply) (← ⊖ reverse) (← ($$ f ω) (f ω)) 
 (← ⇒ foldr) (← ⇐ foldl) (← ¬ not) (← ⍨ flip) (← ∀∀ for-each) (← ∞ +inf.0)
+(← call/cc call-with-current-continuation)
 (← ⊆ list) (← ∀? filter)
 (← (I ω) ω)
 (← (K ω) (λ (α) ω))
@@ -36,37 +37,37 @@
 (← (⍋ f ωs) (sort ωs f))
 
 (define-record-type right
-  (right value)
+  (make-right value)
   right?
   (value right-value))
 
-(define-record-printer (right ω port)
-  (fprintf port "#R(~S)" (right-value ω)))
+(set-record-printer! right 
+  (λ (ω port) (fprintf port "#R(~S)" (right-value ω))))
 
-(set-sharp-read-syntax! #\R (λ (port) `(right ,(↑ (read port)))))
+(set-sharp-read-syntax! #\R (λ (port) `(make-right ,(↑ (read port)))))
 
 (define-record-type left
-  (left value)
+  (make-left value)
   left?
   (value left-value))
 
-(define-record-printer (left ω port)
-  (fprintf port "#L(~S)" (left-value ω)))
+(set-record-printer! left
+  (λ (ω port) (fprintf port "#L(~S)" (left-value ω))))
 
-(set-sharp-read-syntax! #\L (λ (port) `(left ,(↑ (read port)))))
+(set-sharp-read-syntax! #\L (λ (port) `(make-left (↑ (read port)))))
 
 (define-syntax either
   (syntax-rules ()
     ((_ f ...)
      (∃ ((ω (condition-case ((λ () f ...))
               (e (exn) (left (get-condition-property e 'exn 'message))))))
-       (? (left? ω) ω (right ω))))))
+       (? (left? ω) ω (make-right ω))))))
 
 (define-syntax for
   (syntax-rules (← ▽ yield)
-    ((_ ▽ △ (yield α) Ω ... ) (△ (right α)))
+    ((_ ▽ △ (yield α) Ω ... ) (△ (make-right α)))
     ((_ ▽ △ (← α β)  ω Ω ...) (△+_ △ (>>= (λ (α) (for ▽ △ ω Ω ...)) β)))
-    ((_ ▽ △ (  α β)  ω Ω ...) (>>= (λ (α) (for ▽ △ ω Ω ...)) (right β)))
+    ((_ ▽ △ (  α β)  ω Ω ...) (>>= (λ (α) (for ▽ △ ω Ω ...)) (make-right β)))
     ((_ ▽ △                ω)  ω)
     ((_                α ...) (call/cc (λ (△) (for ▽ △ α ...))))))
 
@@ -75,8 +76,8 @@
 (← (either-guard f Fω) (? (either? Fω) (f Fω) (error "not either" Fω)))
 (← (gett Fω) (? (_+? Fω) (_+ Fω) (error (+_ Fω))))
 (← get (D either-guard gett))
-(← (ensure p e ω) (? p (right ω) (left e)))
-(← (fmapp f Fω) (? (_+? Fω) (right (f (_+ Fω))) Fω))
+(← (ensure p e ω) (? p (make-right ω) (make-left e)))
+(← (fmapp f Fω) (? (_+? Fω) (make-right (f (_+ Fω))) Fω))
 (← (fmap f Fω) (either-guard (D fmapp f) Fω))
 (← (bindd f Fω) (? (_+? Fω) (f (_+ Fω)) Fω))
 (← (bind f Fω) (either-guard (D bindd f) Fω))
@@ -98,9 +99,9 @@
 (← (break-left △ Fω) (? (+_? Fω) (△ Fω) Fω))
 (← △+_ break-left)
 (← (sequencee Fωs)
-  (call/cc (λ (△) (⇒ (λ (α acc) (△+_ △ (lift22 ⊂ α acc))) (right ∅) Fωs))))
+  (call/cc (λ (△) (⇒ (λ (α acc) (△+_ △ (lift22 ⊂ α acc))) (make-right ∅) Fωs))))
 (← (sequence Fωs)
-  (call/cc (λ (△) (⇒ (λ (α acc) (△+_ △ (lift2 ⊂ α acc))) (right ∅) Fωs))))
+  (call/cc (λ (△) (⇒ (λ (α acc) (△+_ △ (lift2 ⊂ α acc))) (make-right ∅) Fωs))))
 (← (traversee f Fωs) (sequencee (∀ f Fωs)))
 (← (traverse f Fωs) (sequence (∀ f Fωs)))
 (← (lmapp f Fω) (? (+_? Fω) (left (f (+_ Fω))) Fω))

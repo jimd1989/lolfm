@@ -24,4 +24,4 @@
 (← (get-plays db)
   (get-sql db plays-query decode-plays-row
            (λ (acc ω) (lift2 keep-first-page acc ω))
-           (right `(0 ,∅))))
+           (make-right `(0 ,∅))))

@@ -1,4 +1,4 @@
-(import (chicken bitwise) (chicken blob) (chicken file) (chicken fixnum) 
+(import (chicken bitwise) (chicken bytevector) (chicken file) (chicken fixnum) 
         (chicken string) srfi-1 srfi-4 sxml-transforms)
 ; figure out css, file naming, etc
 (← (write-html dir file ω)
@@ -44,7 +44,7 @@
       (wrapper (∘ (D tag 'table) (D tag 'tbody))))
     (λ (table) ((∘ (◁ wrapper) (◁ (D ⊂ titles)) (◁ (D ∀? (∘ not ∅?))))
                    (? (list? table) 
-                     (right (∀ row-f table))
+                     (make-right (∀ row-f table))
                      (⊆v⍋∀ row-f sort-key table))))))
 
 (← (table-transformer-truncated n sort-key . columns)
@@ -54,7 +54,7 @@
     (λ (table) ((∘ (◁ wrapper) (◁ (D ⊂ titles)) (◁ (D ↑n n))
                    (◁ (D ∀? (∘ not ∅?))))
                    (? (list? table) 
-                     (right (∀ row-f table))
+                     (make-right (∀ row-f table))
                      (⊆v⍋∀ row-f sort-key table))))))
 
 (← tabbed-table-name ↑)
@@ -102,8 +102,6 @@
                                "../style.css")))))
           (body ,@body)))
 
-(import (chicken bitwise) (chicken blob) srfi-4)
-
 (← (flag-bytes code)
   (list (bitwise-ior 240 (arithmetic-shift code -18))
         (bitwise-ior 128 (bitwise-and 63 (arithmetic-shift code -12)))
@@ -114,7 +112,7 @@
   (∃ ((chars (string->list code))
       (code-points (∀ (λ (c) (+ 127397 (char->integer c))) chars))
       (byte-list ($ append (∀ flag-bytes code-points))))
-    (blob->string (u8vector->blob (list->u8vector byte-list)))))
+    (utf8->string (apply bytevector byte-list))))
 
 (← css
 "

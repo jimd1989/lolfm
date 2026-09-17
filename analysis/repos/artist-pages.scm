@@ -75,4 +75,4 @@ WITH
 (← (get-artist-pages db)
   (get-sql db artist-pages-query decode-artist-page-row
            (λ (_ ω) (⊙ (K #t) ω)) 
-           (right #t)))
+           (make-right #t)))

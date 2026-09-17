@@ -100,4 +100,4 @@
 
 (← (get-albums db)
   (get-sql db albums-query decode-album-row 
-           (λ (acc ω) (lift2 keep-first-page acc ω)) (right `(0 ,∅))))
+           (λ (acc ω) (lift2 keep-first-page acc ω)) (make-right `(0 ,∅))))

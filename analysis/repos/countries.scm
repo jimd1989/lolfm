@@ -160,4 +160,4 @@
 (← (get-countries db)
   (get-sql db countries-query decode-countries-row 
            (λ (acc ω) (lift2 ⊆v⊂ ω acc))
-           (right (slice))))
+           (make-right (slice))))

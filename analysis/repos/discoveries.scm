@@ -19,4 +19,4 @@
 (← (get-discoveries db)
   (get-sql db discoveries-query decode-discoveries-row
            (λ (acc ω) (lift2 ⊃ acc ω))
-           (right ∅)))
+           (make-right ∅)))

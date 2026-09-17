@@ -105,4 +105,4 @@
 (← (get-artists db)
   (get-sql db artists-query decode-artists-row
            (λ (acc ω) (lift2 keep-first-page acc ω))
-           (right `(0 ,∅))))
+           (make-right `(0 ,∅))))

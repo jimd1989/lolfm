@@ -8,8 +8,8 @@
   (sorts slice-sorts slice-sorts-set!)
   (vec slice-vec slice-vec-set!))
 
-(define-record-printer (slice ω port)
-  (fprintf port "#~S~S" (∀ ↑ (⊆v⍋ ω)) (⊆v⊥xs ω)))
+(set-record-printer! slice 
+  (λ (ω port) (fprintf port "#~S~S" (∀ ↑ (⊆v⍋ ω)) (⊆v⊥xs ω))))
 
 (← (next-2 n)
   (∃ ((n (- n 1))

@@ -78,4 +78,4 @@
 (← (get-genre-pages db)
   (get-sql db genre-pages-query decode-genre-pages-row
            (λ (_ ω) (⊙ (K #t) ω)) 
-           (right #t)))
+           (make-right #t)))

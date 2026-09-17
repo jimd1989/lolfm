@@ -37,7 +37,7 @@
 (← (s⊥ f e ω) (>>= (λ (α) (ensure α (◇ e ": " ω) α)) (either (f ω))))
 (← (s⊥n ω) (s⊥ string->number "not number" ω))
 (← (s⊥x ω) (s⊥ string->symbol "not valid symbol" ω))
-(← (s⊥s ω) (right ω))
+(← (s⊥s ω) (make-right ω))
 (← s⊥b (∘ (◁ (D = 1)) s⊥n))
 (← (decoder key f) (λ (ω) (⊙ (λ (α) `(,key ,α)) (f ω))))
 (← (decode decoders row) (sequence (∀ $$ decoders (string-split row "\t"))))

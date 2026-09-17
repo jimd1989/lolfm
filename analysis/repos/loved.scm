@@ -18,4 +18,4 @@
 (← (get-loved db)
   (get-sql db loved-query decode-loved-row
            (λ (acc ω) (lift2 ⊃ acc ω))
-           (right ∅)))
+           (make-right ∅)))
