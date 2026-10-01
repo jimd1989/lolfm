@@ -4,6 +4,7 @@ use crate::models::er::Er;
 pub enum ReadTableName {
   Loved,
   Plays,
+  Artists
 }
 
 impl ReadTableName {
@@ -11,6 +12,7 @@ impl ReadTableName {
     match ω {
       α if α.eq_ignore_ascii_case("LOVED") => Ok(ReadTableName::Loved),
       α if α.eq_ignore_ascii_case("PLAYS") => Ok(ReadTableName::Plays),
+      α if α.eq_ignore_ascii_case("ARTISTS") => Ok(ReadTableName::Artists),
       α => Err(format!("invalid table {}", α).into()),
     }
   }

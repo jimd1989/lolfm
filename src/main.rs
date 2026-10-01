@@ -54,6 +54,7 @@ mod repos {
   pub mod songs_to_db;
   pub mod system_time;
   pub mod update_artist_country_in_db;
+  pub mod update_artist_country_in_db_by_name;
 }
 
 mod traits {
@@ -64,6 +65,7 @@ mod traits {
 
 mod transformers {
   pub mod cmus_events_to_lolfm_events;
+  pub mod cmus_tags_to_artists;
   pub mod cmus_tags_to_cmus_events;
   pub mod cmus_tags_to_loved_songs;
   pub mod cmus_tags_to_songs;
