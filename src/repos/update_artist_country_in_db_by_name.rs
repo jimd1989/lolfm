@@ -1,18 +1,27 @@
 use sqlite::Connection;
 
-use crate::helpers::sql_helpers::{sql_execute_void, sql_int, sql_string};
+use crate::helpers::sql_helpers::{sql_execute_void, sql_string};
+use crate::models::artist::Artist;
 use crate::models::er::Er;
 
-/* Update SQL to be a batch JOIN against artists' name */
-pub fn write(db: &Connection, artist_id: i64, country: String) 
+pub fn write(db: &Connection, ω: impl Iterator<Item = Result<Artist, Er>>) 
 -> Result<(), Er> {
   let query = "
     UPDATE artists
-       SET country = (SELECT id FROM countries WHERE abbreviation = ?)
-     WHERE id      = ?
+       SET country = (
+           SELECT id
+             FROM countries
+            WHERE abbreviation = ?
+           )
+     WHERE name = ?
   ";
   let mut statement = db.prepare(query)?;
-  sql_string(&mut statement, 1, country)?;
-  sql_int(&mut statement, 2, artist_id)?;
-  Ok(sql_execute_void(&mut statement)?)
+  for res in ω {
+    let α = res?;
+    sql_string(&mut statement, 1, α.country_abbreviation)?;
+    sql_string(&mut statement, 2, α.name)?;
+    sql_execute_void(&mut statement)?;
+    statement.reset()?;
+  }
+  Ok(())
 }

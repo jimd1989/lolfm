@@ -6,6 +6,7 @@ use crate::repos::cmus_events_to_db;
 use crate::repos::lines_from_stdin;
 use crate::repos::lolfm_events_to_db;
 use crate::repos::loved_songs_to_db;
+use crate::repos::update_artist_country_in_db_by_name;
 use crate::transformers::cmus_events_to_lolfm_events;
 use crate::transformers::cmus_tags_to_artists;
 use crate::transformers::cmus_tags_to_cmus_events;
@@ -40,9 +41,8 @@ fn process(ω: &AppConfig, t: ReadTableName) -> Result<(), Er> {
     ReadTableName::Artists => {
       let ls = lines_from_stdin::get()?;
       let ts = lines_to_cmus_tags::run(ls, "country");
-      let _ss = cmus_tags_to_artists::run(ts);
-      /* write DB */
-      Ok(())
+      let ss = cmus_tags_to_artists::run(ts);
+               update_artist_country_in_db_by_name::write(&ω.db, ss)
     }
   }
 }
