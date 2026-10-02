@@ -56,11 +56,17 @@ pub fn run(ω: &AppConfig, t: DumpTableName, as_events: bool) -> Result<(), Er> 
       Ok(())
     }
     DumpTableName::Artists => {
-      let cs = artists_from_db::get(&ω.db)?;
-      for c in cs {
-        c?.print_row(&mut out)?;
-      }
-      Ok(())
+        let cs = artists_from_db::get(&ω.db)?;
+        if as_events {
+          for c in cs {
+            c?.print_cmus_event(&mut out)?;
+          }
+        } else {
+          for c in cs {
+            c?.print_row(&mut out)?;
+          }
+        }
+        Ok(())
     }
   }
 }
